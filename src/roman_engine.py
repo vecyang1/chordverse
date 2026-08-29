@@ -252,3 +252,44 @@ def get_progression_name(prog_str: str) -> Optional[str]:
     """Get the common industry/theory name for a chord progression if recognized."""
     comma_str, _, _ = normalize_progression_input(prog_str)
     return NAMED_PROGRESSIONS.get(comma_str)
+
+
+def is_subsequence(sub: List[int], main_seq: List[int]) -> bool:
+    """Check if sub list is a contiguous subsegment of main_seq."""
+    return matches_progression_sequence(main_seq, sub, exact=False)
+
+
+def chords_to_roman(chords: List[str], key_center: str = "C", scale_type: str = "major") -> Dict[str, Any]:
+    """
+    Given a list of absolute chords (e.g. ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C']),
+    convert to Roman numerals, scale degrees, and detect recognized patterns.
+    """
+    clean_chords = [c.strip() for c in chords if c.strip()]
+    degrees = []
+    romans = []
+
+    for c in clean_chords:
+        deg, rom = chord_to_scale_degree(c, key_root=key_center, scale_type=scale_type)
+        degrees.append(deg)
+        romans.append(rom)
+
+    deg_str = ",".join(str(d) for d in degrees)
+    rom_str = "-".join(romans)
+
+    recognized = []
+    for pattern_str, name in NAMED_PROGRESSIONS.items():
+        _, _, pat_degs = normalize_progression_input(pattern_str)
+        if is_subsequence(pat_degs, degrees):
+            recognized.append({
+                "pattern": pattern_str,
+                "name": name
+            })
+
+    return {
+        "input_chords": clean_chords,
+        "key": f"{key_center} {scale_type}",
+        "scale_degrees": degrees,
+        "progression_string": deg_str,
+        "roman_numerals": rom_str,
+        "recognized_progressions": recognized
+    }

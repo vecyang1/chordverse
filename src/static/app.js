@@ -187,21 +187,108 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (artist) params.append("artist", artist);
 
-      const res = await fetch(`/api/search?${params.toString()}`);
-      const data = await res.json();
-      currentSearchResults = data;
+      let data = null;
+      try {
+        const res = await fetch(`/api/search?${params.toString()}`);
+        if (res.ok) {
+          data = await res.json();
+        }
+      } catch (e) {
+        // Fallback to client-side static dataset
+      }
 
+      if (!data || !data.songs) {
+        // Pure client-side edge search fallback
+        data = await performClientSideSearch(query, lang, artist);
+      }
+
+      currentSearchResults = data;
       renderResults(data);
       loadNextChordProbabilities(query);
     } catch (err) {
+      console.error(err);
       songsTbody.innerHTML = `
         <tr>
           <td colspan="6" class="empty-state">
-            <span>❌ 检索失败，请检查网络或后端服务。</span>
+            <span>❌ 检索失败，请检查输入或网络。</span>
           </td>
         </tr>
       `;
     }
+  }
+
+  // Client-Side Search Fallback using static data JSON
+  async function performClientSideSearch(query, lang, artist) {
+    const clean = query.replace(/[\s\->|/]+/g, ",").replace(/^,+|,+$/g, "");
+    let zhSongs = [];
+    let enSongs = [];
+    let taxonomy = {};
+
+    try {
+      const [zhResp, enResp, taxResp] = await Promise.all([
+        fetch("/data/chinese_corpus.json"),
+        fetch("/data/western_corpus.json"),
+        fetch("/data/named_progressions.json")
+      ]);
+      if (zhResp.ok) zhSongs = await zhResp.json();
+      if (enResp.ok) enSongs = await enResp.json();
+      if (taxResp.ok) taxonomy = await taxResp.json();
+    } catch (e) {
+      console.warn("Could not load static datasets:", e);
+    }
+
+    let matches = [];
+    const seen = new Set();
+
+    if (["all", "zh"].includes(lang.toLowerCase())) {
+      for (const s of zhSongs) {
+        if (s.progression.includes(clean) || clean.includes(s.progression)) {
+          const k = (s.title + s.artist + s.section).toLowerCase();
+          if (!seen.has(k)) {
+            seen.add(k);
+            matches.push({ ...s, language: "zh", source: "chinese_corpus" });
+          }
+        }
+      }
+    }
+
+    if (["all", "en"].includes(lang.toLowerCase())) {
+      for (const s of enSongs) {
+        if (s.progression.includes(clean) || clean.includes(s.progression)) {
+          const k = (s.title + s.artist + s.section).toLowerCase();
+          if (!seen.has(k)) {
+            seen.add(k);
+            matches.push({ ...s, language: "en", source: "western_corpus" });
+          }
+        }
+      }
+    }
+
+    if (artist) {
+      const aLow = artist.toLowerCase();
+      matches = matches.filter(s => s.artist.toLowerCase().includes(aLow) || s.title.toLowerCase().includes(aLow));
+    }
+
+    const degs = clean.split(",").map(Number).filter(n => !isNaN(n));
+    const refC = degs.map(d => degreeToChord(d, "C"));
+    const refG = degs.map(d => degreeToChord(d, "G"));
+
+    return {
+      progression: clean,
+      roman_progression: degs.map(d => romanMap[d] || d).join("-"),
+      progression_name: taxonomy[clean] || (namedProgressions[clean] || "自定义和弦进行"),
+      degrees: degs,
+      reference_chords: {
+        in_C_major: refC,
+        in_G_major: refG
+      },
+      total_count: matches.length,
+      counts_by_language: {
+        chinese: matches.filter(s => s.language === "zh").length,
+        western: matches.filter(s => s.language === "en").length
+      },
+      songs: matches
+    };
   }
 
   // Render Table & Header Stats

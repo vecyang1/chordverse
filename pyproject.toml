@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chordverse"
+version = "1.1.0"
+description = "Zero-Hallucination Chord Progression Search Engine & Music Theory Analyzer (Hooktheory 75k+ & Mandopop Ground Truth)"
+readme = "README.md"
+authors = [{ name = "V" }]
+license = { text = "AGPL-3.0-or-later" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Topic :: Multimedia :: Sound/Audio :: MIDI",
+]
+keywords = ["music-theory", "chord-progression", "hooktheory", "mandopop", "pop909", "roman-numerals", "1564", "royal-road", "mcp-server"]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+chord-analyzer = "src.cli:main"
+chordverse-mcp = "src.mcp_server:main"

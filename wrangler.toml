@@ -1,0 +1,7 @@
+name = "chordverse"
+compatibility_date = "2026-08-29"
+pages_build_output_dir = "src/static"
+
+[vars]
+ENVIRONMENT = "production"
+CUSTOM_DOMAIN = "chord.worldinspirelab.com"

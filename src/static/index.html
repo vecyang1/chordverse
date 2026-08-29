@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChordVerse | 零幻觉和弦进行搜索与乐理分析引擎 (1-5-6-4 & Extensible)</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">ChordVerse <span class="brand-badge">Ground Truth</span></h1>
+          <p class="brand-sub">零幻觉和弦进行检索与乐理级数分析系统 (Hooktheory 7.5万+ 曲库 + 华语真值库)</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-export-csv" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          导出 CSV
+        </button>
+        <button id="btn-export-md" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          导出 Markdown
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-grid">
+      <!-- Left Panel: Interactive Progression Builder & Search -->
+      <section class="card query-card">
+        <div class="card-header">
+          <h2>和弦进行搜索与构建器</h2>
+          <span class="card-tag">支持 1564 / 6415 / 4536251 / 罗马数字</span>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="presets-container">
+          <label class="section-label">经典热门进行预设：</label>
+          <div class="preset-chips">
+            <button class="chip active" data-prog="1,5,6,4">1-5-6-4 (流行四和弦)</button>
+            <button class="chip" data-prog="6,4,1,5">6-4-1-5 (伤感六四一五)</button>
+            <button class="chip" data-prog="4,5,3,6,2,5,1">4-5-3-6-2-5-1 (王道进行)</button>
+            <button class="chip" data-prog="1,5,6,3,4,1,2,5">1-5-6-3-4-1-2-5 (卡农进行)</button>
+            <button class="chip" data-prog="1,6,4,5">1-6-4-5 (50年代进行)</button>
+            <button class="chip" data-prog="2,5,1">2-5-1 (爵士标准进行)</button>
+          </div>
+        </div>
+
+        <!-- Visual Piano Roll / Step Builder -->
+        <div class="builder-box">
+          <div class="builder-top-bar">
+            <div class="transposition-control">
+              <label>试听调性 (Key):</label>
+              <select id="play-key-select">
+                <option value="C" selected>C 调 (C Major)</option>
+                <option value="G">G 调 (G Major)</option>
+                <option value="D">D 调 (D Major)</option>
+                <option value="F">F 调 (F Major)</option>
+                <option value="A">A 调 (A Major)</option>
+                <option value="E">E 调 (E Major)</option>
+                <option value="Bb">Bb 调 (Bb Major)</option>
+                <option value="Eb">Eb 调 (Eb Major)</option>
+                <option value="Ab">Ab 调 (Ab Major)</option>
+              </select>
+            </div>
+            <button id="btn-play-loop" class="btn btn-primary btn-play">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span id="play-btn-text">试听进行 (Play)</span>
+            </button>
+          </div>
+
+          <div class="prog-display" id="prog-display-box">
+            <span class="prog-empty-hint">点击下方级数构建进行...</span>
+          </div>
+
+          <div class="builder-buttons">
+            <button class="chord-btn" data-degree="1" data-roman="I"><strong>1</strong><span>I</span></button>
+            <button class="chord-btn" data-degree="2" data-roman="ii"><strong>2</strong><span>ii</span></button>
+            <button class="chord-btn" data-degree="3" data-roman="iii"><strong>3</strong><span>iii</span></button>
+            <button class="chord-btn" data-degree="4" data-roman="IV"><strong>4</strong><span>IV</span></button>
+            <button class="chord-btn" data-degree="5" data-roman="V"><strong>5</strong><span>V</span></button>
+            <button class="chord-btn" data-degree="6" data-roman="vi"><strong>6</strong><span>vi</span></button>
+            <button class="chord-btn" data-degree="7" data-roman="vii°"><strong>7</strong><span>vii°</span></button>
+            <button class="chord-btn chord-btn-action" id="btn-backspace" title="删除上一个">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                <line x1="18" y1="9" x2="12" y2="15"></line>
+                <line x1="12" y1="9" x2="18" y2="15"></line>
+              </svg>
+            </button>
+            <button class="chord-btn chord-btn-action" id="btn-clear" title="清空">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Bar & Filters -->
+        <div class="search-form">
+          <div class="input-group">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="input-progression" placeholder="输入进行，例如 1564, 1,5,6,4, I-V-vi-IV..." value="1,5,6,4">
+            <button id="btn-search" class="btn btn-primary">立即检索</button>
+          </div>
+
+          <div class="filter-row">
+            <div class="filter-item">
+              <label>语种范围：</label>
+              <select id="select-lang">
+                <option value="all">全部 (All Languages)</option>
+                <option value="zh" selected>🇨🇳 华语流行 (Mandopop/Cantopop)</option>
+                <option value="en">🌍 欧美流行 (Hooktheory 75,000+)</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>歌手过滤：</label>
+              <input type="text" id="input-artist" placeholder="如 周杰伦 / 五月天 / Taylor Swift">
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Chord Probability Box -->
+        <div class="probability-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+            下一个和弦出现概率预测 (Next Chord Probability)
+          </h3>
+          <div id="prob-container" class="prob-list">
+            <div class="loading-spinner">计算中...</div>
+          </div>
+        </div>
+
+        <!-- Custom Chord Sheet Analyzer Tab -->
+        <div class="analyzer-tool-box">
+          <h3 class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            自选和弦谱解析器 (Chord Sheet Decoder)
+          </h3>
+          <p class="tool-desc">粘贴任意歌谱绝对和弦（如 <code>F G Em Am Dm G C</code>），自动转换为罗马级数并识别曲式进行。</p>
+          <div class="analyze-input-row">
+            <input type="text" id="custom-chords-input" placeholder="输入和弦，如 F G Em Am Dm G C 或 G D Em C">
+            <select id="custom-key-select">
+              <option value="C">C 调</option>
+              <option value="G">G 调</option>
+              <option value="D">D 调</option>
+              <option value="F">F 调</option>
+              <option value="A">A 调</option>
+              <option value="E">E 调</option>
+              <option value="Bb">Bb 调</option>
+              <option value="Eb">Eb 调</option>
+              <option value="Ab">Ab 调</option>
+              <option value="Db">Db 调</option>
+            </select>
+            <button id="btn-custom-analyze" class="btn btn-secondary">解析级数</button>
+          </div>
+          <div id="custom-analysis-result" class="custom-result-box" style="display: none;"></div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Results & Songs Grid -->
+      <section class="card results-card">
+        <div class="results-header">
+          <div>
+            <div class="progression-pill">
+              <span id="current-roman">I-V-vi-IV</span>
+              <span id="current-deg" class="deg-tag">1,5,6,4</span>
+            </div>
+            <h2 id="progression-name-title" class="prog-title">流行四和弦 (Pop-Punk / Axis of Awesome)</h2>
+            <div class="reference-keys" id="ref-keys-box">
+              <span><strong>C 调:</strong> C - G - Am - F</span>
+              <span><strong>G 调:</strong> G - D - Em - C</span>
+            </div>
+          </div>
+          <div class="results-stat-box">
+            <div class="stat-num" id="total-songs-count">0</div>
+            <div class="stat-label">命中歌曲总数</div>
+          </div>
+        </div>
+
+        <!-- Songs List / Grid -->
+        <div class="songs-table-wrapper">
+          <table class="songs-table">
+            <thead>
+              <tr>
+                <th width="5%">#</th>
+                <th width="32%">歌名 (Song Title)</th>
+                <th width="24%">歌手 (Artist)</th>
+                <th width="15%">段落 (Section)</th>
+                <th width="12%">原调 (Key)</th>
+                <th width="12%">试听 / 来源</th>
+              </tr>
+            </thead>
+            <tbody id="songs-tbody">
+              <tr>
+                <td colspan="6" class="loading-state">
+                  <div class="spinner"></div>
+                  <span>正在加载数据...</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>ChordVerse Engine · 基于 Hooktheory 7.5万+ 歌曲与 POP909 / 华语流行真值库 · 100% 真实人工乐理扒谱校对</p>
+    </footer>
+  </div>
+
+  <script src="/audio_synth.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

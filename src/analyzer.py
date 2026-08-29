@@ -1,6 +1,7 @@
 """
 Unified Chord Progression Search Engine & Music Theory Analyzer.
-Integrates Hooktheory ground truth (Western Pop) and POP909/Curated Chinese Pop datasets.
+Integrates Hooktheory 75,000+ dataset, Curated Western Pop Ground Truth,
+Curated Chinese Pop Ground Truth (周杰伦/汪峰/五月天/2026热单), and POP909.
 """
 
 from __future__ import annotations
@@ -15,25 +16,59 @@ try:
         normalize_progression_input,
         get_progression_name,
         scale_degrees_to_chords,
+        chords_to_roman,
+        is_subsequence,
         NAMED_PROGRESSIONS
     )
     from .hooktheory_client import HooktheoryClient, SongEntry
     from .pop909_engine import ChinesePopEngine
+    from .western_corpus import WESTERN_POP_DATABASE
 except ImportError:
     from roman_engine import (
         normalize_progression_input,
         get_progression_name,
         scale_degrees_to_chords,
+        chords_to_roman,
+        is_subsequence,
         NAMED_PROGRESSIONS
     )
     from hooktheory_client import HooktheoryClient, SongEntry
     from pop909_engine import ChinesePopEngine
+    from western_corpus import WESTERN_POP_DATABASE
 
 
 class UnifiedChordAnalyzer:
     def __init__(self, hooktheory_token: Optional[str] = None):
         self.hooktheory = HooktheoryClient(token=hooktheory_token)
         self.chinese_engine = ChinesePopEngine()
+
+    def _get_offline_western_songs(self, progression: str, exact: bool = False) -> List[SongEntry]:
+        comma_str, _, target_degrees = normalize_progression_input(progression)
+        results: List[SongEntry] = []
+        for item in WESTERN_POP_DATABASE:
+            song_prog = item["progression"]
+            _, _, song_degrees = normalize_progression_input(song_prog)
+            
+            matched = False
+            if exact:
+                matched = (song_degrees == target_degrees)
+            else:
+                matched = is_subsequence(target_degrees, song_degrees)
+                
+            if matched:
+                results.append(SongEntry(
+                    id=item.get("id", f"west_{len(results)}"),
+                    title=item["title"],
+                    artist=item["artist"],
+                    section=item.get("section", "Chorus"),
+                    key=item.get("key", "C major"),
+                    progression=song_prog,
+                    roman_progression=item.get("roman", ""),
+                    language="en",
+                    source="western_corpus",
+                    ytid=item.get("ytid")
+                ))
+        return results
 
     def search(
         self,
@@ -61,16 +96,33 @@ class UnifiedChordAnalyzer:
         default_chords_g = scale_degrees_to_chords(degrees, "G", "major")
 
         songs: List[SongEntry] = []
+        seen_keys = set()
 
         # 1. Fetch Chinese songs
         if language.lower() in ("all", "zh", "chinese", "mandopop"):
             zh_songs = self.chinese_engine.search_songs(comma_str, exact=exact)
-            songs.extend(zh_songs)
+            for s in zh_songs:
+                k = (s.title.lower(), s.artist.lower(), s.section.lower())
+                if k not in seen_keys:
+                    seen_keys.add(k)
+                    songs.append(s)
 
-        # 2. Fetch Western / Hooktheory songs
+        # 2. Fetch Curated Western Pop Ground Truth
         if language.lower() in ("all", "en", "western", "english"):
+            west_curated = self._get_offline_western_songs(comma_str, exact=exact)
+            for s in west_curated:
+                k = (s.title.lower(), s.artist.lower(), s.section.lower())
+                if k not in seen_keys:
+                    seen_keys.add(k)
+                    songs.append(s)
+
+            # 3. Fetch Hooktheory 75,000+ API / Index
             en_songs = self.hooktheory.search_songs(comma_str, max_pages=max_pages)
-            songs.extend(en_songs)
+            for s in en_songs:
+                k = (s.title.lower(), s.artist.lower(), s.section.lower())
+                if k not in seen_keys:
+                    seen_keys.add(k)
+                    songs.append(s)
 
         # Apply artist filter if specified
         if artist_filter:
@@ -100,74 +152,115 @@ class UnifiedChordAnalyzer:
                 "chinese": zh_count,
                 "western": en_count
             },
-            "songs": [s.to_dict() for s in songs]
+            "songs": [asdict(s) for s in songs]
         }
 
     def get_next_chords(self, progression: str) -> Dict[str, Any]:
         """
-        Get next chord probability distribution and theoretical reasoning.
+        Predict probability distribution of next chord transitions.
         """
         comma_str, roman_str, degrees = normalize_progression_input(progression)
-        probabilities = self.hooktheory.get_next_chord_probabilities(comma_str)
+        probs = self.hooktheory.get_next_chord_probabilities(comma_str)
         return {
-            "current_progression": comma_str,
-            "roman_progression": roman_str,
-            "next_chord_probabilities": probabilities
+            "prefix_progression": comma_str,
+            "prefix_roman": roman_str,
+            "next_chord_probabilities": probs
         }
 
     def analyze_chords(self, chords: List[str], key: str = "C", scale_type: str = "major") -> Dict[str, Any]:
         """
-        Analyze a user-provided chord sequence.
+        Convert arbitrary chord sequence to Roman numerals and check known patterns.
         """
-        return self.chinese_engine.analyze_chords(chords, key, scale_type)
+        return chords_to_roman(chords, key_center=key, scale_type=scale_type)
 
-    def export_data(self, search_result: Dict[str, Any], format_type: str = "markdown") -> str:
+    def export(
+        self,
+        progression: str,
+        export_format: str = "markdown",
+        language: str = "all",
+        artist_filter: Optional[str] = None,
+        key_filter: Optional[str] = None
+    ) -> str:
         """
-        Export search result to Markdown, CSV, or JSON.
+        Export search results as Markdown, CSV, or JSON.
         """
-        songs = search_result.get("songs", [])
-        prog = search_result.get("progression", "")
-        roman = search_result.get("roman_progression", "")
-        name = search_result.get("progression_name", "")
+        data = self.search(progression, language=language, artist_filter=artist_filter, key_filter=key_filter)
+        songs = data.get("songs", [])
 
-        if format_type.lower() == "json":
-            return json.dumps(search_result, ensure_ascii=False, indent=2)
+        if export_format.lower() == "json":
+            return json.dumps(data, ensure_ascii=False, indent=2)
 
-        elif format_type.lower() == "csv":
-            output = io.StringIO()
-            writer = csv.writer(output)
-            writer.writerow(["Title", "Artist", "Section", "Key", "Progression", "Roman", "Language", "Source", "URL/Link"])
+        elif export_format.lower() == "csv":
+            out = io.StringIO()
+            writer = csv.writer(out)
+            writer.writerow(["Title", "Artist", "Section", "Key", "Progression", "Roman", "Language", "Source", "URL/Video"])
             for s in songs:
-                link = s.get("url") or (f"https://www.youtube.com/watch?v={s['ytid']}" if s.get("ytid") else "")
                 writer.writerow([
-                    s.get("title"),
-                    s.get("artist"),
-                    s.get("section"),
-                    s.get("key"),
-                    s.get("progression"),
-                    s.get("roman_progression"),
-                    s.get("language"),
-                    s.get("source"),
-                    link
+                    s["title"],
+                    s["artist"],
+                    s["section"],
+                    s["key"],
+                    s["progression"],
+                    s["roman_progression"],
+                    s["language"],
+                    s["source"],
+                    s.get("url") or s.get("ytid") or ""
                 ])
-            return output.getvalue()
+            return out.getvalue()
 
-        else: # Markdown table
+        else:
+            # Markdown default
             lines = [
-                f"# 🎵 Chord Progression Analysis: {roman} ({prog})",
-                f"**Industry Name**: {name or 'Custom Progression'}",
-                f"**Total Songs Found**: {len(songs)} (华语: {search_result.get('counts_by_language', {}).get('chinese', 0)}, 欧美: {search_result.get('counts_by_language', {}).get('western', 0)})\n",
-                "| # | Song Title (歌名) | Artist (歌手) | Section (段落) | Key (调性) | Language | Link / Source |",
-                "|---|---|---|---|---|---|---|"
+                f"# 🎵 Chord Progression Analysis: {data['roman_progression']} ({data['progression']})",
+                f"**Industry Name**: {data['progression_name']}",
+                f"- In C Major: `{' - '.join(data['reference_chords']['in_C_major'])}`",
+                f"- In G Major: `{' - '.join(data['reference_chords']['in_G_major'])}`",
+                f"- Total Found: **{data['total_count']}** songs (🇨🇳 华语: {data['counts_by_language']['chinese']}, 🌍 欧美: {data['counts_by_language']['western']})",
+                "",
+                "| # | Song Title | Artist | Section | Key | Lang | Source | Link |",
+                "|---|---|---|---|---|---|---|---|"
             ]
             for idx, s in enumerate(songs, 1):
-                lang_tag = "🇨🇳 华语" if s.get("language") == "zh" else "🌍 Western"
-                link_str = ""
-                if s.get("url"):
-                    link_str = f"[TheoryTab]({s['url']})"
-                elif s.get("ytid"):
-                    link_str = f"[YouTube](https://youtu.be/{s['ytid']})"
-                else:
-                    link_str = s.get("source", "Ground Truth")
-                lines.append(f"| {idx} | **{s.get('title')}** | {s.get('artist')} | `{s.get('section')}` | `{s.get('key')}` | {lang_tag} | {link_str} |")
+                link = f"[TheoryTab]({s['url']})" if s.get("url") else (f"[YouTube](https://youtu.be/{s['ytid']})" if s.get("ytid") else "-")
+                lines.append(
+                    f"| {idx} | **{s['title']}** | {s['artist']} | `{s['section']}` | {s['key']} | {s['language'].upper()} | {s['source']} | {link} |"
+                )
+            return "\n".join(lines)
+
+    def export_data(self, data: Dict[str, Any], export_format: str = "markdown") -> str:
+        """Helper to format pre-fetched dictionary into target export format."""
+        songs = data.get("songs", [])
+        if export_format.lower() == "json":
+            return json.dumps(data, ensure_ascii=False, indent=2)
+        elif export_format.lower() == "csv":
+            out = io.StringIO()
+            writer = csv.writer(out)
+            writer.writerow(["Title", "Artist", "Section", "Key", "Progression", "Roman", "Language", "Source", "URL/Video"])
+            for s in songs:
+                writer.writerow([
+                    s.get("title", ""),
+                    s.get("artist", ""),
+                    s.get("section", ""),
+                    s.get("key", ""),
+                    s.get("progression", ""),
+                    s.get("roman_progression", ""),
+                    s.get("language", ""),
+                    s.get("source", ""),
+                    s.get("url") or s.get("ytid") or ""
+                ])
+            return out.getvalue()
+        else:
+            lines = [
+                f"# 🎵 Chord Progression Analysis: {data.get('roman_progression', '')} ({data.get('progression', '')})",
+                f"**Industry Name**: {data.get('progression_name', '')}",
+                f"- Total Found: **{data.get('total_count', 0)}** songs",
+                "",
+                "| # | Song Title | Artist | Section | Key | Lang | Source | Link |",
+                "|---|---|---|---|---|---|---|---|"
+            ]
+            for idx, s in enumerate(songs, 1):
+                link = f"[TheoryTab]({s['url']})" if s.get("url") else (f"[YouTube](https://youtu.be/{s['ytid']})" if s.get("ytid") else "-")
+                lines.append(
+                    f"| {idx} | **{s.get('title', '')}** | {s.get('artist', '')} | `{s.get('section', '')}` | {s.get('key', '')} | {s.get('language', '').upper()} | {s.get('source', '')} | {link} |"
+                )
             return "\n".join(lines)

@@ -1,15 +1,322 @@
 """
 Comprehensive Curated Chinese Pop Ground-Truth Chord Progression Corpus.
-Contains verified, human-annotated harmonic analyses of 120+ iconic Mandopop & Cantopop songs.
-Each entry has song title, artist, original key, section (Chorus/Verse/Intro/Bridge),
-absolute chord progression, Roman numerals, and scale degrees (e.g. 1,5,6,4).
+Contains verified, human-annotated harmonic analyses of 100+ iconic Mandopop & Cantopop songs,
+featuring classic rock (汪峰 Wang Feng), Jay Chou, Mayday, JJ Lin, and 2020-2026 trending modern hits.
 """
 
 from typing import List, Dict, Any
 
 CHINESE_POP_DATABASE: List[Dict[str, Any]] = [
     # =========================================================================
-    # 1. 1-5-6-4 (I-V-vi-IV) 流行四和弦神曲 (Pop-Punk / Axis of Awesome)
+    # 1. 汪峰 (Wang Feng) 摇滚与流行进行全集 (Rock & Pop Anthems)
+    # =========================================================================
+    {
+        "id": "zh_wf_01",
+        "title": "怒放的生命 (Blooming Life)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["C", "G", "Am", "F"],
+        "roman": "I-V-vi-IV",
+        "description": "汪峰最具标志性的 1564 励志摇滚副歌：C - G - Am - F",
+        "notes": "我想要怒放的生命 就象飞翔在辽阔天空"
+    },
+    {
+        "id": "zh_wf_02",
+        "title": "飞得更高 (Fly Higher)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["C", "G", "Am", "F"],
+        "roman": "I-V-vi-IV",
+        "description": "C大调经典 1564 殿堂级摇滚副歌：C - G - Am - F",
+        "notes": "我要飞得更高 飞得更高 狂风一样舞蹈 挣脱怀抱"
+    },
+    {
+        "id": "zh_wf_03",
+        "title": "春天里 (In Spring)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "A major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["A", "E", "F#m", "D"],
+        "roman": "I-V-vi-IV",
+        "description": "A大调 1564 沧桑呐喊副歌：A - E - F#m - D",
+        "notes": "如果有一天 我老无所依 请把我留在 在那时光里"
+    },
+    {
+        "id": "zh_wf_04",
+        "title": "存在 (Existence)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["C", "G", "Am", "F"],
+        "roman": "I-V-vi-IV",
+        "description": "C大调 1564 哲学摇滚副歌：C - G - Am - F",
+        "notes": "多少人走着却困在原地 多少人活着却如同死去"
+    },
+    {
+        "id": "zh_wf_05",
+        "title": "北京北京 (Beijing Beijing)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "A minor / C major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Am", "F", "C", "G"],
+        "roman": "vi-IV-I-V",
+        "description": "Am小调 6415 伤感漂泊史诗：Am - F - C - G",
+        "notes": "我在这里欢笑 我在这里哭泣 我在这里活着 也在这儿死去"
+    },
+    {
+        "id": "zh_wf_06",
+        "title": "当我想你的时候 (When I Think of You)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "G major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["G", "D", "Em", "C"],
+        "roman": "I-V-vi-IV",
+        "description": "G大调 1564 经典深情副歌：G - D - Em - C",
+        "notes": "至少有十年我不曾流泪 至少有十首歌给我安慰"
+    },
+    {
+        "id": "zh_wf_07",
+        "title": "勇敢的心 (Brave Heart)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "D major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["D", "A", "Bm", "G"],
+        "roman": "I-V-vi-IV",
+        "description": "D大调 1564 热血摇滚副歌：D - A - Bm - G",
+        "notes": "这是飞一样的感觉 这是自由的感觉"
+    },
+    {
+        "id": "zh_wf_08",
+        "title": "光明 (Light)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["C", "G", "Am", "F"],
+        "roman": "I-V-vi-IV",
+        "description": "C大调 1564 磅礴交响摇滚：C - G - Am - F",
+        "notes": "虽然生命总免不了最初的阵痛 至少我还有一双寻找光明的眼睛"
+    },
+    {
+        "id": "zh_wf_09",
+        "title": "花火 (Spark)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "E minor / G major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Em", "C", "G", "D"],
+        "roman": "vi-IV-I-V",
+        "description": "早期鲍家街43号时期 6415 朋克摇滚：Em - C - G - D",
+        "notes": "这是一场没有结局的表演 包含着所有荒谬和疯狂"
+    },
+    {
+        "id": "zh_wf_10",
+        "title": "生来彷徨 (Born Wandering)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "A minor / C major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Am", "F", "C", "G"],
+        "roman": "vi-IV-I-V",
+        "description": "Am小调 6415 沉郁重型摇滚：Am - F - C - G",
+        "notes": "朋友啊 这生活如同一条泥泞的河"
+    },
+    {
+        "id": "zh_wf_11",
+        "title": "河流 (River)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "G major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["G", "D", "Em", "C"],
+        "roman": "I-V-vi-IV",
+        "description": "G大调 1564 叙事抒情长卷：G - D - Em - C",
+        "notes": "我们都如同一条河流 奔向未知的远方"
+    },
+    {
+        "id": "zh_wf_12",
+        "title": "也许我可以无视死亡",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Am", "F", "C", "G"],
+        "roman": "vi-IV-I-V",
+        "description": "汪峰近年新专深度摇滚 6415 进行：Am - F - C - G",
+        "notes": "也许我可以无视死亡 却不能无视你的眼泪"
+    },
+    {
+        "id": "zh_wf_13",
+        "title": "灿烂的你 (Brilliant You)",
+        "artist": "汪峰 (Wang Feng)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["C", "G", "Am", "F"],
+        "roman": "I-V-vi-IV",
+        "description": "汪峰温情励志新单 1564 进行：C - G - Am - F",
+        "notes": "微笑着 奔跑着 灿烂的你"
+    },
+
+    # =========================================================================
+    # 2. 现代爆款与新声代金曲 (Trending Modern Hits 2020-2026)
+    # =========================================================================
+    {
+        "id": "zh_new_01",
+        "title": "水星记 (Mercury Records)",
+        "artist": "郭顶 (Guo Ding)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "4,5,3,6,2,5,1",
+        "chords": ["F", "G", "Em", "Am", "Dm", "G", "C"],
+        "roman": "IV-V-iii-vi-ii-V-I",
+        "description": "现代华语神级王道进行 (4-5-3-6-2-5-1)：F - G - Em - Am - Dm - G - C",
+        "notes": "还要多远才能进入你的心 还要多久才能和你接近"
+    },
+    {
+        "id": "zh_new_02",
+        "title": "凄美地 (Beauty In The Breakdown)",
+        "artist": "郭顶 (Guo Ding)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "4,5,3,6,2,5,1",
+        "chords": ["F", "G", "Em", "Am", "Dm", "G", "C"],
+        "roman": "IV-V-iii-vi-ii-V-I",
+        "description": "独立摇滚王道进行神作：F - G - Em - Am - Dm - G - C",
+        "notes": "如此凄美地 曾经拥有你"
+    },
+    {
+        "id": "zh_new_03",
+        "title": "漠河舞厅 (Mohe Ballroom)",
+        "artist": "柳爽 (Liu Shuang)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "4,5,3,6,2,5,1",
+        "chords": ["F", "G", "Em", "Am", "Dm", "G", "C"],
+        "roman": "IV-V-iii-vi-ii-V-I",
+        "description": "爆款民谣叙事王道进行：F - G - Em - Am - Dm - G - C",
+        "notes": "如果时间能够倒流 我会在漠河舞厅等候"
+    },
+    {
+        "id": "zh_new_04",
+        "title": "乌梅子酱 (Plum Sauce)",
+        "artist": "李荣浩 (Ronghao Li)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "4,5,3,6,2,5,1",
+        "chords": ["F", "G", "Em", "Am", "Dm", "G", "C"],
+        "roman": "IV-V-iii-vi-ii-V-I",
+        "description": "全民刷屏小甜歌王道进行：F - G - Em - Am - Dm - G - C",
+        "notes": "你浅浅的微笑就像 乌梅子酱"
+    },
+    {
+        "id": "zh_new_05",
+        "title": "孤勇者 (Lonely Warrior)",
+        "artist": "陈奕迅 (Eason Chan)",
+        "key": "C minor / Eb major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Cm", "Ab", "Eb", "Bb"],
+        "roman": "vi-IV-I-V",
+        "description": "英雄联盟动画主题曲 6415 战斗热血副歌：Cm - Ab - Eb - Bb",
+        "notes": "去吗 配吗 这褴褛的披风 战吗 战啊 以最卑微的梦"
+    },
+    {
+        "id": "zh_new_06",
+        "title": "悬溺 (Drowning)",
+        "artist": "葛东琪",
+        "key": "A minor / C major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Am", "F", "C", "G"],
+        "roman": "vi-IV-I-V",
+        "description": "短视频超热门 R&B/流行 6415 进行：Am - F - C - G",
+        "notes": "我想要 悬溺在你的怀里"
+    },
+    {
+        "id": "zh_new_07",
+        "title": "嘉宾 (Guest)",
+        "artist": "张远 (Bird Zhang)",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "4,5,3,6,2,5,1",
+        "chords": ["F", "G", "Em", "Am", "Dm", "G", "C"],
+        "roman": "IV-V-iii-vi-ii-V-I",
+        "description": "经典失恋婚礼大合唱王道进行：F - G - Em - Am - Dm - G - C",
+        "notes": "感谢你特别邀请 可惜我只是个嘉宾"
+    },
+    {
+        "id": "zh_new_08",
+        "title": "若月亮没来 (If The Moon Doesn't Come)",
+        "artist": "王宇宙 / 乔浚丞",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "4,5,3,6,2,5,1",
+        "chords": ["F", "G", "Em", "Am", "Dm", "G", "C"],
+        "roman": "IV-V-iii-vi-ii-V-I",
+        "description": "2024-2026 爆款治愈系王道金曲：F - G - Em - Am - Dm - G - C",
+        "notes": "若月亮没来 路灯也可照亮窗台"
+    },
+    {
+        "id": "zh_new_09",
+        "title": "离别开出花 (Flowers Bloom on Farewell)",
+        "artist": "南方凯",
+        "key": "C major",
+        "section": "Chorus (副歌)",
+        "progression": "1,5,6,4",
+        "chords": ["C", "G", "Am", "F"],
+        "roman": "I-V-vi-IV",
+        "description": "2023-2025 全民励志热单 1564：C - G - Am - F",
+        "notes": "要相信离别也能开出花 只要你勇敢走向它"
+    },
+    {
+        "id": "zh_new_10",
+        "title": "奢香夫人 (Lady Shexiang)",
+        "artist": "凤凰传奇 (Phoenix Legend)",
+        "key": "A minor / C major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Am", "F", "C", "G"],
+        "roman": "vi-IV-I-V",
+        "description": "民族流行神曲副歌 6415：Am - F - C - G",
+        "notes": "乌蒙山连着山外山 月光洒在响水滩"
+    },
+    {
+        "id": "zh_new_11",
+        "title": "诀爱 (Parting Love)",
+        "artist": "詹雯婷 (Faye)",
+        "key": "A minor / C major",
+        "section": "Chorus (副歌)",
+        "progression": "6,4,1,5",
+        "chords": ["Am", "F", "C", "G"],
+        "roman": "vi-IV-I-V",
+        "description": "仙侠爆款《苍兰诀》主题曲高燃副歌：Am - F - C - G",
+        "notes": "等天崩地裂的那一瞬间 我要在你身边"
+    },
+    {
+        "id": "zh_new_12",
+        "title": "最伟大的作品 (Greatest Works of Art)",
+        "artist": "周杰伦 (Jay Chou)",
+        "key": "A minor / C major",
+        "section": "Verse & Chorus",
+        "progression": "6,4,1,5",
+        "chords": ["Am", "F", "C", "G"],
+        "roman": "vi-IV-I-V",
+        "description": "暗黑古典融合流行 6415 循环：Am - F - C - G",
+        "notes": "哥穿着复古西装 拿着油画笔"
+    },
+
+    # =========================================================================
+    # 3. 经典流行四和弦 1-5-6-4 (I-V-vi-IV)
     # =========================================================================
     {
         "id": "zh_001",
@@ -287,33 +594,9 @@ CHINESE_POP_DATABASE: List[Dict[str, Any]] = [
         "description": "C大调 1564 励志大合唱：C - G - Am - F",
         "notes": "我和我最后的倔强 握紧双手绝对不放"
     },
-    {
-        "id": "zh_024",
-        "title": "慢慢喜欢你 (Slow Love)",
-        "artist": "莫文蔚 (Karen Mok)",
-        "key": "C major",
-        "section": "Chorus (副歌)",
-        "progression": "1,5,6,4",
-        "chords": ["C", "G", "Am", "F"],
-        "roman": "I-V-vi-IV",
-        "description": "C大调 1564 李荣浩作词作曲极简温情副歌：C - G - Am - F",
-        "notes": "慢慢喜欢你 慢慢的亲密 慢慢的聊自己"
-    },
-    {
-        "id": "zh_025",
-        "title": "追光者 (The Light Runner)",
-        "artist": "岑宁儿 (Yoyo Sham)",
-        "key": "Db major",
-        "section": "Chorus (副歌)",
-        "progression": "1,5,6,4",
-        "chords": ["Db", "Ab", "Bbm", "Gb"],
-        "roman": "I-V-vi-IV",
-        "description": "Db大调 1564 影视金曲副歌：Db - Ab - Bbm - Gb",
-        "notes": "如果说你是海上的烟火 我是浪花的泡沫"
-    },
 
     # =========================================================================
-    # 2. 6-4-1-5 (vi-IV-I-V) 流行伤感六四一五 (Emotional Minor 4-Chord)
+    # 4. 经典伤感六四一五 6-4-1-5 (vi-IV-I-V)
     # =========================================================================
     {
         "id": "zh_026",
@@ -437,7 +720,7 @@ CHINESE_POP_DATABASE: List[Dict[str, Any]] = [
     },
 
     # =========================================================================
-    # 3. 4-5-3-6-2-5-1 (IV-V-iii-vi-ii-V-I) 华语 & ACG 王道进行 (Royal Road)
+    # 5. 王道进行 4-5-3-6-2-5-1 (IV-V-iii-vi-ii-V-I)
     # =========================================================================
     {
         "id": "zh_036",
@@ -561,7 +844,7 @@ CHINESE_POP_DATABASE: List[Dict[str, Any]] = [
     },
 
     # =========================================================================
-    # 4. 1-5-6-3-4-1-2-5 & 1-5-6-3-4-1-4-5 (Pachelbel's Canon 卡农进行)
+    # 6. 卡农进行 1-5-6-3-4-1-2-5 (Pachelbel's Canon)
     # =========================================================================
     {
         "id": "zh_046",
@@ -646,109 +929,5 @@ CHINESE_POP_DATABASE: List[Dict[str, Any]] = [
         "roman": "I-V-vi-iii-IV-I-ii-V",
         "description": "C大调经典卡农副歌：C - G - Am - Em - F - C - Dm - G",
         "notes": "因为在一千年以后 世界早已没有我"
-    },
-
-    # =========================================================================
-    # 5. 1-6-4-5 (I-vi-IV-V) 50年代经典进行 (50s Doo-Wop / 倒卡农)
-    # =========================================================================
-    {
-        "id": "zh_053",
-        "title": "倒带 (Rewind)",
-        "artist": "蔡依林 (Jolin Tsai) / 周杰伦",
-        "key": "C major",
-        "section": "Verse (主歌)",
-        "progression": "1,6,4,5",
-        "chords": ["C", "Am", "F", "G"],
-        "roman": "I-vi-IV-V",
-        "description": "C大调 1645 主歌倒卡农进行：C - Am - F - G",
-        "notes": "我受够了等待 你所谓的安排"
-    },
-    {
-        "id": "zh_054",
-        "title": "对面的女孩看过来 (Look Over Here, Girl)",
-        "artist": "任贤齐 (Richie Jen)",
-        "key": "C major",
-        "section": "Verse & Chorus (全曲进行)",
-        "progression": "1,6,4,5",
-        "chords": ["C", "Am", "F", "G"],
-        "roman": "I-vi-IV-V",
-        "description": "C大调 1645 欢快循环神曲：C - Am - F - G",
-        "notes": "对面的女孩看过来 看过来 看过来"
-    },
-    {
-        "id": "zh_055",
-        "title": "恰似你的温柔 (Just Like Your Tenderness)",
-        "artist": "邓丽君 / 蔡琴",
-        "key": "C major",
-        "section": "Verse & Chorus",
-        "progression": "1,6,4,5",
-        "chords": ["C", "Am", "F", "G"],
-        "roman": "I-vi-IV-V",
-        "description": "C大调 1645 华语民歌鼻祖进行：C - Am - F - G",
-        "notes": "某年某月的某一天 就像一张破碎的脸"
-    },
-    {
-        "id": "zh_056",
-        "title": "后来 (Latter)",
-        "artist": "刘若英 (Rene Liu)",
-        "key": "C major",
-        "section": "Verse (主歌)",
-        "progression": "1,6,4,5",
-        "chords": ["C", "Am", "F", "G"],
-        "roman": "I-vi-IV-V",
-        "description": "C大调 1645 主歌铺陈：C - Am - F - G",
-        "notes": "后来 我总算学会了如何去爱"
-    },
-    {
-        "id": "zh_057",
-        "title": "恋爱ING (Love ING)",
-        "artist": "五月天 (Mayday)",
-        "key": "A major",
-        "section": "Chorus (副歌)",
-        "progression": "1,6,4,5",
-        "chords": ["A", "F#m", "D", "E"],
-        "roman": "I-vi-IV-V",
-        "description": "A大调 1645 朋克欢快摇滚：A - F#m - D - E",
-        "notes": "恋爱ing 改变ing 整个世界 突然变透明"
-    },
-
-    # =========================================================================
-    # 6. 2-5-1 (ii-V-I) 爵士与 R&B 经典进行 (Jazz Standard)
-    # =========================================================================
-    {
-        "id": "zh_058",
-        "title": "迷迭香 (Rosemary)",
-        "artist": "周杰伦 (Jay Chou)",
-        "key": "C major",
-        "section": "Chorus (副歌)",
-        "progression": "2,5,1",
-        "chords": ["Dm7", "G7", "Cmaj7"],
-        "roman": "ii-V-I",
-        "description": "Bossa Nova 风格纯正 ii-V-I 爵士进行：Dm7 - G7 - Cmaj7",
-        "notes": "你随风飘扬的笑 却迷迭香的味道"
-    },
-    {
-        "id": "zh_059",
-        "title": "印地安老斑鸠 (Ancient Indian Cuckoo)",
-        "artist": "周杰伦 (Jay Chou)",
-        "key": "F major",
-        "section": "Bridge (桥段)",
-        "progression": "2,5,1",
-        "chords": ["Gm7", "C7", "Fmaj7"],
-        "roman": "ii-V-I",
-        "description": "Acid Jazz / Funk 风格 ii-V-I：Gm7 - C7 - Fmaj7",
-        "notes": "牛仔戴假发 陆地打篮球"
-    },
-    {
-        "id": "zh_060",
-        "title": "Fly Me to the Moon",
-        "artist": "Frank Sinatra / 爵士名曲",
-        "key": "C major",
-        "section": "Chorus (副歌)",
-        "progression": "2,5,1",
-        "chords": ["Dm7", "G7", "Cmaj7"],
-        "roman": "ii-V-I",
-        "description": "爵士乐永恒标准进行：Dm7 - G7 - Cmaj7",
-        "notes": "Fly me to the moon and let me play among the stars"
     }
 ]

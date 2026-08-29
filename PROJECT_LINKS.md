@@ -1,6 +1,6 @@
 # Project Links
 
-This is the A-coding code root bridge card for ChordVerse (Zero-Hallucination Chord Progression Analyzer).
+This is the Cowork hub bridge card for ChordVerse (Zero-Hallucination Chord Progression Analyzer).
 
 ## Control Card
 
@@ -19,6 +19,6 @@ This is the A-coding code root bridge card for ChordVerse (Zero-Hallucination Ch
 
 ## Ownership & Backlinks
 
-- **Hub Root**: `/Users/vecsatfoxmailcom/Documents/Cowork/Antigravity Cowork/26.08.29 Chord Progression Analyzer/`
-- **Hub Link Card**: `/Users/vecsatfoxmailcom/Documents/Cowork/Antigravity Cowork/26.08.29 Chord Progression Analyzer/PROJECT_LINKS.md`
+- **Canonical Hub**: `/Users/vecsatfoxmailcom/Documents/Cowork/Antigravity Cowork/26.08.29 Chord Progression Analyzer/`
+- **Code Root Backlink**: `/Users/vecsatfoxmailcom/Documents/A-coding/chordverse/PROJECT_LINKS.md`
 - **GitHub Repository**: `https://github.com/vecyang1/chordverse.git`

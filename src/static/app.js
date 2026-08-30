@@ -390,43 +390,84 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Custom Chord Decoder
+  // Custom Chord Decoder with Client-Side Symbolic Fallback
   btnCustomAnalyze.addEventListener("click", async () => {
     const raw = customChordsInput.value.trim();
     if (!raw) return;
     const key = customKeySelect.value;
 
+    let data = null;
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chords: raw, key: key, scale: "major" })
       });
-      const data = await res.json();
-      
-      customAnalysisResult.style.display = "block";
-      let recHtml = "";
-      if (data.recognized_progressions?.length > 0) {
-        recHtml = `<div style="margin-top:8px;color:#10b981;font-weight:600;">🏆 命中经典进行: ${data.recognized_progressions.map(r => r.name).join(" / ")}</div>`;
+      if (res.ok) {
+        data = await res.json();
+      }
+    } catch (e) {
+      // Fall through to client-side symbolic analysis
+    }
+
+    if (!data) {
+      // Client-side instant symbolic analysis fallback
+      const chordList = raw.replace(/[\s\->,|/]+/g, " ").trim().split(/\s+/).filter(Boolean);
+      const keyPitch = notePitchMap[key] ?? 0;
+      const degMap = { 0: 1, 2: 2, 4: 3, 5: 4, 7: 5, 9: 6, 11: 7 };
+      const romMap = { 1: "I", 2: "ii", 3: "iii", 4: "IV", 5: "V", 6: "vi", 7: "vii°" };
+
+      const degrees = [];
+      const romans = [];
+      for (const c of chordList) {
+        const rootMatch = c.match(/^([A-Ga-g][#b]?)(.*)$/);
+        const root = rootMatch ? rootMatch[1].charAt(0).toUpperCase() + rootMatch[1].slice(1) : c;
+        const quality = rootMatch ? rootMatch[2] : "";
+        const cPitch = notePitchMap[root] ?? 0;
+        const interval = (cPitch - keyPitch + 12) % 12;
+        const deg = degMap[interval] || 1;
+        let rom = romMap[deg] || "I";
+        if (quality.startsWith("m") && !quality.startsWith("maj")) {
+          rom = rom.toLowerCase();
+        } else if (deg === 1 || deg === 4 || deg === 5) {
+          rom = rom.toUpperCase();
+        }
+        degrees.push(deg);
+        romans.push(rom);
       }
 
-      customAnalysisResult.innerHTML = `
-        <div><strong>输入和弦:</strong> ${data.input_chords.join(" - ")} (${data.key})</div>
-        <div style="margin-top:4px;"><strong>罗马级数:</strong> <span style="color:var(--primary-accent);font-weight:700;">${data.roman_numerals}</span> (${data.progression_string})</div>
-        ${recHtml}
-        <button id="btn-use-custom-prog" class="btn btn-secondary" style="margin-top:8px;padding:4px 8px;font-size:11px;">用此进行检索歌曲 ➔</button>
-      `;
+      const progStr = degrees.join(",");
+      const recognized = namedProgressionsTaxonomy[progStr] ? [{ name: namedProgressionsTaxonomy[progStr], progression: progStr }] : [];
 
-      document.getElementById("btn-use-custom-prog")?.addEventListener("click", () => {
-        inputProg.value = data.progression_string;
-        activeDegrees = parseInputToDegrees(data.progression_string);
-        renderBuilderDisplay();
-        executeSearch();
-      });
-
-    } catch (e) {
-      alert("解析失败");
+      data = {
+        input_chords: chordList,
+        key: `${key} major`,
+        scale_degrees: degrees,
+        progression_string: progStr,
+        roman_numerals: romans.join(" - "),
+        recognized_progressions: recognized
+      };
     }
+
+    customAnalysisResult.style.display = "block";
+    let recHtml = "";
+    if (data.recognized_progressions?.length > 0) {
+      recHtml = `<div style="margin-top:8px;color:#10b981;font-weight:600;">🏆 命中经典进行: ${data.recognized_progressions.map(r => r.name).join(" / ")}</div>`;
+    }
+
+    customAnalysisResult.innerHTML = `
+      <div><strong>输入和弦:</strong> ${data.input_chords.join(" - ")} (${data.key})</div>
+      <div style="margin-top:4px;"><strong>罗马级数:</strong> <span style="color:var(--primary-accent);font-weight:700;">${data.roman_numerals}</span> (${data.progression_string})</div>
+      ${recHtml}
+      <button id="btn-use-custom-prog" class="btn btn-secondary" style="margin-top:8px;padding:4px 8px;font-size:11px;">用此进行检索歌曲 ➔</button>
+    `;
+
+    document.getElementById("btn-use-custom-prog")?.addEventListener("click", () => {
+      inputProg.value = data.progression_string;
+      activeDegrees = parseInputToDegrees(data.progression_string);
+      renderBuilderDisplay();
+      executeSearch();
+    });
   });
 
   // 1-Click Yopu / UGC Harvester & Search Handler

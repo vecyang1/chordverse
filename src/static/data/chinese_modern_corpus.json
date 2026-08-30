@@ -1231,5 +1231,61 @@
     },
     "source_url": "https://yopu.co/view/towards_clouds",
     "raw_lyrics_sample": "向云端 山那边 海里面 真实的我应该走向哪边"
+  },
+  {
+    "id": "custom_86830",
+    "title": "测试入库歌曲",
+    "artist": "测试入库歌手",
+    "key": "C major",
+    "original_key": "C",
+    "capo": 0,
+    "primary_progression": "1,5,6,4",
+    "primary_roman": "I-V-vi-IV",
+    "primary_degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "progression_name": "Pop-Punk / 4-Chord Progression (Axis of Awesome / 流行四和弦)",
+    "primary_chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "section_breakdowns": {
+      "Chorus": "1,5,6,4"
+    },
+    "source_url": "local://chord_sheet",
+    "raw_lyrics_sample": "C G Am F"
+  },
+  {
+    "id": "custom_47769",
+    "title": "测试入库歌曲",
+    "artist": "测试入库歌手",
+    "key": "C major",
+    "original_key": "C",
+    "capo": 0,
+    "primary_progression": "1,5,6,4",
+    "primary_roman": "I-V-vi-IV",
+    "primary_degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "progression_name": "Pop-Punk / 4-Chord Progression (Axis of Awesome / 流行四和弦)",
+    "primary_chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "section_breakdowns": {
+      "Chorus": "1,5,6,4"
+    },
+    "source_url": "local://chord_sheet",
+    "raw_lyrics_sample": "C G Am F"
   }
 ]

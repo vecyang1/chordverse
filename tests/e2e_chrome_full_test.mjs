@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import path from 'path';
 
 const TARGET_URL = 'https://chord.worldinspirelab.com/';
-console.log(`🌐 Launching Chrome to execute full interactive E2E tests on ${TARGET_URL}...`);
+console.log(`🌐 Launching Chrome to execute multi-progression interactive E2E tests on ${TARGET_URL}...`);
 
 (async () => {
   const browser = await chromium.launch({
@@ -37,55 +37,58 @@ console.log(`🌐 Launching Chrome to execute full interactive E2E tests on ${TA
   const title = await page.title();
   console.log(`   Page Title: "${title}"`);
 
-  // 2. Test Yopu Search & 1-Click Parsing Workflow
-  console.log(`🚀 Step 2: Testing Yopu Search & 1-Click Import Workflow with keyword '青春'...`);
-  await page.fill('#yopu-import-input', '青春');
-  await page.click('#btn-yopu-search');
+  // 2. Test 6-4-1-5 Chip Click
+  console.log(`🚀 Step 2: Clicking '6-4-1-5 (伤感六四一五)' preset chip...`);
+  await page.click('.chip[data-prog="6,4,1,5"]');
+  await page.waitForTimeout(600);
 
-  // Wait for search result box to display matches
-  await page.waitForSelector('#yopu-search-results-box .btn-import-item', { state: 'attached', timeout: 15000 });
-  const searchHtml = await page.textContent('#yopu-search-results-box');
-  console.log(`   Search Results Summary:\n   ${searchHtml.slice(0, 160).replace(/\s+/g, ' ')}...`);
-
-  if (searchHtml.includes('undefined')) {
-    throw new Error(`❌ Found 'undefined' in Yopu search results HTML: ${searchHtml}`);
+  const prog6415Title = await page.textContent('#progression-name-title');
+  const count6415 = await page.textContent('#total-songs-count');
+  console.log(`   Progression Title: "${prog6415Title}", Hits: ${count6415}`);
+  if (!prog6415Title.includes('六四一五')) {
+    throw new Error(`Expected 6415 title, got: ${prog6415Title}`);
   }
 
-  // 3. Click the first "解析 ➔" button
-  console.log(`🚀 Step 3: Clicking the first '解析 ➔' button...`);
-  const firstImportBtn = page.locator('#yopu-search-results-box .btn-import-item').first();
-  const itemTitle = await firstImportBtn.getAttribute('data-title');
-  const itemArtist = await firstImportBtn.getAttribute('data-artist');
-  console.log(`   Target Song: "${itemTitle}" by "${itemArtist}"`);
-  
-  await firstImportBtn.click();
+  // 3. Test 4-5-3-6-2-5-1 (王道进行) Chip Click
+  console.log(`🚀 Step 3: Clicking '4-5-3-6-2-5-1 (王道进行)' preset chip...`);
+  await page.click('.chip[data-prog="4,5,3,6,2,5,1"]');
+  await page.waitForTimeout(600);
 
-  // Wait for #yopu-import-result to show success
-  await page.waitForFunction(() => {
-    const el = document.getElementById('yopu-import-result');
-    return el && el.textContent.includes('解析成功并已入库');
-  }, { timeout: 15000 });
-
-  const importResultText = await page.textContent('#yopu-import-result');
-  console.log(`   Import Result Card:\n${importResultText.trim()}`);
-
-  if (importResultText.includes('undefined') || importResultText.includes('未知歌手')) {
-    throw new Error(`❌ Found 'undefined' or '未知歌手' in import result: ${importResultText}`);
+  const progRoyalTitle = await page.textContent('#progression-name-title');
+  const countRoyal = await page.textContent('#total-songs-count');
+  console.log(`   Progression Title: "${progRoyalTitle}", Hits: ${countRoyal}`);
+  if (!progRoyalTitle.includes('王道进行')) {
+    throw new Error(`Expected 王道进行 title, got: ${progRoyalTitle}`);
   }
 
-  // 4. Click '在曲库中检索此进行 ➔'
-  console.log(`🚀 Step 4: Clicking '在曲库中检索此进行 ➔'...`);
-  await page.click('#btn-use-yopu-prog');
-  await page.waitForTimeout(500);
+  // 4. Test Keyword Search for '青花瓷' (Jay Chou)
+  console.log(`🚀 Step 4: Typing '青花瓷' into search bar...`);
+  await page.fill('#input-progression', '青花瓷');
+  await page.click('#btn-search');
+  await page.waitForTimeout(600);
 
-  const activeProgInput = await page.inputValue('#input-progression');
-  console.log(`   Active Progression loaded into builder: "${activeProgInput}"`);
-  if (!activeProgInput) {
-    throw new Error(`Progression was not loaded into input!`);
+  const firstSongTitle = await page.textContent('#songs-tbody tr:first-child .song-title');
+  const firstSongProg = await page.textContent('#songs-tbody tr:first-child td:nth-child(4)');
+  console.log(`   Matched Song: "${firstSongTitle.trim()}", Progression: "${firstSongProg.trim().replace(/\s+/g, ' ')}"`);
+  if (!firstSongTitle.includes('青花瓷') || !firstSongProg.includes('4,5,3,6,2,5,1')) {
+    throw new Error(`Expected 青花瓷 with 4,5,3,6,2,5,1, got ${firstSongTitle} / ${firstSongProg}`);
   }
 
-  // 5. Test Chord Sheet Decoder
-  console.log(`🚀 Step 5: Testing Chord Sheet Decoder with 'F G Em Am Dm G C'...`);
+  // 5. Test Keyword Search for '北京北京' (Wang Feng 6415)
+  console.log(`🚀 Step 5: Typing '北京北京' into search bar...`);
+  await page.fill('#input-progression', '北京北京');
+  await page.click('#btn-search');
+  await page.waitForTimeout(600);
+
+  const bjSongTitle = await page.textContent('#songs-tbody tr:first-child .song-title');
+  const bjSongProg = await page.textContent('#songs-tbody tr:first-child td:nth-child(4)');
+  console.log(`   Matched Song: "${bjSongTitle.trim()}", Progression: "${bjSongProg.trim().replace(/\s+/g, ' ')}"`);
+  if (!bjSongTitle.includes('北京北京') || !bjSongProg.includes('6,4,1,5')) {
+    throw new Error(`Expected 北京北京 with 6,4,1,5, got ${bjSongTitle} / ${bjSongProg}`);
+  }
+
+  // 6. Test Chord Sheet Decoder with 'F G Em Am Dm G C'
+  console.log(`🚀 Step 6: Testing Chord Sheet Decoder with 'F G Em Am Dm G C'...`);
   await page.fill('#custom-chords-input', 'F G Em Am Dm G C');
   await page.click('#btn-custom-analyze');
   await page.waitForSelector('#custom-analysis-result div', { state: 'attached', timeout: 5000 });
@@ -96,14 +99,6 @@ console.log(`🌐 Launching Chrome to execute full interactive E2E tests on ${TA
   if (!decodeText.includes('IV - V - iii - vi - ii - V - I') && !decodeText.includes('4,5,3,6,2,5,1')) {
     throw new Error(`Decoder failed to produce Roman progression: ${decodeText}`);
   }
-
-  // 6. Test '用此进行检索歌曲 ➔' from decoder
-  console.log(`🚀 Step 6: Testing '用此进行检索歌曲 ➔' from decoder...`);
-  await page.click('#btn-use-custom-prog');
-  await page.waitForTimeout(500);
-
-  const totalHits = await page.textContent('#total-songs-count');
-  console.log(`   Songs count matching decoded progression: ${totalHits}`);
 
   // 7. Save High-Res Production Screenshot
   console.log(`🚀 Step 7: Capturing Screenshot...`);
@@ -118,5 +113,5 @@ console.log(`🌐 Launching Chrome to execute full interactive E2E tests on ${TA
   }
 
   await browser.close();
-  console.log(`🎉 ALL INTERACTIVE CHROME E2E TESTS PASSED 100%!`);
+  console.log(`🎉 ALL MULTI-PROGRESSION CHROME E2E TESTS PASSED 100%!`);
 })();

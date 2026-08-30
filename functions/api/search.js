@@ -7,11 +7,17 @@ export async function onRequestGet(context) {
 
   // Load static data from edge asset fetch
   const host = url.origin;
-  const zhResp = await fetch(`${host}/data/chinese_corpus.json`);
-  const enResp = await fetch(`${host}/data/western_corpus.json`);
-  const taxResp = await fetch(`${host}/data/named_progressions.json`);
+  const [zhResp, popResp, modResp, enResp, taxResp] = await Promise.all([
+    fetch(`${host}/data/chinese_corpus.json`),
+    fetch(`${host}/data/pop909_indexed_chords.json`),
+    fetch(`${host}/data/chinese_modern_corpus.json`),
+    fetch(`${host}/data/western_corpus.json`),
+    fetch(`${host}/data/named_progressions.json`)
+  ]);
 
   const zhData = zhResp.ok ? await zhResp.json() : [];
+  const popData = popResp.ok ? await popResp.json() : [];
+  const modData = modResp.ok ? await modResp.json() : [];
   const enData = enResp.ok ? await enResp.json() : [];
   const taxonomy = taxResp.ok ? await taxResp.json() : {};
 
@@ -23,12 +29,36 @@ export async function onRequestGet(context) {
   const seen = new Set();
 
   if (["all", "zh"].includes(lang.toLowerCase())) {
+    // 1. Curated Chinese Corpus
     for (const s of zhData) {
-      if (s.progression.includes(cleanProg) || cleanProg.includes(s.progression)) {
-        const k = (s.title + s.artist + s.section).toLowerCase();
+      if (s.progression && (s.progression.includes(cleanProg) || cleanProg.includes(s.progression))) {
+        const k = (s.title + s.artist + (s.section || "")).toLowerCase();
         if (!seen.has(k)) {
           seen.add(k);
-          songs.push({ ...s, language: "zh", source: "chinese_corpus" });
+          songs.push({ ...s, language: "zh", source: "chinese_curated" });
+        }
+      }
+    }
+
+    // 2. POP909 Academic Dataset
+    for (const s of popData) {
+      if (s.progression && (s.progression.includes(cleanProg) || cleanProg.includes(s.progression))) {
+        const k = (s.title + s.artist + (s.section || "")).toLowerCase();
+        if (!seen.has(k)) {
+          seen.add(k);
+          songs.push({ ...s, language: "zh", source: "pop909_academic" });
+        }
+      }
+    }
+
+    // 3. Modern 2020-2026 Hits
+    for (const s of modData) {
+      const prog = s.primary_progression || s.progression || "";
+      if (prog && (prog.includes(cleanProg) || cleanProg.includes(prog))) {
+        const k = (s.title + s.artist + (s.section || "")).toLowerCase();
+        if (!seen.has(k)) {
+          seen.add(k);
+          songs.push({ ...s, progression: prog, language: "zh", source: "chinese_modern_hits" });
         }
       }
     }

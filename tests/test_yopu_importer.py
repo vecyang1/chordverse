@@ -69,6 +69,13 @@ class TestYopuImporter(unittest.TestCase):
         saved = self.importer.save_to_modern_corpus(song)
         self.assertTrue(saved)
 
+    def test_search_yopu(self):
+        res = self.importer.search_yopu("再见青春")
+        self.assertIn("results", res)
+        self.assertGreater(len(res["results"]), 0)
+        titles = [r["title"] for r in res["results"]]
+        self.assertTrue(any("再见青春" in t for t in titles))
+
 
 if __name__ == "__main__":
     unittest.main()

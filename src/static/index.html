@@ -192,7 +192,7 @@
           <div id="custom-analysis-result" class="custom-result-box" style="display: none;"></div>
         </div>
 
-        <!-- 1-Click Yopu / UGC Harvester Tool -->
+        <!-- 1-Click Yopu / UGC Harvester & Search Tool -->
         <div class="analyzer-tool-box" style="margin-top: 16px;">
           <h3 class="section-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -200,13 +200,15 @@
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            有谱么 (Yopu) / UGC 曲谱一键抓取与 Loop 清洗
+            有谱么 (Yopu) 曲谱全网搜索 & Loop 智能清洗
           </h3>
-          <p class="tool-desc">输入有谱么 URL 或 ID（如 <code>aXYaaOXZ</code>），自动变调补偿、识别核心 Loop 进行并入库。</p>
+          <p class="tool-desc">输入歌名/歌手（如 <code>再见青春</code>）全网搜索曲谱，或直接粘贴 URL / ID 自动变调补偿并提取进行。</p>
           <div class="analyze-input-row">
-            <input type="text" id="yopu-import-input" placeholder="输入有谱么链接，例如 https://yopu.co/view/aXYaaOXZ 或 ID">
-            <button id="btn-yopu-import" class="btn btn-primary">一键解析 & 检索</button>
+            <input type="text" id="yopu-import-input" placeholder="输入歌名/歌手搜索（如 再见青春），或粘贴有谱么链接/ID">
+            <button id="btn-yopu-search" class="btn btn-secondary">全网搜索</button>
+            <button id="btn-yopu-import" class="btn btn-primary">直接解析</button>
           </div>
+          <div id="yopu-search-results-box" class="custom-result-box" style="display: none; max-height: 220px; overflow-y: auto; margin-top: 10px;"></div>
           <div id="yopu-import-result" class="custom-result-box" style="display: none;"></div>
         </div>
       </section>

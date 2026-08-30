@@ -225,6 +225,61 @@ def cmd_import_yopu(args):
         print("💡 Tip: Use '--add' to permanently save this song to ChordVerse's Chinese modern corpus.\n")
 
 
+def cmd_yopu_search(args):
+    from yopu_importer import YopuImporter
+    importer = YopuImporter()
+
+    query = args.query.strip()
+    print(f"\n🔍 \033[1;36mSearching Yopu.co for:\033[0m '{query}' ...")
+    try:
+        data = importer.search_yopu(query)
+    except Exception as e:
+        print(f"❌ Search failed: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    results = data.get("results", [])
+    if args.format == "json":
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return
+
+    if not results:
+        print(f"❌ No matching lead sheets found on Yopu for '{query}'\n")
+        return
+
+    if args.pick is not None:
+        idx = args.pick - 1
+        if 0 <= idx < len(results):
+            chosen = results[idx]
+            print(f"🎯 Auto-importing result #{args.pick}: \033[1;32m{chosen['title']}\033[0m - \033[1;33m{chosen['artist']}\033[0m (ID: {chosen['id']}) ...")
+            song = importer.parse_and_clean_score(chosen["id"], custom_title=chosen["title"], custom_artist=chosen["artist"])
+            print("\n" + "=" * 60)
+            print(f"🎵 \033[1;32m{song.title}\033[0m - \033[1;33m{song.artist}\033[0m")
+            print(f"🔑 Key: \033[1m{song.key}\033[0m (Original/Concert: \033[1m{song.original_key}\033[0m, Capo: {song.capo})")
+            print(f"🎼 Primary Progression: \033[1;36m{song.primary_roman}\033[0m ({song.primary_progression})")
+            if song.progression_name:
+                print(f"🏷️  Progression Name: \033[1;35m{song.progression_name}\033[0m")
+            print(f"🎹 Chords: {' - '.join(song.primary_chords)}")
+            print("=" * 60)
+            if args.add:
+                importer.save_to_modern_corpus(song)
+                print(f"✅ Successfully added '{song.title}' to data/chinese_modern_corpus.json!\n")
+            return
+        else:
+            print(f"❌ Pick index {args.pick} out of range (1-{len(results)})", file=sys.stderr)
+            sys.exit(1)
+
+    print(f"\n📊 Found {data['total_count']} matching scores on Yopu.co:\n")
+    print(f"  {'#':<3} {'ID':<10} {'Song Title':<24} {'Artist':<18} {'Key':<6} {'Verified':<10} {'URL'}")
+    print("  " + "─" * 90)
+    for idx, r in enumerate(results, 1):
+        v_tag = "✅ 认证" if r["verified"] else "─"
+        key_tag = r["key"] or "-"
+        print(f"  {idx:<3} {r['id']:<10} {r['title'][:22]:<24} {r['artist'][:16]:<18} {key_tag:<6} {v_tag:<10} {r['url']}")
+
+    print(f"\n💡 To import a score: \033[1;32m./bin/chord-analyzer import-yopu {results[0]['id']} --add\033[0m")
+    print(f"   Or auto-pick:      \033[1;32m./bin/chord-analyzer yopu-search \"{query}\" --pick 1 --add\033[0m\n")
+
+
 def cmd_doctor(args, analyzer: UnifiedChordAnalyzer):
     print("\n🩺 \033[1;36mRunning ChordVerse System Diagnostics...\033[0m\n")
 
@@ -306,6 +361,13 @@ def main():
     p_yopu.add_argument("--add", action="store_true", help="Save imported song directly to modern Chinese corpus")
     p_yopu.add_argument("--format", default="table", choices=["table", "json"], help="Output display format")
 
+    # yopu-search
+    p_yp_search = subparsers.add_parser("yopu-search", help="Search lead sheets on Yopu.co by song/artist keyword")
+    p_yp_search.add_argument("query", help="Song title, artist name, or query keyword (e.g. '再见青春' or '汪峰 存在')")
+    p_yp_search.add_argument("--pick", type=int, help="Auto-pick and import Nth search result (1-indexed)")
+    p_yp_search.add_argument("--add", action="store_true", help="Save imported song directly to modern Chinese corpus")
+    p_yp_search.add_argument("--format", default="table", choices=["table", "json"], help="Output display format")
+
     # chinese
     p_chinese = subparsers.add_parser("chinese", help="Browse iconic Chinese pop chord progression taxonomy")
     p_chinese.add_argument("--top", action="store_true", help="Show top progressions")
@@ -342,6 +404,8 @@ def main():
         cmd_analyze(args, analyzer)
     elif args.command == "import-yopu":
         cmd_import_yopu(args)
+    elif args.command == "yopu-search":
+        cmd_yopu_search(args)
     elif args.command == "chinese":
         cmd_chinese(args, analyzer)
     elif args.command == "export":

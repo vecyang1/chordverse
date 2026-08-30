@@ -94,6 +94,22 @@ class ChordAnalyzerHTTPHandler(BaseHTTPRequestHandler):
             self._send_json(res)
             return
 
+        # API: Search Yopu
+        if path == "/api/yopu-search":
+            q = params.get("q", [""])[0]
+            instrument = params.get("instrument", ["guitar"])[0]
+            if not q:
+                self._send_json({"error": "Missing 'q' search parameter"}, 400)
+                return
+            from yopu_importer import YopuImporter
+            importer = YopuImporter()
+            try:
+                data = importer.search_yopu(q, instrument=instrument)
+                self._send_json(data)
+            except Exception as e:
+                self._send_json({"error": str(e)}, 500)
+            return
+
         # Static File Serving
         if path == "/" or path == "":
             file_path = STATIC_DIR / "index.html"

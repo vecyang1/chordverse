@@ -92,6 +92,34 @@ TOOLS = [
             "type": "object",
             "properties": {}
         }
+    },
+    {
+        "name": "import_yopu_song",
+        "description": "Import, clean, and extract harmonic progressions from a Yopu URL, score ID (e.g. 'aXYaaOXZ'), or lead sheet with Capo compensation.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "score": {
+                    "type": "string",
+                    "description": "Yopu URL, ID, or raw lead sheet text"
+                },
+                "add_to_corpus": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": "Whether to permanently save to modern Chinese corpus"
+                },
+                "key": {
+                    "type": "string",
+                    "description": "Optional key override"
+                },
+                "capo": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Capo fret offset"
+                }
+            },
+            "required": ["score"]
+        }
     }
 ]
 
@@ -137,6 +165,22 @@ def handle_tool_call(name: str, arguments: dict) -> dict:
         return {
             "content": [
                 {"type": "text", "text": json.dumps(items, ensure_ascii=False, indent=2)}
+            ]
+        }
+
+    elif name == "import_yopu_song":
+        from yopu_importer import YopuImporter
+        importer = YopuImporter()
+        score = arguments.get("score", "")
+        add = arguments.get("add_to_corpus", False)
+        custom_key = arguments.get("key")
+        capo = arguments.get("capo", 0)
+        song = importer.parse_and_clean_score(score, custom_key=custom_key, custom_capo=capo)
+        if add:
+            importer.save_to_modern_corpus(song)
+        return {
+            "content": [
+                {"type": "text", "text": json.dumps(song.to_dict(), ensure_ascii=False, indent=2)}
             ]
         }
 

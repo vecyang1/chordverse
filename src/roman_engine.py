@@ -282,6 +282,7 @@ def chords_to_roman(chords: List[str], key_center: str = "C", scale_type: str = 
         if is_subsequence(pat_degs, degrees):
             recognized.append({
                 "pattern": pattern_str,
+                "progression": pattern_str,
                 "name": name
             })
 

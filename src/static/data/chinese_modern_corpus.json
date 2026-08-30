@@ -1,0 +1,30 @@
+[
+  {
+    "id": "aXYaaOXZ",
+    "title": "再见青春",
+    "artist": "汪峰",
+    "key": "C major",
+    "original_key": "C",
+    "capo": 0,
+    "primary_progression": "1,5,6,4",
+    "primary_roman": "I-V-vi-IV",
+    "primary_degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "progression_name": "Pop-Punk / 4-Chord Progression (Axis of Awesome / 流行四和弦)",
+    "primary_chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "section_breakdowns": {
+      "Chorus": "1,5,6,4"
+    },
+    "source_url": "https://yopu.co/view/aXYaaOXZ",
+    "raw_lyrics_sample": ""
+  }
+]

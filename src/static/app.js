@@ -323,13 +323,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const isZh = s.language === "zh";
       const langBadge = isZh ? `<span class="lang-badge zh">🇨🇳 华语</span>` : `<span class="lang-badge en">🌍 Western</span>`;
       
+      let srcBadge = "";
+      if (s.source === "pop909") {
+        srcBadge = `<span class="source-badge pop909" title="POP909 专家人工扒谱真值库">POP909 基准</span>`;
+      } else if (s.source === "chinese_corpus") {
+        srcBadge = `<span class="source-badge curated" title="华语经典精选真值库">华语精选</span>`;
+      } else if (s.source === "modern_harvest") {
+        srcBadge = `<span class="source-badge modern" title="2020-2026 现代热歌清洗库">现代热歌</span>`;
+      } else if (s.source === "western_corpus") {
+        srcBadge = `<span class="source-badge western" title="欧美流行经典库">欧美经典</span>`;
+      } else if (s.source === "hooktheory") {
+        srcBadge = `<span class="source-badge hooktheory" title="Hooktheory 7.5万首和声库">Hooktheory</span>`;
+      }
+
       let linkHtml = "-";
       if (s.url) {
         linkHtml = `<a href="${s.url}" target="_blank" class="song-link">TheoryTab ↗</a>`;
       } else if (s.ytid) {
         linkHtml = `<a href="https://www.youtube.com/watch?v=${s.ytid}" target="_blank" class="song-link">YouTube ↗</a>`;
-      } else if (s.source) {
-        linkHtml = `<span style="color:var(--text-muted);">${s.source}</span>`;
+      } else {
+        linkHtml = srcBadge || `<span style="color:var(--text-muted);">${s.source}</span>`;
       }
 
       tr.innerHTML = `
@@ -338,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${s.artist}</td>
         <td><span class="section-badge">${s.section}</span></td>
         <td><span class="key-badge">${s.key}</span></td>
-        <td>${langBadge} ${linkHtml}</td>
+        <td>${langBadge} ${srcBadge} ${s.url || s.ytid ? linkHtml : ""}</td>
       `;
       songsTbody.appendChild(tr);
     });
@@ -413,6 +426,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (e) {
       alert("解析失败");
+    }
+  });
+
+  // 1-Click Yopu / UGC Harvester Handler
+  const btnYopuImport = document.getElementById("btn-yopu-import");
+  const yopuImportInput = document.getElementById("yopu-import-input");
+  const yopuImportResult = document.getElementById("yopu-import-result");
+
+  btnYopuImport?.addEventListener("click", async () => {
+    const raw = yopuImportInput.value.trim();
+    if (!raw) return;
+    btnYopuImport.textContent = "解析中...";
+    btnYopuImport.disabled = true;
+
+    try {
+      const res = await fetch("/api/import-yopu", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score: raw, add_to_corpus: true })
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        alert("解析失败: " + data.error);
+        return;
+      }
+
+      yopuImportResult.style.display = "block";
+      yopuImportResult.innerHTML = `
+        <div style="color:#10b981;font-weight:700;margin-bottom:6px;">✅ 解析成功并已入库！</div>
+        <div><strong>歌名/歌手:</strong> ${data.title} - ${data.artist}</div>
+        <div><strong>原曲调性:</strong> ${data.key} (Capo: ${data.capo})</div>
+        <div><strong>核心 Loop 级数:</strong> <span style="color:var(--primary-accent);font-weight:700;">${data.primary_roman}</span> (${data.primary_progression})</div>
+        ${data.progression_name ? `<div style="color:#38bdf8;font-size:12px;">🏷️ 对应进行: ${data.progression_name}</div>` : ""}
+        <div><strong>和弦走向:</strong> ${data.primary_chords.join(" - ")}</div>
+        <button id="btn-use-yopu-prog" class="btn btn-secondary" style="margin-top:8px;padding:4px 8px;font-size:11px;">在曲库中检索此进行 ➔</button>
+      `;
+
+      document.getElementById("btn-use-yopu-prog")?.addEventListener("click", () => {
+        inputProg.value = data.primary_progression;
+        activeDegrees = parseInputToDegrees(data.primary_progression);
+        renderBuilderDisplay();
+        executeSearch();
+      });
+
+    } catch (e) {
+      alert("网络请求失败");
+    } finally {
+      btnYopuImport.textContent = "一键解析 & 检索";
+      btnYopuImport.disabled = false;
     }
   });
 

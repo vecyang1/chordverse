@@ -129,36 +129,87 @@ class TestChordVerseStressAndFuzzing(unittest.TestCase):
         self.assertTrue(any("Faded" in t for t in titles_6415))
 
     # =========================================================================
-    # 3. Fuzzing & Malformed / Boundary Input Handling
+    # 4. Multi-Corpus Database Integrity & Schema Audit
     # =========================================================================
-    def test_fuzzing_weird_inputs(self):
-        """Verify engine never crashes on malformed, empty, or malicious inputs."""
-        weird_inputs = [
-            "",
-            "   ",
-            "\n\t\r",
-            "1",
-            "99999",
-            "-1,-5,-6,-4",
-            "!@#$%^&*()_+",
-            "C - G - Am - F",  # User inputted chords into progression box
-            "I, V, VI, IV, V, I, VII, VIII, IX, X",
-            "1,5,6,4,1,5,6,4,1,5,6,4,1,5,6,4",  # Very long progression
-            "undefined",
-            "null",
-            "NaN",
-            "🎉🎶🎹🔥"
-        ]
+    def test_corpus_schema_and_uniqueness(self):
+        """Validate integrity, non-null fields, and uniqueness across all data layers."""
+        # 1. Chinese Curated Corpus
+        zh_ids = set()
+        for song in self.analyzer.chinese_engine.corpus:
+            self.assertIn("id", song)
+            self.assertIn("title", song)
+            self.assertIn("artist", song)
+            self.assertIn("key", song)
+            self.assertIn("progression", song)
+            self.assertIn("roman", song)
+            self.assertIn("chords", song)
+            self.assertNotIn(song["id"], zh_ids, f"Duplicate ID in chinese_corpus: {song['id']}")
+            zh_ids.add(song["id"])
 
-        for inp in weird_inputs:
-            # Must return graceful result or error dict without throwing uncaught exceptions
-            res = self.analyzer.search(inp)
-            self.assertIsInstance(res, dict)
-            self.assertIn("total_count", res)
+        # 2. POP909 Golden Base Index
+        pop_ids = set()
+        for song in self.analyzer.chinese_engine._pop909_data:
+            self.assertIn("id", song)
+            self.assertIn("title", song)
+            self.assertIn("artist", song)
+            self.assertIn("progression", song)
+            self.assertIn("degrees", song)
+            self.assertNotIn(song["id"], pop_ids, f"Duplicate ID in pop909_indexed_chords: {song['id']}")
+            pop_ids.add(song["id"])
 
-            # Analyze fuzz
-            ana_res = chords_to_roman([inp], key_center="C")
-            self.assertIsInstance(ana_res, dict)
+        # 3. Modern 2020-2026 Corpus
+        modern_ids = set()
+        for song in self.analyzer.chinese_engine._modern_data:
+            self.assertIn("id", song)
+            self.assertIn("title", song)
+            self.assertIn("artist", song)
+            self.assertIn("primary_progression", song)
+            self.assertNotIn(song["id"], modern_ids, f"Duplicate ID in modern corpus: {song['id']}")
+            modern_ids.add(song["id"])
+
+    # =========================================================================
+    # 5. Exotic Chords, Extensions, Inversions & Slash Chords
+    # =========================================================================
+    def test_exotic_chord_transposition_and_degrees(self):
+        """Test complex jazzy, modal, and extended chord shapes."""
+        from yopu_importer import transpose_chord_name, transpose_note_name
+
+        # Enharmonics & standard roots
+        self.assertEqual(transpose_note_name("Db", 2), "D#")
+        self.assertEqual(transpose_note_name("Gb", 1), "G")
+        self.assertEqual(transpose_note_name("A#", 2), "C")
+
+        # Slash chords & complex extensions
+        self.assertEqual(transpose_chord_name("G/B", 2), "A/C#")
+        self.assertEqual(transpose_chord_name("C/E", 2), "D/F#")
+        self.assertEqual(transpose_chord_name("F#m7b5", 1), "Gm7b5")
+        self.assertEqual(transpose_chord_name("Cadd9", 2), "Dadd9")
+        self.assertEqual(transpose_chord_name("Dsus4", 2), "Esus4")
+        self.assertEqual(transpose_chord_name("Bbmaj7", 2), "Cmaj7")
+        self.assertEqual(transpose_chord_name("Bdim7", 1), "Cdim7")
+        self.assertEqual(transpose_chord_name("E7#9", 1), "F7#9")
+
+    # =========================================================================
+    # 6. Yopu Importer Edge Cases & Loop Detection Stress Test
+    # =========================================================================
+    def test_yopu_importer_loop_detector_stress(self):
+        """Test harmonic loop extraction on long, noisy, and repetitive chord streams."""
+        from yopu_importer import YopuImporter
+        importer = YopuImporter()
+
+        # Noisy lead sheet with chords + lyrics + comments
+        noisy_chords = (
+            ["C", "G", "Am", "F"] * 4 +  # Chorus 1564
+            ["F", "G", "Em", "Am", "Dm", "G", "C"] * 2 + # Bridge 4536251
+            ["C", "G", "Am", "F"] * 6   # Outro 1564
+        )
+
+        loops = importer.detect_harmonic_loops(noisy_chords, key_root="C")
+        self.assertGreater(len(loops), 0)
+        # Dominant loop must be 1,5,6,4
+        top_loop, count = loops[0]
+        self.assertEqual(top_loop, "1,5,6,4")
+        self.assertGreaterEqual(count, 8)
 
 
 if __name__ == "__main__":

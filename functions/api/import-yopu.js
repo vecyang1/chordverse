@@ -13,16 +13,6 @@ const NOTE_PITCH = {
   'B': 11, 'Cb': 11
 };
 
-const MAJOR_SCALE_INTERVALS = {
-  0: (1, 'I'),
-  2: (2, 'ii'),
-  4: (3, 'iii'),
-  5: (4, 'IV'),
-  7: (5, 'V'),
-  9: (6, 'vi'),
-  11: (7, 'vii°')
-};
-
 const INTERVAL_TO_DEGREE = {
   0: 1, 2: 2, 4: 3, 5: 4, 7: 5, 9: 6, 11: 7
 };
@@ -56,7 +46,7 @@ export async function onRequestPost(context) {
     const body = await context.request.json();
     let urlOrId = body.score || body.url || body.id || "";
     if (!urlOrId) {
-      return new Response(JSON.stringify({ error: "Missing score, url or id parameter" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "请输入曲谱链接、ID 或歌名" }), { status: 400 });
     }
 
     const idMatch = urlOrId.match(/[a-zA-Z0-9_-]{6,16}/);
@@ -70,7 +60,7 @@ export async function onRequestPost(context) {
     });
 
     if (!resp.ok) {
-      return new Response(JSON.stringify({ error: `Yopu returned HTTP ${resp.status}` }), { status: 502 });
+      return new Response(JSON.stringify({ error: `无法获取有谱么曲谱 (HTTP ${resp.status})` }), { status: 502 });
     }
 
     const html = await resp.text();
@@ -81,7 +71,7 @@ export async function onRequestPost(context) {
 
     const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
     if (titleMatch) {
-      const rawTitle = titleMatch[1].replace(/_.*$/, "").trim();
+      const rawTitle = titleMatch[1].replace(/_.*$/, "").replace(/\s*(?:吉他和弦谱|吉他谱|和弦谱|尤克里里谱|钢琴谱|弹唱谱)\s*$/i, "").trim();
       const parts = rawTitle.split(/\s*[-—]\s*/);
       if (parts.length >= 2) {
         title = parts[0].trim();
@@ -91,7 +81,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    // Try to extract key and capo from html or data json
+    // Extract key and capo
     const keyMatch = html.match(/原调[：:\s]*([A-G][#b]?)/i) || html.match(/Key[：:\s]*([A-G][#b]?)/i);
     if (keyMatch) key = keyMatch[1];
     const capoMatch = html.match(/变调夹[：:\s]*(\d+)/i) || html.match(/Capo[：:\s]*(\d+)/i);
@@ -103,26 +93,42 @@ export async function onRequestPost(context) {
     let m;
     while ((m = chordRegex.exec(html)) !== null) {
       const c = m[1];
-      if (!chord_ignore(c) || chords.length > 0) {
+      if (!["A", "I", "C", "D", "E", "F", "G"].includes(c) || chords.length > 0) {
         if (chords.length === 0 || chords[chords.length - 1] !== c) {
           chords.push(c);
         }
       }
     }
 
-    function chord_ignore(token) {
-      return ["A", "I", "C", "D", "E", "F", "G"].includes(token);
+    if (chords.length < 2) {
+      // Check if we have lyrics
+      const artM = html.match(/<article>(.*?)<\/article>/is);
+      const lyricsSnippet = artM ? artM[1].slice(0, 100).trim() : "";
+      
+      return new Response(JSON.stringify({
+        id: sheetId,
+        title: title,
+        artist: artist,
+        key: `${key} major`,
+        original_key: key,
+        capo: capo,
+        no_inline_chords: true,
+        message: `已解析曲目信息《${title} - ${artist}》，但该曲谱未内嵌公开文本和弦。请在【自选和弦谱解析器】中粘贴其实际和弦走向进行分析！`,
+        source_url: targetUrl,
+        lyrics_sample: lyricsSnippet
+      }), {
+        headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
+      });
     }
 
-    const validChords = chords.length > 0 ? chords : ["C", "G", "Am", "F"];
-    const degObjList = validChords.map(c => chordToDegree(c, key));
+    const degObjList = chords.map(c => chordToDegree(c, key));
     const degrees = degObjList.map(o => o.deg);
     const romans = degObjList.map(o => o.rom);
 
     // Detect 4-chord loop
     let loopDegs = degrees.slice(0, 4);
     let loopRomans = romans.slice(0, 4);
-    let loopChords = validChords.slice(0, 4);
+    let loopChords = chords.slice(0, 4);
 
     if (degrees.length >= 4) {
       const counts = {};
@@ -161,7 +167,7 @@ export async function onRequestPost(context) {
       primary_roman: romanStr,
       progression_name: progName,
       primary_chords: loopChords,
-      extracted_chords: validChords.slice(0, 32),
+      extracted_chords: chords.slice(0, 32),
       source_url: targetUrl
     }), {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }

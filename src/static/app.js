@@ -763,6 +763,13 @@ document.addEventListener("DOMContentLoaded", () => {
   filterLang?.addEventListener("change", executeSearch);
   filterArtist?.addEventListener("input", executeSearch);
 
+  document.querySelectorAll(".btn-quick-song").forEach(btn => {
+    btn.addEventListener("click", () => {
+      inputProg.value = btn.textContent.trim();
+      executeSearch();
+    });
+  });
+
   // Exporters
   btnExportCsv?.addEventListener("click", () => {
     if (!currentSearchResults || !currentSearchResults.songs) return;

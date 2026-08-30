@@ -131,22 +131,33 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="input-progression" placeholder="输入进行(如 1564 / 6415 / 4536251) 或 歌名/歌手(如 晴天、青花瓷、汪峰)..." value="1,5,6,4">
+            <input type="text" id="input-progression" placeholder="🔍 直接输入歌名/歌手 (如 Right Here Waiting, 青花瓷, Adele) 或 和弦进行 (如 1564, 4536251)..." value="1,5,6,4">
             <button id="btn-search" class="btn btn-primary">立即检索</button>
           </div>
 
-          <div class="filter-row">
+          <!-- Quick Song Search Tags -->
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:11px;color:var(--text-secondary);">
+            <span>🎵 歌名快捷检索：</span>
+            <button class="btn btn-secondary btn-quick-song" style="padding:1px 6px;font-size:11px;border-radius:10px;">Right Here Waiting</button>
+            <button class="btn btn-secondary btn-quick-song" style="padding:1px 6px;font-size:11px;border-radius:10px;">青花瓷</button>
+            <button class="btn btn-secondary btn-quick-song" style="padding:1px 6px;font-size:11px;border-radius:10px;">晴天</button>
+            <button class="btn btn-secondary btn-quick-song" style="padding:1px 6px;font-size:11px;border-radius:10px;">Let It Be</button>
+            <button class="btn btn-secondary btn-quick-song" style="padding:1px 6px;font-size:11px;border-radius:10px;">水星记</button>
+            <button class="btn btn-secondary btn-quick-song" style="padding:1px 6px;font-size:11px;border-radius:10px;">Hotel California</button>
+          </div>
+
+          <div class="filter-row" style="margin-top:10px;">
             <div class="filter-item">
               <label>语种范围：</label>
               <select id="select-lang">
-                <option value="all">全部 (All Languages)</option>
-                <option value="zh" selected>🇨🇳 华语流行 (Mandopop/Cantopop)</option>
-                <option value="en">🌍 欧美流行 (Hooktheory 75,000+)</option>
+                <option value="all" selected>🌍 全球曲库 (All Languages)</option>
+                <option value="zh">🇨🇳 华语流行 (POP909 + 精选 1000+)</option>
+                <option value="en">🇺🇸 欧美流行 (Hooktheory 75,000+)</option>
               </select>
             </div>
             <div class="filter-item">
-              <label>歌手过滤：</label>
-              <input type="text" id="input-artist" placeholder="如 周杰伦 / 五月天 / Taylor Swift">
+              <label>歌手/歌名过滤：</label>
+              <input type="text" id="input-artist" placeholder="如 Richard Marx / 周杰伦 / Adele">
             </div>
           </div>
         </div>

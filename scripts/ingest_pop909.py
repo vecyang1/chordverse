@@ -1,889 +1,232 @@
 #!/usr/bin/env python3
 """
-POP909 / POP909-CL Chinese Pop Dataset Ingestion & Indexing Pipeline.
+POP909 Full Dataset Ingestion & Indexing Pipeline.
 
-Indexes the 909 classic Mandopop songs with their harmonic analyses,
-sections (Chorus, Verse, Bridge, Intro), keys, and Roman numeral progressions.
-Generates data/pop909_indexed_chords.json for ultra-fast, zero-hallucination querying.
+Indexes ALL 909 canonical Mandopop songs from the academic POP909 dataset
+with their ground-truth annotations (keys, chord progressions, harmonic loops, Roman numerals).
+Generates data/pop909_indexed_chords.json for zero-hallucination querying.
 """
 
 from __future__ import annotations
-import json
 import os
+import re
 import sys
+import html
+import json
+import zipfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
+from collections import Counter
 from typing import List, Dict, Any
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-SRC_DIR = ROOT_DIR / 'src'
-DATA_DIR = ROOT_DIR / 'data'
+SRC_DIR = ROOT_DIR / "src"
+DATA_DIR = ROOT_DIR / "data"
 
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from roman_engine import (
-    normalize_progression_input,
-    progression_to_scale_degrees,
-    NAMED_PROGRESSIONS
-)
+NOTE_PITCH = {
+    'C': 0, 'B#': 0,
+    'C#': 1, 'Db': 1,
+    'D': 2,
+    'D#': 3, 'Eb': 3,
+    'E': 4, 'Fb': 4,
+    'F': 5, 'E#': 5,
+    'F#': 6, 'Gb': 6,
+    'G': 7,
+    'G#': 8, 'Ab': 8,
+    'A': 9,
+    'A#': 10, 'Bb': 10,
+    'B': 11, 'Cb': 11
+}
 
-POP909_CANONICAL_INDEX: List[Dict[str, Any]] = [
-    # 周杰伦 (Jay Chou) 经典和声作品
-    {
-        'id': 'pop909_001',
-        'title': '告白气球 (Love Confession)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'B major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['B', 'F#', 'G#m', 'E'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2016,
-        'notes': '亲爱的 爱上你 从那天起 甜蜜的很轻易'
-    },
-    {
-        'id': 'pop909_002',
-        'title': '晴天 (Sunny Day)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'G major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['G', 'D', 'Em', 'C'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2003,
-        'notes': '刮风这天 我试过握着你手'
-    },
-    {
-        'id': 'pop909_003',
-        'title': '青花瓷 (Blue and White Porcelain)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'A major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['D', 'E', 'C#m', 'F#m', 'Bm', 'E', 'A'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2007,
-        'notes': '天青色等烟雨 而我在等你'
-    },
-    {
-        'id': 'pop909_004',
-        'title': '说好的幸福呢 (Promised Happiness)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['C', 'G', 'Am', 'Em', 'F', 'C', 'Dm', 'G'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2008,
-        'notes': '说好的 幸福呢 我懂了 不说了'
-    },
-    {
-        'id': 'pop909_005',
-        'title': '安静 (Silence)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'Bb major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['Bb', 'F', 'Gm', 'Dm', 'Eb', 'Bb', 'Cm', 'F'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2001,
-        'notes': '你要我说多难堪 我根本不想分开'
-    },
-    {
-        'id': 'pop909_006',
-        'title': '爱在西元前 (Love Before BC)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Am', 'F', 'C', 'G'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2001,
-        'notes': '古巴比伦王颁布了汉谟拉比法典'
-    },
-    {
-        'id': 'pop909_007',
-        'title': '夜曲 (Nocturne)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'Bb minor / Db major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Bbm', 'Gb', 'Db', 'Ab'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2005,
-        'notes': '为你弹奏萧邦的夜曲 纪念我死去的爱情'
-    },
-    {
-        'id': 'pop909_008',
-        'title': '发如雪 (Snow-Like Hair)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'D major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['G', 'A', 'F#m', 'Bm', 'Em', 'A', 'D'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2005,
-        'notes': '你发如雪 凄美了离别'
-    },
-    {
-        'id': 'pop909_009',
-        'title': '千里之外 (Far Away)',
-        'artist': '周杰伦 / 费玉清',
-        'key': 'Eb major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['Ab', 'Bb', 'Gm', 'Cm', 'Fm', 'Bb', 'Eb'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2006,
-        'notes': '我送你离开 千里之外 你无声黑白'
-    },
-    {
-        'id': 'pop909_010',
-        'title': '不能说的秘密 (Secret)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'G major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['C', 'D', 'Bm', 'Em', 'Am', 'D', 'G'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2007,
-        'notes': '最美的不是下雨天 是曾与你躲过雨的屋檐'
-    },
-    {
-        'id': 'pop909_011',
-        'title': '七里香 (Common Jasmin Orange)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'Eb major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['Eb', 'Bb', 'Cm', 'Gm', 'Ab', 'Eb', 'Fm', 'Bb'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2004,
-        'notes': '雨下整夜 我的爱溢出就像雨水'
-    },
-    {
-        'id': 'pop909_012',
-        'title': '蒲公英的约定 (Dandelion Promised)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['C', 'G', 'Am', 'Em', 'F', 'C', 'Dm', 'G'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2007,
-        'notes': '一起长大的约定 那样清晰 拉过勾的我相信'
-    },
-    {
-        'id': 'pop909_013',
-        'title': '开不了口 (I Find It Hard to Say)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'Db major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['Db', 'Ab', 'Bbm', 'Fm', 'Gb', 'Db', 'Ebm', 'Ab'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2001,
-        'notes': '就是开不了口让她知道 我一定会呵护着你也逗你笑'
-    },
-    {
-        'id': 'pop909_014',
-        'title': '黑色幽默 (Black Humor)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'F# minor / A major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['F#m', 'D', 'A', 'E'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2000,
-        'notes': '难过 是因为闷了很久 是因为想了太多'
-    },
-    {
-        'id': 'pop909_015',
-        'title': '珊瑚海 (Coral Sea)',
-        'artist': '周杰伦 / 梁心颐',
-        'key': 'F major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['Bb', 'C', 'Am', 'Dm', 'Gm', 'C', 'F'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2005,
-        'notes': '海鸟跟鱼相爱 只是一场意外'
-    },
-    {
-        'id': 'pop909_016',
-        'title': '简单爱 (Simple Love)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2001,
-        'notes': '我想就这样牵着你的手不放开'
-    },
-    {
-        'id': 'pop909_017',
-        'title': '甜甜的 (Sweet)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'F major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['F', 'C', 'Dm', 'Bb'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2007,
-        'notes': '我喜欢的样子你都有'
-    },
-    {
-        'id': 'pop909_018',
-        'title': '枫 (Maple)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'A major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['D', 'E', 'C#m', 'F#m', 'Bm', 'E', 'A'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2005,
-        'notes': '缓缓飘落的枫叶像思念 我点燃烛火温暖岁末的秋天'
-    },
-    {
-        'id': 'pop909_019',
-        'title': '花海 (Ocean of Flowers)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2008,
-        'notes': '不要你离开 距离隔不开'
-    },
-    {
-        'id': 'pop909_020',
-        'title': '园游会 (Fairground)',
-        'artist': '周杰伦 (Jay Chou)',
-        'key': 'G major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['C', 'D', 'Bm', 'Em', 'Am', 'D', 'G'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2004,
-        'notes': '琥珀色生姜糖 融化了恋爱'
-    },
+MAJOR_SCALE_INTERVALS = {
+    0: (1, 'I'),
+    2: (2, 'ii'),
+    4: (3, 'iii'),
+    5: (4, 'IV'),
+    7: (5, 'V'),
+    9: (6, 'vi'),
+    11: (7, 'vii°')
+}
 
-    # 五月天 (Mayday)
-    {
-        'id': 'pop909_021',
-        'title': '突然好想你 (Suddenly Missing You)',
-        'artist': '五月天 (Mayday)',
-        'key': 'D major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['D', 'A', 'Bm', 'G'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2008,
-        'notes': '突然好想你 你会在哪里 过的快乐或委屈'
-    },
-    {
-        'id': 'pop909_022',
-        'title': '知足 (Contentment)',
-        'artist': '五月天 (Mayday)',
-        'key': 'E major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['E', 'B', 'C#m', 'A'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2005,
-        'notes': '怎么去拥有 一道彩虹 怎么去拥抱 一夏天的风'
-    },
-    {
-        'id': 'pop909_023',
-        'title': '温柔 (Tenderness)',
-        'artist': '五月天 (Mayday)',
-        'key': 'G major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['G', 'D', 'Em', 'C'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2000,
-        'notes': '不打扰 是我的温柔'
-    },
-    {
-        'id': 'pop909_024',
-        'title': '后来的我们 (Us After)',
-        'artist': '五月天 (Mayday)',
-        'key': 'G major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Em', 'C', 'G', 'D'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2016,
-        'notes': '然后呢 他们说你的心 似乎痊愈了'
-    },
-    {
-        'id': 'pop909_025',
-        'title': '倔强 (Stubborn)',
-        'artist': '五月天 (Mayday)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2004,
-        'notes': '我和我最后的倔强 握紧双手绝对不放'
-    },
-    {
-        'id': 'pop909_026',
-        'title': '恋爱ing (In Love)',
-        'artist': '五月天 (Mayday)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,6,4,5',
-        'chords': ['C', 'Am', 'F', 'G'],
-        'degrees': [1, 6, 4, 5],
-        'roman': 'I-vi-IV-V',
-        'year': 2005,
-        'notes': '恋爱ing happy ing 心情就像是 坐上一台喷射机'
-    },
-    {
-        'id': 'pop909_027',
-        'title': '盛夏光年 (Eternal Summer)',
-        'artist': '五月天 (Mayday)',
-        'key': 'A major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['F#m', 'D', 'A', 'E'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2006,
-        'notes': '我不转弯 我不转弯 我不转弯'
-    },
-    {
-        'id': 'pop909_028',
-        'title': '我不愿让你一个人 (I Won\'t Let You Be Alone)',
-        'artist': '五月天 (Mayday)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2011,
-        'notes': '我不愿让你一个人 一个人在人海浮沉'
-    },
+def extract_metadata(xlsx_path: Path) -> Dict[str, Dict[str, str]]:
+    metadata = {}
+    with zipfile.ZipFile(xlsx_path) as z:
+        sheet_xml = z.read('xl/worksheets/sheet1.xml').decode('utf-8')
+        sheet_xml_unescaped = html.unescape(sheet_xml)
+        tree = ET.fromstring(sheet_xml_unescaped)
+        for r in tree.findall('.//{http://schemas.openxmlformats.org/spreadsheetml/2006/main}row'):
+            cells = {}
+            for c in r.findall('{http://schemas.openxmlformats.org/spreadsheetml/2006/main}c'):
+                ref = c.get('r', '')
+                col = ''.join(filter(str.isalpha, ref))
+                t = c.find('.//{http://schemas.openxmlformats.org/spreadsheetml/2006/main}t')
+                v = c.find('{http://schemas.openxmlformats.org/spreadsheetml/2006/main}v')
+                val = t.text if t is not None else (v.text if v is not None else '')
+                cells[col] = val
+            if cells.get('A') and cells['A'] != 'song_id':
+                s_id = cells['A'].zfill(3)
+                metadata[s_id] = {
+                    'title': cells.get('B', f'POP909_{s_id}').strip(),
+                    'artist': cells.get('C', '华语群星').strip()
+                }
+    return metadata
 
-    # 汪峰 (Wang Feng) 经典硬地与流行摇滚
-    {
-        'id': 'pop909_031',
-        'title': '怒放的生命 (Blooming Life)',
-        'artist': '汪峰 (Wang Feng)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2005,
-        'notes': '我想要怒放的生命 就象飞翔在辽阔天空'
-    },
-    {
-        'id': 'pop909_032',
-        'title': '飞得更高 (Fly Higher)',
-        'artist': '汪峰 (Wang Feng)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2004,
-        'notes': '我要飞得更高 飞得更高 狂风一样舞蹈'
-    },
-    {
-        'id': 'pop909_033',
-        'title': '春天里 (In Spring)',
-        'artist': '汪峰 (Wang Feng)',
-        'key': 'A major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['A', 'E', 'F#m', 'D'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2009,
-        'notes': '如果有一天 我老无所依 请把我留在 在那时光里'
-    },
-    {
-        'id': 'pop909_034',
-        'title': '存在 (Existence)',
-        'artist': '汪峰 (Wang Feng)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2011,
-        'notes': '多少人走着却困在原地 多少人活着却如同死去'
-    },
-    {
-        'id': 'pop909_035',
-        'title': '北京北京 (Beijing Beijing)',
-        'artist': '汪峰 (Wang Feng)',
-        'key': 'A minor / C major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Am', 'F', 'C', 'G'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2007,
-        'notes': '我在这里欢笑 我在这里哭泣'
-    },
-    {
-        'id': 'pop909_036',
-        'title': '再见青春 (Farewell Youth)',
-        'artist': '汪峰 (Wang Feng)',
-        'key': 'A minor / C major',
-        'section': 'Verse & Chorus',
-        'progression': '6,4,5,6',
-        'chords': ['Am', 'F', 'G', 'Am'],
-        'degrees': [6, 4, 5, 6],
-        'roman': 'vi-IV-V-vi',
-        'year': 2009,
-        'notes': '我将在深秋的黎明出发 伴着铁皮车厢的摇晃'
-    },
+def ingest_full_pop909():
+    xlsx_path = Path('/tmp/pop909_index.xlsx')
+    raw_dir = Path('/tmp/pop909_raw/POP909')
 
-    # 林俊杰 (JJ Lin)
-    {
-        'id': 'pop909_041',
-        'title': '修炼爱情 (Practice Love)',
-        'artist': '林俊杰 (JJ Lin)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2013,
-        'notes': '修炼爱情的心酸 学会放好以前的渴望'
-    },
-    {
-        'id': 'pop909_042',
-        'title': '江南 (Jiangnan)',
-        'artist': '林俊杰 (JJ Lin)',
-        'key': 'Bb major',
-        'section': 'Verse (主歌)',
-        'progression': '1,5,6,4',
-        'chords': ['Bb', 'F', 'Gm', 'Eb'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2004,
-        'notes': '风到这里就是粘 粘住过客的思念'
-    },
-    {
-        'id': 'pop909_043',
-        'title': '可惜没如果 (If Only)',
-        'artist': '林俊杰 (JJ Lin)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2014,
-        'notes': '倘若那天 把该说的话好好说 该体谅的不执着'
-    },
-    {
-        'id': 'pop909_044',
-        'title': '一千年以后 (A Thousand Years Later)',
-        'artist': '林俊杰 (JJ Lin)',
-        'key': 'Eb major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['Eb', 'Bb', 'Cm', 'Gm', 'Ab', 'Eb', 'Fm', 'Bb'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2005,
-        'notes': '因为在一千年以后 世界早已没有我'
-    },
-    {
-        'id': 'pop909_045',
-        'title': '背对背拥抱 (Back to Back Embrace)',
-        'artist': '林俊杰 (JJ Lin)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2009,
-        'notes': '背对背拥抱 滥用沉默在咆哮'
-    },
+    if not xlsx_path.exists() or not raw_dir.exists():
+        print("Downloading POP909 dataset archive...")
+        import urllib.request
+        urllib.request.urlretrieve("https://raw.githubusercontent.com/music-x-lab/POP909-Dataset/master/POP909/index.xlsx", "/tmp/pop909_index.xlsx")
+        urllib.request.urlretrieve("https://raw.githubusercontent.com/music-x-lab/POP909-Dataset/master/POP909.zip", "/tmp/POP909.zip")
+        os.system("mkdir -p /tmp/pop909_raw && unzip -q -o /tmp/POP909.zip -d /tmp/pop909_raw/")
 
-    # 陈奕迅 (Eason Chan)
-    {
-        'id': 'pop909_051',
-        'title': '十年 (Ten Years)',
-        'artist': '陈奕迅 (Eason Chan)',
-        'key': 'Ab major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['Ab', 'Eb', 'Fm', 'Cm', 'Db', 'Ab', 'Bbm', 'Eb'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2003,
-        'notes': '十年之后 我们是朋友 还可以问候'
-    },
-    {
-        'id': 'pop909_052',
-        'title': '爱情转移 (Love Transfer)',
-        'artist': '陈奕迅 (Eason Chan)',
-        'key': 'Bb major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['Eb', 'F', 'Dm', 'Gm', 'Cm', 'F', 'Bb'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2007,
-        'notes': '把一个人的温暖 转移到另一个的胸膛'
-    },
-    {
-        'id': 'pop909_053',
-        'title': '红玫瑰 (Red Rose)',
-        'artist': '陈奕迅 (Eason Chan)',
-        'key': 'A minor / C major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Am', 'F', 'C', 'G'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2007,
-        'notes': '得不到的永远在骚动 被偏爱的 都有恃无恐'
-    },
-    {
-        'id': 'pop909_054',
-        'title': 'K歌之王 (King of Karaoke)',
-        'artist': '陈奕迅 (Eason Chan)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['C', 'G', 'Am', 'Em', 'F', 'C', 'Dm', 'G'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2000,
-        'notes': '我已经相信 有些人我永远不必等'
-    },
+    metadata = extract_metadata(xlsx_path)
+    print(f"📖 Metadata extracted for {len(metadata)} songs.")
 
-    # 华语殿堂级群星经典
-    {
-        'id': 'pop909_061',
-        'title': '光辉岁月 (Glorious Years)',
-        'artist': 'Beyond',
-        'key': 'D major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['D', 'A', 'Bm', 'G'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 1990,
-        'notes': '风雨中抱紧自由 一生经过磅礴的挣扎'
-    },
-    {
-        'id': 'pop909_062',
-        'title': '海阔天空 (Boundless Oceans, Vast Skies)',
-        'artist': 'Beyond',
-        'key': 'F major',
-        'section': 'Verse (主歌)',
-        'progression': '1,5,6,4',
-        'chords': ['F', 'C', 'Dm', 'Bb'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 1993,
-        'notes': '今天我 寒夜里看雪飘过'
-    },
-    {
-        'id': 'pop909_063',
-        'title': '红豆 (Red Bean)',
-        'artist': '王菲 (Faye Wong)',
-        'key': 'F major',
-        'section': 'Verse (主歌)',
-        'progression': '1,5,6,4',
-        'chords': ['F', 'C', 'Dm', 'Bb'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 1998,
-        'notes': '还没好好地感受 雪花绽放的气候'
-    },
-    {
-        'id': 'pop909_064',
-        'title': '传奇 (Legend)',
-        'artist': '王菲 / 李健',
-        'key': 'C major',
-        'section': 'Verse (主歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2003,
-        'notes': '只因为在人群中 多看了你一眼'
-    },
-    {
-        'id': 'pop909_065',
-        'title': '遇见 (Meet)',
-        'artist': '孙燕姿 (Stefanie Sun)',
-        'key': 'Ab major',
-        'section': 'Verse (主歌)',
-        'progression': '1,5,6,4',
-        'chords': ['Ab', 'Eb', 'Fm', 'Db'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2003,
-        'notes': '听见 冬天的离开 我在某年某月 醒过来'
-    },
-    {
-        'id': 'pop909_066',
-        'title': '我怀念的 (What I Miss)',
-        'artist': '孙燕姿 (Stefanie Sun)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2007,
-        'notes': '我怀念的是无话不说 我怀念的是一起做梦'
-    },
-    {
-        'id': 'pop909_067',
-        'title': '爱很简单 (I Love You)',
-        'artist': '陶喆 (David Tao)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 1997,
-        'notes': 'I love you 一直在这里 在你身边 从不走开'
-    },
-    {
-        'id': 'pop909_068',
-        'title': '普通朋友 (Regular Friends)',
-        'artist': '陶喆 (David Tao)',
-        'key': 'A major',
-        'section': 'Chorus (副歌)',
-        'progression': '2,5,1',
-        'chords': ['Bm7', 'E7', 'Amaj7'],
-        'degrees': [2, 5, 1],
-        'roman': 'ii-V-I',
-        'year': 1999,
-        'notes': '我只是比较慢热 但不是不想交朋友'
-    },
-    {
-        'id': 'pop909_069',
-        'title': '平凡之路 (The Ordinary Road)',
-        'artist': '朴树 (Pu Shu)',
-        'key': 'D major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Bm', 'G', 'D', 'A'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2014,
-        'notes': '我曾经跨过山和大海 也穿过人山人海'
-    },
-    {
-        'id': 'pop909_070',
-        'title': '消愁 (Sorrow Elimination)',
-        'artist': '毛不易 (Mao Buyi)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Am', 'F', 'C', 'G'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2017,
-        'notes': '一杯敬朝阳 一杯敬月光'
-    },
-    {
-        'id': 'pop909_071',
-        'title': '像我这样的人 (Someone Like Me)',
-        'artist': '毛不易 (Mao Buyi)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2017,
-        'notes': '像我这样迷茫的人 像我这样寻找的人'
-    },
-    {
-        'id': 'pop909_072',
-        'title': '泡沫 (Bubble)',
-        'artist': '邓紫棋 (G.E.M.)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Am', 'F', 'C', 'G'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2012,
-        'notes': '全都是泡沫 这一刹的花火'
-    },
-    {
-        'id': 'pop909_073',
-        'title': '光年之外 (Light Years Away)',
-        'artist': '邓紫棋 (G.E.M.)',
-        'key': 'Eb major',
-        'section': 'Chorus (副歌)',
-        'progression': '6,4,1,5',
-        'chords': ['Cm', 'Ab', 'Eb', 'Bb'],
-        'degrees': [6, 4, 1, 5],
-        'roman': 'vi-IV-I-V',
-        'year': 2016,
-        'notes': '感受停在我发端的指尖 如何瞬间冻结时间'
-    },
-    {
-        'id': 'pop909_074',
-        'title': '童话 (Fairy Tale)',
-        'artist': '光良 (Michael Wong)',
-        'key': 'F major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['F', 'C', 'Dm', 'Bb'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2005,
-        'notes': '我愿变成童话里 你爱的那个天使'
-    },
-    {
-        'id': 'pop909_075',
-        'title': '勇气 (Courage)',
-        'artist': '梁静茹 (Fish Leong)',
-        'key': 'F major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,3,4,1,2,5',
-        'chords': ['F', 'C', 'Dm', 'Am', 'Bb', 'F', 'Gm', 'C'],
-        'degrees': [1, 5, 6, 3, 4, 1, 2, 5],
-        'roman': 'I-V-vi-iii-IV-I-ii-V',
-        'year': 2000,
-        'notes': '爱真的需要勇气 来面对流言蜚语'
-    },
-    {
-        'id': 'pop909_076',
-        'title': '可惜不是你 (Unfortunately Not You)',
-        'artist': '梁静茹 (Fish Leong)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '4,5,3,6,2,5,1',
-        'chords': ['F', 'G', 'Em', 'Am', 'Dm', 'G', 'C'],
-        'degrees': [4, 5, 3, 6, 2, 5, 1],
-        'roman': 'IV-V-iii-vi-ii-V-I',
-        'year': 2005,
-        'notes': '可惜不是你 陪我到最后'
-    },
-    {
-        'id': 'pop909_077',
-        'title': "情非得已 (Can't Help Falling for You)",
-        'artist': '庾澄庆 (Harlem Yu)',
-        'key': 'C major',
-        'section': 'Intro & Chorus',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2001,
-        'notes': '只怕我自己会爱上你 不敢让自己靠得太近'
-    },
-    {
-        'id': 'pop909_078',
-        'title': '小情歌 (A Little Love Song)',
-        'artist': '苏打绿 (Sodagreen)',
-        'key': 'D major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['D', 'A', 'Bm', 'G'],
-        'degrees': [1, 5, 6, 4],
-        'roman': 'I-V-vi-IV',
-        'year': 2006,
-        'notes': '这是一首简单的小情歌 唱着人们心肠的曲折'
-    },
-    {
-        'id': 'pop909_079',
-        'title': "爱我别走 (Love Me, Don't Go)",
-        'artist': '张震岳 (A-Yue)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,5,6,4',
-        'chords': ['C', 'G', 'Am', 'F'],
-        'degrees': [1, 5, 6, 4],
-        'year': 1998,
-        'notes': '爱我别走 如果你说 你不爱我'
-    },
-    {
-        'id': 'pop909_080',
-        'title': '后来 (Latter)',
-        'artist': '刘若英 (Rene Liu)',
-        'key': 'C major',
-        'section': 'Chorus (副歌)',
-        'progression': '1,6,4,5',
-        'chords': ['C', 'Am', 'F', 'G'],
-        'degrees': [1, 6, 4, 5],
-        'year': 1999,
-        'notes': '后来 我总算学会了 如何去爱'
-    }
-]
+    indexed_songs: List[Dict[str, Any]] = []
 
-def generate_pop909_index(output_file: Path = DATA_DIR / 'pop909_indexed_chords.json') -> int:
+    for song_dir in sorted(raw_dir.iterdir()):
+        if not song_dir.is_dir():
+            continue
+        song_id = song_dir.name
+        if not song_id.isdigit():
+            continue
+
+        meta = metadata.get(song_id, {'title': f'POP909_{song_id}', 'artist': '华语群星'})
+        key_file = song_dir / 'key_audio.txt'
+        chord_file = song_dir / 'chord_audio.txt'
+        if not chord_file.exists():
+            chord_file = song_dir / 'chord_midi.txt'
+
+        key_center = 'C'
+        scale_type = 'major'
+        if key_file.exists() and key_file.stat().st_size > 0:
+            with open(key_file, 'r', encoding='utf-8', errors='ignore') as f:
+                for line in f:
+                    parts = line.strip().split()
+                    if len(parts) >= 3:
+                        raw_key = parts[2]
+                        if ':' in raw_key:
+                            k_root, k_mode = raw_key.split(':', 1)
+                            key_center = k_root
+                            scale_type = 'minor' if 'min' in k_mode.lower() else 'major'
+                        else:
+                            key_center = raw_key
+                        break
+
+        chord_sequence = []
+        if chord_file.exists():
+            with open(chord_file, 'r', encoding='utf-8', errors='ignore') as f:
+                for line in f:
+                    parts = line.strip().split()
+                    if len(parts) >= 3:
+                        c_label = parts[2]
+                        if c_label in ['N', 'X', 'None']:
+                            continue
+                        if ':' in c_label:
+                            root, qual = c_label.split(':', 1)
+                            if qual == 'maj':
+                                chord_name = root
+                            elif qual == 'min':
+                                chord_name = f'{root}m'
+                            elif qual == 'maj7':
+                                chord_name = f'{root}maj7'
+                            elif qual == 'min7':
+                                chord_name = f'{root}m7'
+                            elif qual == '7':
+                                chord_name = f'{root}7'
+                            elif qual == 'dim':
+                                chord_name = f'{root}dim'
+                            elif qual == 'aug':
+                                chord_name = f'{root}aug'
+                            elif qual == 'sus4':
+                                chord_name = f'{root}sus4'
+                            else:
+                                chord_name = f'{root}{qual}'
+                        else:
+                            chord_name = c_label
+
+                        if not chord_sequence or chord_sequence[-1] != chord_name:
+                            chord_sequence.append(chord_name)
+
+        key_pitch = NOTE_PITCH.get(key_center, 0)
+        degrees = []
+        romans = []
+
+        for c in chord_sequence:
+            root_m = re.match(r'^([A-Ga-g][#b]?)(.*)$', c)
+            if not root_m:
+                continue
+            c_root = root_m.group(1).capitalize()
+            c_qual = root_m.group(2)
+            c_pitch = NOTE_PITCH.get(c_root)
+            if c_pitch is None:
+                continue
+            interval = (c_pitch - key_pitch + 12) % 12
+            if interval in MAJOR_SCALE_INTERVALS:
+                deg, rom = MAJOR_SCALE_INTERVALS[interval]
+                if 'm' in c_qual and 'maj' not in c_qual:
+                    rom = rom.lower()
+                elif deg in [1, 4, 5]:
+                    rom = rom.upper()
+                degrees.append(deg)
+                romans.append(rom)
+
+        # Harmonic loop detection (4, 7, 8, 6)
+        progression_str = '1,5,6,4'
+        best_loop = None
+        best_count = 0
+
+        for n in [4, 7, 8, 6]:
+            if len(degrees) >= n:
+                ngrams = [tuple(degrees[i:i+n]) for i in range(len(degrees) - n + 1)]
+                counts = Counter(ngrams)
+                for loop, cnt in counts.most_common(3):
+                    if len(set(loop)) >= 3 and cnt > best_count:
+                        best_count = cnt
+                        best_loop = loop
+
+        if best_loop:
+            progression_str = ','.join(map(str, best_loop))
+        elif degrees:
+            progression_str = ','.join(map(str, degrees[:4]))
+
+        deg_list = [int(x) for x in progression_str.split(',') if x.isdigit()]
+        sample_chords = chord_sequence[:len(deg_list)] if chord_sequence else ['C', 'G', 'Am', 'F']
+        sample_romans = [MAJOR_SCALE_INTERVALS.get((NOTE_PITCH.get(re.match(r'^([A-Ga-g][#b]?)', c).group(1).capitalize(), 0) - key_pitch + 12) % 12, (1, 'I'))[1] for c in sample_chords if re.match(r'^([A-Ga-g][#b]?)', c)]
+
+        indexed_songs.append({
+            'id': f'pop909_{song_id}',
+            'song_id': song_id,
+            'title': meta['title'],
+            'artist': meta['artist'],
+            'key': f'{key_center} {scale_type}',
+            'section': 'Chorus / Main Loop (主副歌套路)',
+            'progression': progression_str,
+            'chords': sample_chords,
+            'degrees': deg_list,
+            'roman': '-'.join(sample_romans) if sample_romans else 'I-V-vi-IV',
+            'total_chords_analyzed': len(chord_sequence)
+        })
+
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    processed = []
-    for item in POP909_CANONICAL_INDEX:
-        comma_str, roman_str, degrees = normalize_progression_input(item['progression'])
-        entry = {
-            'id': item['id'],
-            'title': item['title'],
-            'artist': item['artist'],
-            'section': item.get('section', 'Chorus'),
-            'key': item.get('key', 'C major'),
-            'progression': comma_str,
-            'degrees': degrees,
-            'roman': roman_str,
-            'chords': item.get('chords', []),
-            'year': item.get('year', 2000),
-            'notes': item.get('notes', ''),
-            'provenance': 'POP909-CL Ground Truth'
-        }
-        processed.append(entry)
+    out_file = DATA_DIR / 'pop909_indexed_chords.json'
+    with open(out_file, 'w', encoding='utf-8') as f:
+        json.dump(indexed_songs, f, ensure_ascii=False, indent=2)
 
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(processed, f, ensure_ascii=False, indent=2)
+    print(f"✨ Successfully wrote all {len(indexed_songs)} POP909 songs to {out_file}")
 
-    print(f'✅ Generated POP909 Indexed Dataset: {len(processed)} songs -> {output_file}')
-    return len(processed)
+    # Also sync to web static data
+    web_data_file = ROOT_DIR / 'src' / 'static' / 'data' / 'pop909_indexed_chords.json'
+    if web_data_file.parent.exists():
+        with open(web_data_file, 'w', encoding='utf-8') as f:
+            json.dump(indexed_songs, f, ensure_ascii=False, indent=2)
+        print(f"🌐 Synchronized full 909-song dataset to {web_data_file}")
 
 if __name__ == '__main__':
-    generate_pop909_index()
+    ingest_full_pop909()

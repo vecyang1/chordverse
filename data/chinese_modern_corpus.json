@@ -1287,5 +1287,61 @@
     },
     "source_url": "local://chord_sheet",
     "raw_lyrics_sample": "C G Am F"
+  },
+  {
+    "id": "custom_68730",
+    "title": "测试入库歌曲",
+    "artist": "测试入库歌手",
+    "key": "C major",
+    "original_key": "C",
+    "capo": 0,
+    "primary_progression": "1,5,6,4",
+    "primary_roman": "I-V-vi-IV",
+    "primary_degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "progression_name": "Pop-Punk / 4-Chord Progression (Axis of Awesome / 流行四和弦)",
+    "primary_chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "section_breakdowns": {
+      "Chorus": "1,5,6,4"
+    },
+    "source_url": "local://chord_sheet",
+    "raw_lyrics_sample": "C G Am F"
+  },
+  {
+    "id": "custom_98129",
+    "title": "测试入库歌曲",
+    "artist": "测试入库歌手",
+    "key": "C major",
+    "original_key": "C",
+    "capo": 0,
+    "primary_progression": "1,5,6,4",
+    "primary_roman": "I-V-vi-IV",
+    "primary_degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "progression_name": "Pop-Punk / 4-Chord Progression (Axis of Awesome / 流行四和弦)",
+    "primary_chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "section_breakdowns": {
+      "Chorus": "1,5,6,4"
+    },
+    "source_url": "local://chord_sheet",
+    "raw_lyrics_sample": "C G Am F"
   }
 ]

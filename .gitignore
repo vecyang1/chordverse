@@ -35,3 +35,4 @@ Thumbs.db
 # Private tokens & local runtime state
 .env
 .env.local
+*.uploading.cfg

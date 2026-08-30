@@ -3,33 +3,15 @@
     "id": "pop909_001",
     "title": "告白气球 (Love Confession)",
     "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
     "key": "B major",
+    "section": "Chorus (副歌)",
     "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
     "chords": [
       "B",
       "F#",
       "G#m",
       "E"
     ],
-    "year": 2016,
-    "notes": "亲爱的 爱上你 从那天起 甜蜜的很轻易",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_002",
-    "title": "晴天 (Sunny Day)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "G major",
-    "progression": "1,5,6,4",
     "degrees": [
       1,
       5,
@@ -37,23 +19,48 @@
       4
     ],
     "roman": "I-V-vi-IV",
+    "year": 2016,
+    "notes": "亲爱的 爱上你 从那天起 甜蜜的很轻易"
+  },
+  {
+    "id": "pop909_002",
+    "title": "晴天 (Sunny Day)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
     "chords": [
       "G",
       "D",
       "Em",
       "C"
     ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
     "year": 2003,
-    "notes": "刮风这天 我试过握着你手",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "刮风这天 我试过握着你手 但偏偏 雨渐渐 大到我看你不见"
   },
   {
     "id": "pop909_003",
     "title": "青花瓷 (Blue and White Porcelain)",
     "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
     "key": "A major",
+    "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "D",
+      "E",
+      "C#m",
+      "F#m",
+      "Bm",
+      "E",
+      "A"
+    ],
     "degrees": [
       4,
       5,
@@ -64,37 +71,16 @@
       1
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "D",
-      "E",
-      "C#m",
-      "F#m",
-      "Bm",
-      "E",
-      "A"
-    ],
     "year": 2007,
-    "notes": "天青色等烟雨 而我在等你",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "天青色等烟雨 而我在等你 炊烟袅袅升起 隔江千万里"
   },
   {
     "id": "pop909_004",
     "title": "说好的幸福呢 (Promised Happiness)",
     "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
     "key": "C major",
+    "section": "Chorus (副歌)",
     "progression": "1,5,6,3,4,1,2,5",
-    "degrees": [
-      1,
-      5,
-      6,
-      3,
-      4,
-      1,
-      2,
-      5
-    ],
-    "roman": "I-V-vi-iii-IV-I-ii-V",
     "chords": [
       "C",
       "G",
@@ -105,17 +91,6 @@
       "Dm",
       "G"
     ],
-    "year": 2008,
-    "notes": "说好的 幸福呢 我懂了 不说了",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_005",
-    "title": "安静 (Silence)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "Bb major",
-    "progression": "1,5,6,3,4,1,2,5",
     "degrees": [
       1,
       5,
@@ -127,6 +102,16 @@
       5
     ],
     "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2008,
+    "notes": "说好的 幸福呢 我懂了 不说了 爱淡了 梦远了"
+  },
+  {
+    "id": "pop909_005",
+    "title": "安静 (Silence)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
     "chords": [
       "Bb",
       "F",
@@ -137,41 +122,33 @@
       "Cm",
       "F"
     ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
     "year": 2001,
-    "notes": "你要我说多难堪 我根本不想分开",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "你要我说多难堪 我根本不想分开 为什么还要我用微笑来带过"
   },
   {
     "id": "pop909_006",
     "title": "爱在西元前 (Love Before BC)",
     "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
     "key": "C major",
+    "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
     "chords": [
       "Am",
       "F",
       "C",
       "G"
     ],
-    "year": 2001,
-    "notes": "古巴比伦王颁布了汉谟拉比法典",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_007",
-    "title": "夜曲 (Nocturne)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "Bb minor / Db major",
-    "progression": "6,4,1,5",
     "degrees": [
       6,
       4,
@@ -179,63 +156,93 @@
       5
     ],
     "roman": "vi-IV-I-V",
+    "year": 2001,
+    "notes": "古巴比伦王颁布了汉谟拉比法典 刻在黑色的玄武岩 距今已经三千七百多年"
+  },
+  {
+    "id": "pop909_007",
+    "title": "夜曲 (Nocturne)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "Bb minor / Db major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
     "chords": [
       "Bbm",
       "Gb",
       "Db",
       "Ab"
     ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
     "year": 2005,
-    "notes": "为你弹奏萧邦的夜曲 纪念我死去的爱情",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "为你弹奏肖邦的夜曲 纪念我死去的爱情"
   },
   {
     "id": "pop909_008",
-    "title": "发如雪 (Snow-Like Hair)",
+    "title": "稻香 (Rice Field)",
     "artist": "周杰伦 (Jay Chou)",
+    "key": "A major",
     "section": "Chorus (副歌)",
-    "key": "D major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
+    "progression": "1,5,6,3,4,1,2,5",
     "chords": [
-      "G",
       "A",
+      "E",
       "F#m",
-      "Bm",
-      "Em",
+      "C#m",
+      "D",
       "A",
-      "D"
+      "Bm",
+      "E"
     ],
-    "year": 2005,
-    "notes": "你发如雪 凄美了离别",
-    "provenance": "POP909-CL Ground Truth"
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2008,
+    "notes": "还记得你说家是唯一的城堡 随着稻香河流继续奔跑"
   },
   {
     "id": "pop909_009",
-    "title": "千里之外 (Far Away)",
-    "artist": "周杰伦 / 费玉清",
+    "title": "简单爱 (Simple Love)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "C major",
     "section": "Chorus (副歌)",
-    "key": "Eb major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
+    "progression": "1,6,4,5",
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
     ],
-    "roman": "IV-V-iii-vi-ii-V-I",
+    "degrees": [
+      1,
+      6,
+      4,
+      5
+    ],
+    "roman": "I-vi-IV-V",
+    "year": 2001,
+    "notes": "我想就这样牵着你的手不放开 爱能不能够永远单纯没有悲哀"
+  },
+  {
+    "id": "pop909_010",
+    "title": "七里香 (Common Jasmin Orange)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "Eb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
     "chords": [
       "Ab",
       "Bb",
@@ -245,17 +252,6 @@
       "Bb",
       "Eb"
     ],
-    "year": 2006,
-    "notes": "我送你离开 千里之外 你无声黑白",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_010",
-    "title": "不能说的秘密 (Secret)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "G major",
-    "progression": "4,5,3,6,2,5,1",
     "degrees": [
       4,
       5,
@@ -266,26 +262,26 @@
       1
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "C",
-      "D",
-      "Bm",
-      "Em",
-      "Am",
-      "D",
-      "G"
-    ],
-    "year": 2007,
-    "notes": "最美的不是下雨天 是曾与你躲过雨的屋檐",
-    "provenance": "POP909-CL Ground Truth"
+    "year": 2004,
+    "notes": "雨下整夜 我的爱溢出就像雨水 院子落叶 跟我的思念厚厚一叠"
   },
   {
     "id": "pop909_011",
-    "title": "七里香 (Common Jasmin Orange)",
+    "title": "不能说的秘密 (Secret)",
     "artist": "周杰伦 (Jay Chou)",
+    "key": "G major",
     "section": "Chorus (副歌)",
-    "key": "Eb major",
     "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "Bm",
+      "C",
+      "G",
+      "Am",
+      "D"
+    ],
     "degrees": [
       1,
       5,
@@ -297,38 +293,45 @@
       5
     ],
     "roman": "I-V-vi-iii-IV-I-ii-V",
-    "chords": [
-      "Eb",
-      "Bb",
-      "Cm",
-      "Gm",
-      "Ab",
-      "Eb",
-      "Fm",
-      "Bb"
-    ],
-    "year": 2004,
-    "notes": "雨下整夜 我的爱溢出就像雨水",
-    "provenance": "POP909-CL Ground Truth"
+    "year": 2007,
+    "notes": "最美的不是下雨天 是曾与你躲过雨的屋檐"
   },
   {
     "id": "pop909_012",
-    "title": "蒲公英的约定 (Dandelion Promised)",
+    "title": "枫 (Maple)",
     "artist": "周杰伦 (Jay Chou)",
+    "key": "F major",
     "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,5,6,3,4,1,2,5",
-    "degrees": [
-      1,
-      5,
-      6,
-      3,
-      4,
-      1,
-      2,
-      5
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Bb",
+      "C",
+      "Am",
+      "Dm",
+      "Gm",
+      "C",
+      "F"
     ],
-    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2005,
+    "notes": "缓缓飘落的枫叶像思念 我点燃烛火温暖岁末的秋天"
+  },
+  {
+    "id": "pop909_013",
+    "title": "蒲公英的约定 (Dandelion Promise)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
     "chords": [
       "C",
       "G",
@@ -339,17 +342,6 @@
       "Dm",
       "G"
     ],
-    "year": 2007,
-    "notes": "一起长大的约定 那样清晰 拉过勾的我相信",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_013",
-    "title": "开不了口 (I Find It Hard to Say)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "Db major",
-    "progression": "1,5,6,3,4,1,2,5",
     "degrees": [
       1,
       5,
@@ -361,105 +353,22 @@
       5
     ],
     "roman": "I-V-vi-iii-IV-I-ii-V",
-    "chords": [
-      "Db",
-      "Ab",
-      "Bbm",
-      "Fm",
-      "Gb",
-      "Db",
-      "Ebm",
-      "Ab"
-    ],
-    "year": 2001,
-    "notes": "就是开不了口让她知道 我一定会呵护着你也逗你笑",
-    "provenance": "POP909-CL Ground Truth"
+    "year": 2007,
+    "notes": "一起长大的约定 那样清晰 拉过勾的我相信"
   },
   {
     "id": "pop909_014",
-    "title": "黑色幽默 (Black Humor)",
+    "title": "甜甜的 (Sweet)",
     "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "F# minor / A major",
-    "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
-    "chords": [
-      "F#m",
-      "D",
-      "A",
-      "E"
-    ],
-    "year": 2000,
-    "notes": "难过 是因为闷了很久 是因为想了太多",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_015",
-    "title": "珊瑚海 (Coral Sea)",
-    "artist": "周杰伦 / 梁心颐",
-    "section": "Chorus (副歌)",
-    "key": "F major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "Bb",
-      "C",
-      "Am",
-      "Dm",
-      "Gm",
-      "C",
-      "F"
-    ],
-    "year": 2005,
-    "notes": "海鸟跟鱼相爱 只是一场意外",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_016",
-    "title": "简单爱 (Simple Love)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
     "key": "C major",
+    "section": "Chorus (副歌)",
     "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
     "chords": [
       "C",
       "G",
       "Am",
       "F"
     ],
-    "year": 2001,
-    "notes": "我想就这样牵着你的手不放开",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_017",
-    "title": "甜甜的 (Sweet)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "F major",
-    "progression": "1,5,6,4",
     "degrees": [
       1,
       5,
@@ -467,63 +376,16 @@
       4
     ],
     "roman": "I-V-vi-IV",
-    "chords": [
-      "F",
-      "C",
-      "Dm",
-      "Bb"
-    ],
     "year": 2007,
-    "notes": "我喜欢的样子你都有",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "我轻轻的尝一口 你说的爱我 还在回味你给过的温柔"
   },
   {
-    "id": "pop909_018",
-    "title": "枫 (Maple)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "A major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "D",
-      "E",
-      "C#m",
-      "F#m",
-      "Bm",
-      "E",
-      "A"
-    ],
-    "year": 2005,
-    "notes": "缓缓飘落的枫叶像思念 我点燃烛火温暖岁末的秋天",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_019",
+    "id": "pop909_015",
     "title": "花海 (Ocean of Flowers)",
     "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
     "key": "C major",
+    "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
     "chords": [
       "F",
       "G",
@@ -533,17 +395,6 @@
       "G",
       "C"
     ],
-    "year": 2008,
-    "notes": "不要你离开 距离隔不开",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_020",
-    "title": "园游会 (Fairground)",
-    "artist": "周杰伦 (Jay Chou)",
-    "section": "Chorus (副歌)",
-    "key": "G major",
-    "progression": "4,5,3,6,2,5,1",
     "degrees": [
       4,
       5,
@@ -554,50 +405,165 @@
       1
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "C",
-      "D",
-      "Bm",
-      "Em",
-      "Am",
-      "D",
-      "G"
-    ],
-    "year": 2004,
-    "notes": "琥珀色生姜糖 融化了恋爱",
-    "provenance": "POP909-CL Ground Truth"
+    "year": 2008,
+    "notes": "静止了 所有的花开 遥远了 清晰了爱"
   },
   {
-    "id": "pop909_021",
-    "title": "突然好想你 (Suddenly Missing You)",
-    "artist": "五月天 (Mayday)",
+    "id": "pop909_016",
+    "title": "彩虹 (Rainbow)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "C major",
     "section": "Chorus (副歌)",
-    "key": "D major",
-    "progression": "1,5,6,4",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
     "degrees": [
       1,
       5,
       6,
-      4
+      3,
+      4,
+      1,
+      2,
+      5
     ],
-    "roman": "I-V-vi-IV",
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2007,
+    "notes": "哪里有彩虹告诉我 能不能把我的愿望还给我"
+  },
+  {
+    "id": "pop909_017",
+    "title": "发如雪 (Snowy Hair)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "D minor / F major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Bb",
+      "C",
+      "Am",
+      "Dm",
+      "Gm",
+      "C",
+      "F"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2005,
+    "notes": "你发如雪 凄美了离别 我焚香感动了谁"
+  },
+  {
+    "id": "pop909_018",
+    "title": "东风破 (East Wind Breaks)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "Eb major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Cm",
+      "Ab",
+      "Eb",
+      "Bb"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2003,
+    "notes": "一盏离愁 孤单窗前明月 谁在阁楼上 冰冷的绝望"
+  },
+  {
+    "id": "pop909_019",
+    "title": "兰亭序 (Orchid Pavilion)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2008,
+    "notes": "兰亭临帖 行书如行云流水 月下门推 心细如你脚步碎"
+  },
+  {
+    "id": "pop909_020",
+    "title": "千里之外 (Far Away)",
+    "artist": "周杰伦 / 费玉清",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2006,
+    "notes": "我送你离开 千里之外 你无声黑白"
+  },
+  {
+    "id": "pop909_021",
+    "title": "突然好想你 (Suddenly Miss You)",
+    "artist": "五月天 (Mayday)",
+    "key": "D major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
     "chords": [
       "D",
       "A",
       "Bm",
       "G"
     ],
-    "year": 2008,
-    "notes": "突然好想你 你会在哪里 过的快乐或委屈",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_022",
-    "title": "知足 (Contentment)",
-    "artist": "五月天 (Mayday)",
-    "section": "Chorus (副歌)",
-    "key": "E major",
-    "progression": "1,5,6,4",
     "degrees": [
       1,
       5,
@@ -605,23 +571,1761 @@
       4
     ],
     "roman": "I-V-vi-IV",
+    "year": 2008,
+    "notes": "突然好想你 你会在哪里 过的快乐或委屈"
+  },
+  {
+    "id": "pop909_022",
+    "title": "温柔 (Tenderness)",
+    "artist": "五月天 (Mayday)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2000,
+    "notes": "走在风中 今天阳光 突然好温柔"
+  },
+  {
+    "id": "pop909_023",
+    "title": "知足 (Contentment)",
+    "artist": "五月天 (Mayday)",
+    "key": "E major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "E",
+      "B",
+      "C#m",
+      "G#m",
+      "A",
+      "E",
+      "F#m",
+      "B"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2005,
+    "notes": "怎么去拥有 一道彩虹 怎么去拥抱 一夏天的风"
+  },
+  {
+    "id": "pop909_024",
+    "title": "拥抱 (Embrace)",
+    "artist": "五月天 (Mayday)",
+    "key": "F major",
+    "section": "Verse & Chorus",
+    "progression": "1,6,2,5",
+    "chords": [
+      "F",
+      "Dm",
+      "Gm",
+      "C"
+    ],
+    "degrees": [
+      1,
+      6,
+      2,
+      5
+    ],
+    "roman": "I-vi-ii-V",
+    "year": 1999,
+    "notes": "脱下长日的假面 奔向梦幻的疆界"
+  },
+  {
+    "id": "pop909_025",
+    "title": "倔强 (Stubborn)",
+    "artist": "五月天 (Mayday)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2004,
+    "notes": "我和我最后的倔强 握紧双手绝对不放"
+  },
+  {
+    "id": "pop909_026",
+    "title": "我不愿让你一个人 (Not Alone)",
+    "artist": "五月天 (Mayday)",
+    "key": "Ab major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Db",
+      "Eb",
+      "Cm",
+      "Fm",
+      "Bbm",
+      "Eb",
+      "Ab"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2011,
+    "notes": "我不愿让你一个人 一个人在人海浮沉"
+  },
+  {
+    "id": "pop909_027",
+    "title": "后来的我们 (Here, After, Us)",
+    "artist": "五月天 (Mayday)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "Bb",
+      "F",
+      "Gm",
+      "Eb"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2016,
+    "notes": "后来的我们 依然走着 只是不再并肩了"
+  },
+  {
+    "id": "pop909_028",
+    "title": "志明与春娇 (Peter & Mary)",
+    "artist": "五月天 (Mayday)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1999,
+    "notes": "志明真正不知要按怎 为什么爱人会变成别人的"
+  },
+  {
+    "id": "pop909_029",
+    "title": "江南 (River South)",
+    "artist": "林俊杰 (JJ Lin)",
+    "key": "Bb minor / Db major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Bbm",
+      "Gb",
+      "Db",
+      "Ab"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2004,
+    "notes": "圈圈圆圆圈圈 天天年年天天的我 深深看你的脸"
+  },
+  {
+    "id": "pop909_030",
+    "title": "修炼爱情 (Practice Love)",
+    "artist": "林俊杰 (JJ Lin)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2013,
+    "notes": "修炼爱情的心酸 学会放好以前的渴望"
+  },
+  {
+    "id": "pop909_031",
+    "title": "可惜没如果 (If Only)",
+    "artist": "林俊杰 (JJ Lin)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2014,
+    "notes": "全都怪我 不该沉默时沉默 该勇敢时软弱"
+  },
+  {
+    "id": "pop909_032",
+    "title": "背对背拥抱 (Back to Back)",
+    "artist": "林俊杰 (JJ Lin)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2009,
+    "notes": "背对着背拥抱 滥用沉默在咆哮 爱情来不及变老"
+  },
+  {
+    "id": "pop909_033",
+    "title": "她说 (She Says)",
+    "artist": "林俊杰 (JJ Lin)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2010,
+    "notes": "她静静听着我们的歌 依然想念那一段"
+  },
+  {
+    "id": "pop909_034",
+    "title": "那些你很冒险的梦 (Those Were The Days)",
+    "artist": "林俊杰 (JJ Lin)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2011,
+    "notes": "那些你很冒险的梦 我陪你去疯 折断翅膀也陪你飞翔"
+  },
+  {
+    "id": "pop909_035",
+    "title": "一千年以后 (A Thousand Years Later)",
+    "artist": "林俊杰 (JJ Lin)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2005,
+    "notes": "因为在 一千年以后 世界早已没有我"
+  },
+  {
+    "id": "pop909_036",
+    "title": "十年 (Ten Years)",
+    "artist": "陈奕迅 (Eason Chan)",
+    "key": "Ab major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "Ab",
+      "Eb",
+      "Fm",
+      "Cm",
+      "Db",
+      "Ab",
+      "Bbm",
+      "Eb"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2003,
+    "notes": "十年之前 我不认识你 你不属于我"
+  },
+  {
+    "id": "pop909_037",
+    "title": "爱情转移 (Love Transfer)",
+    "artist": "陈奕迅 (Eason Chan)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Eb",
+      "F",
+      "Dm",
+      "Gm",
+      "Cm",
+      "F",
+      "Bb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2007,
+    "notes": "短发睫毛 怎么写都是空谈 熬过了这一关 幸福还有多远"
+  },
+  {
+    "id": "pop909_038",
+    "title": "富士山下 (Under Mt. Fuji)",
+    "artist": "陈奕迅 (Eason Chan)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Eb",
+      "F",
+      "Dm",
+      "Gm",
+      "Cm",
+      "F",
+      "Bb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2006,
+    "notes": "谁都只得那双手 靠拥抱亦难任你拥有 要拥有必先懂失去怎接受"
+  },
+  {
+    "id": "pop909_039",
+    "title": "红玫瑰 (Red Rose)",
+    "artist": "陈奕迅 (Eason Chan)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2007,
+    "notes": "得不到的永远在骚动 被偏爱的 都有恃无恐"
+  },
+  {
+    "id": "pop909_040",
+    "title": "好久不见 (Long Time No See)",
+    "artist": "陈奕迅 (Eason Chan)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2007,
+    "notes": "你会不会忽然的出现 在街角的咖啡店"
+  },
+  {
+    "id": "pop909_041",
+    "title": "淘汰 (Elimination)",
+    "artist": "陈奕迅 (Eason Chan)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2007,
+    "notes": "我说了所有的谎 你全都相信 简单的我爱你 你却老不信"
+  },
+  {
+    "id": "pop909_042",
+    "title": "你的背包 (Your Backpack)",
+    "artist": "陈奕迅 (Eason Chan)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2002,
+    "notes": "你的背包 背到现在还没烂 却成为我身体的另一半"
+  },
+  {
+    "id": "pop909_043",
+    "title": "红豆 (Red Bean)",
+    "artist": "王菲 (Faye Wong)",
+    "key": "A major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "A",
+      "E",
+      "F#m",
+      "C#m",
+      "D",
+      "A",
+      "Bm",
+      "E"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1998,
+    "notes": "有时候 有时候 我会相信一切有尽头"
+  },
+  {
+    "id": "pop909_044",
+    "title": "容易受伤的女人 (Fragile Woman)",
+    "artist": "王菲 (Faye Wong)",
+    "key": "F# minor / A major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "F#m",
+      "D",
+      "A",
+      "E"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 1992,
+    "notes": "情难自禁 我却其实属于 极度容易受伤的女人"
+  },
+  {
+    "id": "pop909_045",
+    "title": "流年 (Fleeting Years)",
+    "artist": "王菲 (Faye Wong)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2001,
+    "notes": "有生之年 狭路相逢 终不能幸免"
+  },
+  {
+    "id": "pop909_046",
+    "title": "传奇 (Legend)",
+    "artist": "王菲 / 李健",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2003,
+    "notes": "只是因为在人群中多看了你一眼 再也没能忘掉你容颜"
+  },
+  {
+    "id": "pop909_047",
+    "title": "匆匆那年 (Fleet of Time)",
+    "artist": "王菲 (Faye Wong)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2014,
+    "notes": "匆匆那年我们 究竟说了几遍 再见之后再拖延"
+  },
+  {
+    "id": "pop909_048",
+    "title": "海阔天空 (Boundless Oceans, Vast Skies)",
+    "artist": "Beyond",
+    "key": "F major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4,1,5,1",
+    "chords": [
+      "F",
+      "C",
+      "Dm",
+      "Bb",
+      "F",
+      "C",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4,
+      1,
+      5,
+      1
+    ],
+    "roman": "I-V-vi-IV-I-V-I",
+    "year": 1993,
+    "notes": "原谅我这一生不羁放纵爱自由 也会怕有一天会跌倒"
+  },
+  {
+    "id": "pop909_049",
+    "title": "光辉岁月 (Glorious Years)",
+    "artist": "Beyond",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1990,
+    "notes": "风雨中抱紧自由 一生经过磅礴的挣扎 自信可改变未来"
+  },
+  {
+    "id": "pop909_050",
+    "title": "真的爱你 (Truly Love You)",
+    "artist": "Beyond",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1989,
+    "notes": "沉醉于音阶的起跌 柔和地去歌唱 谁人可发光发热"
+  },
+  {
+    "id": "pop909_051",
+    "title": "喜欢你 (Like You)",
+    "artist": "Beyond",
+    "key": "A major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "A",
+      "E",
+      "F#m",
+      "D"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1988,
+    "notes": "喜欢你 那双眼动人 笑声更迷人"
+  },
+  {
+    "id": "pop909_052",
+    "title": "不再犹豫 (No More Hesitation)",
+    "artist": "Beyond",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1991,
+    "notes": "自信打不死的心态活到老 谁人定我去或留"
+  },
+  {
+    "id": "pop909_053",
+    "title": "我怀念的 (What I Miss)",
+    "artist": "孙燕姿 (Stefanie Sun)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2007,
+    "notes": "我怀念的是无话不说 我怀念的是一起做梦"
+  },
+  {
+    "id": "pop909_054",
+    "title": "开始懂了 (Beginning to Understand)",
+    "artist": "孙燕姿 (Stefanie Sun)",
+    "key": "Eb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Ab",
+      "Bb",
+      "Gm",
+      "Cm",
+      "Fm",
+      "Bb",
+      "Eb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2000,
+    "notes": "用心酸微笑去原谅了 也翻越了 有昨天还是好的"
+  },
+  {
+    "id": "pop909_055",
+    "title": "遇见 (Encounter)",
+    "artist": "孙燕姿 (Stefanie Sun)",
+    "key": "Ab major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "Ab",
+      "Eb",
+      "Fm",
+      "Cm",
+      "Db",
+      "Ab",
+      "Bbm",
+      "Eb"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2003,
+    "notes": "我遇见谁 会有怎样的对白 我等的人 他在多远的未来"
+  },
+  {
+    "id": "pop909_056",
+    "title": "天黑黑 (Cloudy Sky)",
+    "artist": "孙燕姿 (Stefanie Sun)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "Bb",
+      "F",
+      "Gm",
+      "Dm",
+      "Eb",
+      "Bb",
+      "Cm",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2000,
+    "notes": "我的小时候 吵闹任性的时候 我的外婆 总会唱歌哄我"
+  },
+  {
+    "id": "pop909_057",
+    "title": "绿光 (Green Light)",
+    "artist": "孙燕姿 (Stefanie Sun)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2001,
+    "notes": "期待着一个幸运和一个奇迹 哪怕它在远方"
+  },
+  {
+    "id": "pop909_058",
+    "title": "勇气 (Courage)",
+    "artist": "梁静茹 (Fish Leong)",
+    "key": "F major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "F",
+      "C",
+      "Dm",
+      "Am",
+      "Bb",
+      "F",
+      "Gm",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2000,
+    "notes": "爱真的需要勇气 来面对流言蜚语"
+  },
+  {
+    "id": "pop909_059",
+    "title": "可惜不是你 (Unfortunately Not You)",
+    "artist": "梁静茹 (Fish Leong)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Eb",
+      "F",
+      "Dm",
+      "Gm",
+      "Cm",
+      "F",
+      "Bb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2005,
+    "notes": "可惜不是你 陪我到最后 曾一起走却走失那路口"
+  },
+  {
+    "id": "pop909_060",
+    "title": "会呼吸的痛 (Breathing Pain)",
+    "artist": "梁静茹 (Fish Leong)",
+    "key": "Eb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Ab",
+      "Bb",
+      "Gm",
+      "Cm",
+      "Fm",
+      "Bb",
+      "Eb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2007,
+    "notes": "想念是会呼吸的痛 它活在我身上所有角落"
+  },
+  {
+    "id": "pop909_061",
+    "title": "情歌 (Love Song)",
+    "artist": "梁静茹 (Fish Leong)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2009,
+    "notes": "时光是琥珀 泪一滴滴被反锁 情书再不朽 也磨成沙漏"
+  },
+  {
+    "id": "pop909_062",
+    "title": "暖暖 (Warm)",
+    "artist": "梁静茹 (Fish Leong)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2006,
+    "notes": "都可以随便的 你说的 我都愿意去"
+  },
+  {
+    "id": "pop909_063",
+    "title": "爱很简单 (I Love You)",
+    "artist": "陶喆 (David Tao)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "Bb",
+      "F",
+      "Gm",
+      "Dm",
+      "Eb",
+      "Bb",
+      "Cm",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1997,
+    "notes": "I love you 无法不爱你 baby 说你也爱我"
+  },
+  {
+    "id": "pop909_064",
+    "title": "普通朋友 (Regular Friends)",
+    "artist": "陶喆 (David Tao)",
+    "key": "Gb major",
+    "section": "Verse & Chorus",
+    "progression": "2,5,1,6",
+    "chords": [
+      "Abm",
+      "Db",
+      "Gb",
+      "Ebm"
+    ],
+    "degrees": [
+      2,
+      5,
+      1,
+      6
+    ],
+    "roman": "ii-V-I-vi",
+    "year": 1999,
+    "notes": "我只是你的普通朋友 只能看着你走入别人的怀中"
+  },
+  {
+    "id": "pop909_065",
+    "title": "寂寞的季节 (Season of Loneliness)",
+    "artist": "陶喆 (David Tao)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "Bm",
+      "C",
+      "G",
+      "Am",
+      "D"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2002,
+    "notes": "风吹落最后一片叶 我的心也飘着雪"
+  },
+  {
+    "id": "pop909_066",
+    "title": "唯一 (The One)",
+    "artist": "王力宏 (Leehom Wang)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2001,
+    "notes": "BABY 你就是我的唯一 两个世界都变形 回去谈何容易"
+  },
+  {
+    "id": "pop909_067",
+    "title": "依然爱你 (Still Love You)",
+    "artist": "王力宏 (Leehom Wang)",
+    "key": "B major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "B",
+      "F#",
+      "G#m",
+      "E"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2011,
+    "notes": "我依然爱你 就是唯一的退路 我依然爱你 哪怕全世界都认输"
+  },
+  {
+    "id": "pop909_068",
+    "title": "大城小爱 (Big City Small Love)",
+    "artist": "王力宏 (Leehom Wang)",
+    "key": "D major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "D",
+      "A",
+      "Bm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2005,
+    "notes": "千万分之一的几率 让我遇到你 爱你在这座小城里"
+  },
+  {
+    "id": "pop909_069",
+    "title": "平凡之路 (Ordinary Path)",
+    "artist": "朴树 (Pu Shu)",
+    "key": "D major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Bm",
+      "G",
+      "D",
+      "A"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2014,
+    "notes": "我曾经跨过山和大海 也穿过人山人海"
+  },
+  {
+    "id": "pop909_070",
+    "title": "那些花儿 (Those Flowers)",
+    "artist": "朴树 (Pu Shu)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1999,
+    "notes": "她们都老了吧 她们在哪里呀 我们就这样 各自奔天涯"
+  },
+  {
+    "id": "pop909_071",
+    "title": "生如夏花 (Born Like Summer Flowers)",
+    "artist": "朴树 (Pu Shu)",
+    "key": "Em / G major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Em",
+      "C",
+      "G",
+      "D"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2003,
+    "notes": "惊鸿一般短暂 像夏花一样绚烂"
+  },
+  {
+    "id": "pop909_072",
+    "title": "成都 (Chengdu)",
+    "artist": "赵雷 (Zhao Lei)",
+    "key": "D major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "D",
+      "A",
+      "Bm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2016,
+    "notes": "和我在成都的街头走一走 喔 直到所有的灯都熄灭了也不停留"
+  },
+  {
+    "id": "pop909_073",
+    "title": "少年锦时 (Youthful Days)",
+    "artist": "赵雷 (Zhao Lei)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2014,
+    "notes": "秋夜凉风吹过我的头发 晴朗的夜空看着像一幅画"
+  },
+  {
+    "id": "pop909_074",
+    "title": "南方姑娘 (Southern Girl)",
+    "artist": "赵雷 (Zhao Lei)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "Bm",
+      "C",
+      "G",
+      "Am",
+      "D"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2011,
+    "notes": "南方姑娘 你是否爱上了北方"
+  },
+  {
+    "id": "pop909_075",
+    "title": "董小姐 (Miss Dong)",
+    "artist": "宋冬野 (Song Dongye)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2012,
+    "notes": "爱上一匹野马 可我的家里没有草原"
+  },
+  {
+    "id": "pop909_076",
+    "title": "安和桥 (Anhe Bridge)",
+    "artist": "宋冬野 (Song Dongye)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2013,
+    "notes": "我知道 那些夏天 就像青春一样回不来"
+  },
+  {
+    "id": "pop909_077",
+    "title": "斑马斑马 (Zebra Zebra)",
+    "artist": "宋冬野 (Song Dongye)",
+    "key": "Am / C major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Am",
+      "F",
+      "C",
+      "G"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2013,
+    "notes": "斑马斑马 你不要睡着了 我只是个匆忙的旅人啊"
+  },
+  {
+    "id": "pop909_078",
+    "title": "奇妙能力歌 (Wonderful Ability)",
+    "artist": "陈粒 (Chen Li)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2014,
+    "notes": "我看过沙漠下暴雨 看过大海亲吻鲨鱼 看过黄昏追逐黎明 没看过你"
+  },
+  {
+    "id": "pop909_079",
+    "title": "小半 (A Little Half)",
+    "artist": "陈粒 (Chen Li)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2016,
+    "notes": "不敢看你 哪怕是一眼 怕自己又深陷"
+  },
+  {
+    "id": "pop909_080",
+    "title": "达尔文 (Darwin)",
+    "artist": "蔡健雅 (Tanya Chua)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2007,
+    "notes": "我的青春 也不是没伤痕 是明白爱是进化论"
+  },
+  {
+    "id": "pop909_081",
+    "title": "红色高跟鞋 (Red High Heels)",
+    "artist": "蔡健雅 (Tanya Chua)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,2,4,1",
+    "chords": [
+      "C",
+      "Dm",
+      "F",
+      "C"
+    ],
+    "degrees": [
+      1,
+      2,
+      4,
+      1
+    ],
+    "roman": "I-ii-IV-I",
+    "year": 2009,
+    "notes": "该怎么去形容你最贴切 拿什么跟你作比较才算特别"
+  },
+  {
+    "id": "pop909_082",
+    "title": "光年之外 (Light Years Away)",
+    "artist": "邓紫棋 (G.E.M.)",
+    "key": "C minor / Eb major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Cm",
+      "Ab",
+      "Eb",
+      "Bb"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2016,
+    "notes": "感受停在我发端的指尖 如何瞬间冻结时间"
+  },
+  {
+    "id": "pop909_083",
+    "title": "泡沫 (Bubble)",
+    "artist": "邓紫棋 (G.E.M.)",
+    "key": "Gb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Cb",
+      "Db",
+      "Bbm",
+      "Ebm",
+      "Abm",
+      "Db",
+      "Gb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2012,
+    "notes": "全都是泡沫 只一刹的花火 你所有承诺 全部都太脆弱"
+  },
+  {
+    "id": "pop909_084",
+    "title": "来自天堂的魔鬼 (Away)",
+    "artist": "邓紫棋 (G.E.M.)",
+    "key": "G minor / Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Gm",
+      "Eb",
+      "Bb",
+      "F"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2015,
+    "notes": "撒旦在跳舞 迷离的眼神 我陷入了梦境"
+  },
+  {
+    "id": "pop909_085",
+    "title": "句号 (Full Stop)",
+    "artist": "邓紫棋 (G.E.M.)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 2019,
+    "notes": "可惜我们终于来到一个句号 差一步我们就能走到白头偕老"
+  },
+  {
+    "id": "pop909_086",
+    "title": "年少有为 (If I Were Young)",
+    "artist": "李荣浩 (Li Ronghao)",
+    "key": "Eb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Ab",
+      "Bb",
+      "Gm",
+      "Cm",
+      "Fm",
+      "Bb",
+      "Eb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2018,
+    "notes": "假如我年少有为不自卑 懂得什么是珍贵"
+  },
+  {
+    "id": "pop909_087",
+    "title": "李白 (Li Bai)",
+    "artist": "李荣浩 (Li Ronghao)",
+    "key": "E major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
     "chords": [
       "E",
       "B",
       "C#m",
       "A"
     ],
-    "year": 2005,
-    "notes": "怎么去拥有 一道彩虹 怎么去拥抱 一夏天的风",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_023",
-    "title": "温柔 (Tenderness)",
-    "artist": "五月天 (Mayday)",
-    "section": "Chorus (副歌)",
-    "key": "G major",
-    "progression": "1,5,6,4",
     "degrees": [
       1,
       5,
@@ -629,23 +2333,111 @@
       4
     ],
     "roman": "I-V-vi-IV",
+    "year": 2013,
+    "notes": "要是能重来 我要选李白 几百年前做的好几首诗"
+  },
+  {
+    "id": "pop909_088",
+    "title": "模特 (Model)",
+    "artist": "李荣浩 (Li Ronghao)",
+    "key": "Ab major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Db",
+      "Eb",
+      "Cm",
+      "Fm",
+      "Bbm",
+      "Eb",
+      "Ab"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2013,
+    "notes": "穿华丽的服装 为原始的渴望而站着"
+  },
+  {
+    "id": "pop909_089",
+    "title": "不将就 (No Compromise)",
+    "artist": "李荣浩 (Li Ronghao)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2015,
+    "notes": "互相折磨到白头 悲伤坚决不放手"
+  },
+  {
+    "id": "pop909_090",
+    "title": "老街 (Old Street)",
+    "artist": "李荣浩 (Li Ronghao)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
     "chords": [
       "G",
       "D",
       "Em",
-      "C"
+      "Bm",
+      "C",
+      "G",
+      "Am",
+      "D"
     ],
-    "year": 2000,
-    "notes": "不打扰 是我的温柔",
-    "provenance": "POP909-CL Ground Truth"
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2010,
+    "notes": "一张褪色的照片 好像带我回到从前"
   },
   {
-    "id": "pop909_024",
-    "title": "后来的我们 (Us After)",
-    "artist": "五月天 (Mayday)",
+    "id": "pop909_091",
+    "title": "吻别 (Take Me to Your Heart)",
+    "artist": "张学友 (Jacky Cheung)",
+    "key": "G minor / Bb major",
     "section": "Chorus (副歌)",
-    "key": "G major",
     "progression": "6,4,1,5",
+    "chords": [
+      "Gm",
+      "Eb",
+      "Bb",
+      "F"
+    ],
     "degrees": [
       6,
       4,
@@ -653,23 +2445,136 @@
       5
     ],
     "roman": "vi-IV-I-V",
-    "chords": [
-      "Em",
-      "C",
-      "G",
-      "D"
-    ],
-    "year": 2016,
-    "notes": "然后呢 他们说你的心 似乎痊愈了",
-    "provenance": "POP909-CL Ground Truth"
+    "year": 1993,
+    "notes": "我和你吻别在无人的街 让风痴笑我不能拒绝"
   },
   {
-    "id": "pop909_025",
-    "title": "倔强 (Stubborn)",
-    "artist": "五月天 (Mayday)",
-    "section": "Chorus (副歌)",
+    "id": "pop909_092",
+    "title": "一千个伤心的理由 (1000 Reasons for Sorrow)",
+    "artist": "张学友 (Jacky Cheung)",
     "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1995,
+    "notes": "一千个伤心的理由 一千个伤心的理由 最后我的爱情在风中飘零"
+  },
+  {
+    "id": "pop909_093",
+    "title": "遥远的她 (Faraway Her)",
+    "artist": "张学友 (Jacky Cheung)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Eb",
+      "F",
+      "Dm",
+      "Gm",
+      "Cm",
+      "F",
+      "Bb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 1985,
+    "notes": "遥远的她 仿佛借风声跟我话 热情若无变 哪管她沧桑变化"
+  },
+  {
+    "id": "pop909_094",
+    "title": "李香兰 (Ikuko)",
+    "artist": "张学友 (Jacky Cheung)",
+    "key": "A minor / C major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,5,1",
+    "chords": [
+      "Am",
+      "F",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      6,
+      4,
+      5,
+      1
+    ],
+    "roman": "vi-IV-V-I",
+    "year": 1990,
+    "notes": "恼春风 我心因何恼春风 说不出 借酒相送"
+  },
+  {
+    "id": "pop909_095",
+    "title": "忘情水 (Water of Forgetfulness)",
+    "artist": "刘德华 (Andy Lau)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1994,
+    "notes": "给我一杯忘情水 换我一生不伤悲"
+  },
+  {
+    "id": "pop909_096",
+    "title": "冰雨 (Ice Rain)",
+    "artist": "刘德华 (Andy Lau)",
+    "key": "D major",
+    "section": "Chorus (副歌)",
     "progression": "1,5,6,4",
+    "chords": [
+      "D",
+      "A",
+      "Bm",
+      "G"
+    ],
     "degrees": [
       1,
       5,
@@ -677,23 +2582,316 @@
       4
     ],
     "roman": "I-V-vi-IV",
+    "year": 1997,
+    "notes": "冷冷的冰雨在脸上胡乱地拍 暖暖的眼泪跟寒雨混成一块"
+  },
+  {
+    "id": "pop909_097",
+    "title": "朋友 (Friends)",
+    "artist": "周华健 (Emil Chau)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "Bm",
+      "C",
+      "G",
+      "Am",
+      "D"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1997,
+    "notes": "朋友一生一起走 那些日子不再有 一句话 一辈子 一生情 一杯酒"
+  },
+  {
+    "id": "pop909_098",
+    "title": "让我欢喜让我忧 (You Make Me Happy and Sad)",
+    "artist": "周华健 (Emil Chau)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 1991,
+    "notes": "就请你给我多一点点时间 再多一点点温柔 不要一切都结束"
+  },
+  {
+    "id": "pop909_099",
+    "title": "花心 (Flowery Heart)",
+    "artist": "周华健 (Emil Chau)",
+    "key": "G major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "G",
+      "D",
+      "Em",
+      "C"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1993,
+    "notes": "花的心藏在蕊中 空把花期都错过 一朵花香为了谁"
+  },
+  {
+    "id": "pop909_100",
+    "title": "爱如潮水 (Love as a Tide)",
+    "artist": "张信哲 (Jeff Chang)",
+    "key": "Bb major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "Eb",
+      "F",
+      "Dm",
+      "Gm",
+      "Cm",
+      "F",
+      "Bb"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 1993,
+    "notes": "不愿别的男人见识你的妩媚 你该知道这样会让我心碎"
+  },
+  {
+    "id": "pop909_101",
+    "title": "过火 (Too Far)",
+    "artist": "张信哲 (Jeff Chang)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 1995,
+    "notes": "怎么忍心怪你犯了错 是我给你自由过了火"
+  },
+  {
+    "id": "pop909_102",
+    "title": "信仰 (Faith)",
+    "artist": "张信哲 (Jeff Chang)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
     "chords": [
       "C",
       "G",
       "Am",
-      "F"
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
     ],
-    "year": 2004,
-    "notes": "我和我最后的倔强 握紧双手绝对不放",
-    "provenance": "POP909-CL Ground Truth"
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2000,
+    "notes": "我爱你 是多么清楚 多么坚固的信仰"
   },
   {
-    "id": "pop909_026",
-    "title": "恋爱ing (In Love)",
-    "artist": "五月天 (Mayday)",
-    "section": "Chorus (副歌)",
+    "id": "pop909_103",
+    "title": "大约在冬季 (Approximately in Winter)",
+    "artist": "齐秦 (Chyi Chin)",
     "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1987,
+    "notes": "没有你的日子里 我会更加珍惜自己 没有我的岁月里 你要保重你自己"
+  },
+  {
+    "id": "pop909_104",
+    "title": "外面的世界 (The World Outside)",
+    "artist": "齐秦 (Chyi Chin)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1987,
+    "notes": "在很久很久以前 你拥有我 我拥有你"
+  },
+  {
+    "id": "pop909_105",
+    "title": "其实你不懂我的心 (You Don't Understand My Heart)",
+    "artist": "童安格 (Angus Tung)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 1989,
+    "notes": "你说我像云 捉摸不定 其实你不懂我的心"
+  },
+  {
+    "id": "pop909_106",
+    "title": "再回首 (Looking Back Again)",
+    "artist": "姜育恒 (Johnny Jiang)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 1989,
+    "notes": "再回首 恍然如梦 再回首 我心依旧"
+  },
+  {
+    "id": "pop909_107",
+    "title": "童年 (Childhood)",
+    "artist": "罗大佑 (Lo Ta-yu)",
+    "key": "C major",
+    "section": "Verse & Chorus",
     "progression": "1,6,4,5",
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
+    ],
     "degrees": [
       1,
       6,
@@ -701,23 +2899,365 @@
       5
     ],
     "roman": "I-vi-IV-V",
+    "year": 1981,
+    "notes": "池塘边的榕树上 知了在声声叫着夏天"
+  },
+  {
+    "id": "pop909_108",
+    "title": "光阴的故事 (Story of Time)",
+    "artist": "罗大佑 (Lo Ta-yu)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,6,4,5",
     "chords": [
       "C",
       "Am",
       "F",
       "G"
     ],
-    "year": 2005,
-    "notes": "恋爱ing happy ing 心情就像是 坐上一台喷射机",
-    "provenance": "POP909-CL Ground Truth"
+    "degrees": [
+      1,
+      6,
+      4,
+      5
+    ],
+    "roman": "I-vi-IV-V",
+    "year": 1982,
+    "notes": "春天的花开秋天的风以及冬天的落阳 忧郁的青春年少的我曾经无知的这么想"
   },
   {
-    "id": "pop909_027",
-    "title": "盛夏光年 (Eternal Summer)",
-    "artist": "五月天 (Mayday)",
+    "id": "pop909_109",
+    "title": "恋曲1990 (Love Song 1990)",
+    "artist": "罗大佑 (Lo Ta-yu)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1988,
+    "notes": "乌溜溜的黑眼珠和你的笑脸 怎么也难忘记你容颜的转变"
+  },
+  {
+    "id": "pop909_110",
+    "title": "凡人歌 (Mortal Song)",
+    "artist": "李宗盛 (Jonathan Lee)",
+    "key": "C major",
     "section": "Chorus (副歌)",
-    "key": "A major",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1991,
+    "notes": "你我皆凡人 生在人世间 终日奔波苦 一刻不得闲"
+  },
+  {
+    "id": "pop909_111",
+    "title": "山丘 (Hills)",
+    "artist": "李宗盛 (Jonathan Lee)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2013,
+    "notes": "越过山丘 虽然已白了头 喋喋不休 时不我予的哀愁"
+  },
+  {
+    "id": "pop909_112",
+    "title": "Last Dance",
+    "artist": "伍佰 (Wu Bai)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,6,4,5",
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
+    ],
+    "degrees": [
+      1,
+      6,
+      4,
+      5
+    ],
+    "roman": "I-vi-IV-V",
+    "year": 1996,
+    "notes": "所以暂时将妳眼睛闭了起来 黑暗当中漂浮我的期待"
+  },
+  {
+    "id": "pop909_113",
+    "title": "挪威的森林 (Norwegian Forest)",
+    "artist": "伍佰 (Wu Bai)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1996,
+    "notes": "让我将妳心儿摘下 试着将它慢慢融化 看我在妳心中是否仍完美无瑕"
+  },
+  {
+    "id": "pop909_114",
+    "title": "浪人情歌 (Wanderer Love Song)",
+    "artist": "伍佰 (Wu Bai)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,4",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "F"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      4
+    ],
+    "roman": "I-V-vi-IV",
+    "year": 1994,
+    "notes": "不要再想妳 不要再爱妳 让妳的声音从我耳边消失"
+  },
+  {
+    "id": "pop909_115",
+    "title": "盛夏的果实 (Fruit of Summer)",
+    "artist": "莫文蔚 (Karen Mok)",
+    "key": "C major",
+    "section": "Verse & Chorus",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
+    "year": 2000,
+    "notes": "也许放弃 才能靠近你 不再见你 你才会把我记起"
+  },
+  {
+    "id": "pop909_116",
+    "title": "慢慢喜欢你 (Slowly Like You)",
+    "artist": "莫文蔚 (Karen Mok)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2018,
+    "notes": "慢慢喜欢你 慢慢的亲密 慢慢的聊自己"
+  },
+  {
+    "id": "pop909_117",
+    "title": "如果没有你 (Without You)",
+    "artist": "莫文蔚 (Karen Mok)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2006,
+    "notes": "如果没有你 我在哪里 又有什么可惜"
+  },
+  {
+    "id": "pop909_118",
+    "title": "听海 (Listen to the Sea)",
+    "artist": "张惠妹 (A-Mei)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 1997,
+    "notes": "听 海哭的声音 叹惜着谁又被伤了心 却还不清醒"
+  },
+  {
+    "id": "pop909_119",
+    "title": "记得 (Remember)",
+    "artist": "张惠妹 (A-Mei)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2001,
+    "notes": "谁还记得是谁先说 永远的爱我 以前的一句话 是我们以后的伤口"
+  },
+  {
+    "id": "pop909_120",
+    "title": "连名带姓 (Full Name)",
+    "artist": "张惠妹 (A-Mei)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2017,
+    "notes": "再听到你名字 我已经不难受 甚至能微笑着说出口"
+  },
+  {
+    "id": "pop909_121",
+    "title": "Super Star",
+    "artist": "S.H.E",
+    "key": "C minor / Eb major",
+    "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
+    "chords": [
+      "Cm",
+      "Ab",
+      "Eb",
+      "Bb"
+    ],
     "degrees": [
       6,
       4,
@@ -725,950 +3265,240 @@
       5
     ],
     "roman": "vi-IV-I-V",
+    "year": 2003,
+    "notes": "你是电 你是光 你是唯一的神话 我只爱你 You are my super star"
+  },
+  {
+    "id": "pop909_122",
+    "title": "恋人未满 (Not Yet Lovers)",
+    "artist": "S.H.E",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2001,
+    "notes": "友达以上 恋人未满 甜蜜心烦 愉悦混乱"
+  },
+  {
+    "id": "pop909_123",
+    "title": "热带雨林 (Tropical Rainforest)",
+    "artist": "S.H.E",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "4,5,3,6,2,5,1",
+    "chords": [
+      "F",
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
+    ],
+    "degrees": [
+      4,
+      5,
+      3,
+      6,
+      2,
+      5,
+      1
+    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "year": 2002,
+    "notes": "冷色调的雨林 淋湿了谁的心 走不出的迷雾"
+  },
+  {
+    "id": "pop909_124",
+    "title": "Lydia",
+    "artist": "F.I.R. 飞儿乐团",
+    "key": "E minor / G major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Em",
+      "C",
+      "G",
+      "D"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2004,
+    "notes": "Lydia 迷离的眼眸 为何流浪 照亮这片夜空"
+  },
+  {
+    "id": "pop909_125",
+    "title": "我们的爱 (Our Love)",
+    "artist": "F.I.R. 飞儿乐团",
+    "key": "C minor / Eb major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Cm",
+      "Ab",
+      "Eb",
+      "Bb"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2004,
+    "notes": "我们的爱 过了就不再回来 直到现在 我还默默的等待"
+  },
+  {
+    "id": "pop909_126",
+    "title": "月牙湾 (Crescent Bay)",
+    "artist": "F.I.R. 飞儿乐团",
+    "key": "A minor / C major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Am",
+      "F",
+      "C",
+      "G"
+    ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2007,
+    "notes": "是谁的心啊 孤单地留下 他还在想着她"
+  },
+  {
+    "id": "pop909_127",
+    "title": "千年之恋 (Millennium Love)",
+    "artist": "F.I.R. 飞儿乐团",
+    "key": "F# minor / A major",
+    "section": "Chorus (副歌)",
+    "progression": "6,4,1,5",
     "chords": [
       "F#m",
       "D",
       "A",
       "E"
     ],
+    "degrees": [
+      6,
+      4,
+      1,
+      5
+    ],
+    "roman": "vi-IV-I-V",
+    "year": 2005,
+    "notes": "穿越千年的伤痛 只为求一个结果 你问我为什么"
+  },
+  {
+    "id": "pop909_128",
+    "title": "隐形的翅膀 (Invisible Wings)",
+    "artist": "张韶涵 (Angela Zhang)",
+    "key": "C major",
+    "section": "Chorus (副歌)",
+    "progression": "1,5,6,3,4,1,2,5",
+    "chords": [
+      "C",
+      "G",
+      "Am",
+      "Em",
+      "F",
+      "C",
+      "Dm",
+      "G"
+    ],
+    "degrees": [
+      1,
+      5,
+      6,
+      3,
+      4,
+      1,
+      2,
+      5
+    ],
+    "roman": "I-V-vi-iii-IV-I-ii-V",
     "year": 2006,
-    "notes": "我不转弯 我不转弯 我不转弯",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "每一次 都在徘徊孤单中坚强 每一次 就算很受伤也不闪泪光"
   },
   {
-    "id": "pop909_028",
-    "title": "我不愿让你一个人 (I Won't Let You Be Alone)",
-    "artist": "五月天 (Mayday)",
+    "id": "pop909_129",
+    "title": "欧若拉 (Aurora)",
+    "artist": "张韶涵 (Angela Zhang)",
+    "key": "C minor / Eb major",
     "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "4,5,3,6,2,5,1",
+    "progression": "6,4,1,5",
+    "chords": [
+      "Cm",
+      "Ab",
+      "Eb",
+      "Bb"
+    ],
     "degrees": [
+      6,
       4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
-    ],
-    "year": 2011,
-    "notes": "我不愿让你一个人 一个人在人海浮沉",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_031",
-    "title": "怒放的生命 (Blooming Life)",
-    "artist": "汪峰 (Wang Feng)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
       1,
-      5,
-      6,
-      4
+      5
     ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
-    "year": 2005,
-    "notes": "我想要怒放的生命 就象飞翔在辽阔天空",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_032",
-    "title": "飞得更高 (Fly Higher)",
-    "artist": "汪峰 (Wang Feng)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
+    "roman": "vi-IV-I-V",
     "year": 2004,
-    "notes": "我要飞得更高 飞得更高 狂风一样舞蹈",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "爱是一道光 如此美妙 指引我们 想要的前方"
   },
   {
-    "id": "pop909_033",
-    "title": "春天里 (In Spring)",
-    "artist": "汪峰 (Wang Feng)",
-    "section": "Chorus (副歌)",
-    "key": "A major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "A",
-      "E",
-      "F#m",
-      "D"
-    ],
-    "year": 2009,
-    "notes": "如果有一天 我老无所依 请把我留在 在那时光里",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_034",
-    "title": "存在 (Existence)",
-    "artist": "汪峰 (Wang Feng)",
-    "section": "Chorus (副歌)",
+    "id": "pop909_130",
+    "title": "遗失的美好 (Lost Beauty)",
+    "artist": "张韶涵 (Angela Zhang)",
     "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
-    "year": 2011,
-    "notes": "多少人走着却困在原地 多少人活着却如同死去",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_035",
-    "title": "北京北京 (Beijing Beijing)",
-    "artist": "汪峰 (Wang Feng)",
     "section": "Chorus (副歌)",
-    "key": "A minor / C major",
-    "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
+    "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "Am",
       "F",
-      "C",
-      "G"
+      "G",
+      "Em",
+      "Am",
+      "Dm",
+      "G",
+      "C"
     ],
-    "year": 2007,
-    "notes": "我在这里欢笑 我在这里哭泣",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_036",
-    "title": "再见青春 (Farewell Youth)",
-    "artist": "汪峰 (Wang Feng)",
-    "section": "Verse & Chorus",
-    "key": "A minor / C major",
-    "progression": "6,4,5,6",
     "degrees": [
-      6,
       4,
       5,
-      6
-    ],
-    "roman": "vi-IV-V-vi",
-    "chords": [
-      "Am",
-      "F",
-      "G",
-      "Am"
-    ],
-    "year": 2009,
-    "notes": "我将在深秋的黎明出发 伴着铁皮车厢的摇晃",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_041",
-    "title": "修炼爱情 (Practice Love)",
-    "artist": "林俊杰 (JJ Lin)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
+      3,
       6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
-    "year": 2013,
-    "notes": "修炼爱情的心酸 学会放好以前的渴望",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_042",
-    "title": "江南 (Jiangnan)",
-    "artist": "林俊杰 (JJ Lin)",
-    "section": "Verse (主歌)",
-    "key": "Bb major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
+      2,
       5,
-      6,
-      4
+      1
     ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "Bb",
-      "F",
-      "Gm",
-      "Eb"
-    ],
+    "roman": "IV-V-iii-vi-ii-V-I",
     "year": 2004,
-    "notes": "风到这里就是粘 粘住过客的思念",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_043",
-    "title": "可惜没如果 (If Only)",
-    "artist": "林俊杰 (JJ Lin)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
-    ],
-    "year": 2014,
-    "notes": "倘若那天 把该说的话好好说 该体谅的不执着",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_044",
-    "title": "一千年以后 (A Thousand Years Later)",
-    "artist": "林俊杰 (JJ Lin)",
-    "section": "Chorus (副歌)",
-    "key": "Eb major",
-    "progression": "1,5,6,3,4,1,2,5",
-    "degrees": [
-      1,
-      5,
-      6,
-      3,
-      4,
-      1,
-      2,
-      5
-    ],
-    "roman": "I-V-vi-iii-IV-I-ii-V",
-    "chords": [
-      "Eb",
-      "Bb",
-      "Cm",
-      "Gm",
-      "Ab",
-      "Eb",
-      "Fm",
-      "Bb"
-    ],
-    "year": 2005,
-    "notes": "因为在一千年以后 世界早已没有我",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_045",
-    "title": "背对背拥抱 (Back to Back Embrace)",
-    "artist": "林俊杰 (JJ Lin)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
-    ],
-    "year": 2009,
-    "notes": "背对背拥抱 滥用沉默在咆哮",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_051",
-    "title": "十年 (Ten Years)",
-    "artist": "陈奕迅 (Eason Chan)",
-    "section": "Chorus (副歌)",
-    "key": "Ab major",
-    "progression": "1,5,6,3,4,1,2,5",
-    "degrees": [
-      1,
-      5,
-      6,
-      3,
-      4,
-      1,
-      2,
-      5
-    ],
-    "roman": "I-V-vi-iii-IV-I-ii-V",
-    "chords": [
-      "Ab",
-      "Eb",
-      "Fm",
-      "Cm",
-      "Db",
-      "Ab",
-      "Bbm",
-      "Eb"
-    ],
-    "year": 2003,
-    "notes": "十年之后 我们是朋友 还可以问候",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_052",
-    "title": "爱情转移 (Love Transfer)",
-    "artist": "陈奕迅 (Eason Chan)",
-    "section": "Chorus (副歌)",
-    "key": "Bb major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "Eb",
-      "F",
-      "Dm",
-      "Gm",
-      "Cm",
-      "F",
-      "Bb"
-    ],
-    "year": 2007,
-    "notes": "把一个人的温暖 转移到另一个的胸膛",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_053",
-    "title": "红玫瑰 (Red Rose)",
-    "artist": "陈奕迅 (Eason Chan)",
-    "section": "Chorus (副歌)",
-    "key": "A minor / C major",
-    "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
-    "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
-    ],
-    "year": 2007,
-    "notes": "得不到的永远在骚动 被偏爱的 都有恃无恐",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_054",
-    "title": "K歌之王 (King of Karaoke)",
-    "artist": "陈奕迅 (Eason Chan)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,5,6,3,4,1,2,5",
-    "degrees": [
-      1,
-      5,
-      6,
-      3,
-      4,
-      1,
-      2,
-      5
-    ],
-    "roman": "I-V-vi-iii-IV-I-ii-V",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "Em",
-      "F",
-      "C",
-      "Dm",
-      "G"
-    ],
-    "year": 2000,
-    "notes": "我已经相信 有些人我永远不必等",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_061",
-    "title": "光辉岁月 (Glorious Years)",
-    "artist": "Beyond",
-    "section": "Chorus (副歌)",
-    "key": "D major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "D",
-      "A",
-      "Bm",
-      "G"
-    ],
-    "year": 1990,
-    "notes": "风雨中抱紧自由 一生经过磅礴的挣扎",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_062",
-    "title": "海阔天空 (Boundless Oceans, Vast Skies)",
-    "artist": "Beyond",
-    "section": "Verse (主歌)",
-    "key": "F major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "F",
-      "C",
-      "Dm",
-      "Bb"
-    ],
-    "year": 1993,
-    "notes": "今天我 寒夜里看雪飘过",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_063",
-    "title": "红豆 (Red Bean)",
-    "artist": "王菲 (Faye Wong)",
-    "section": "Verse (主歌)",
-    "key": "F major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "F",
-      "C",
-      "Dm",
-      "Bb"
-    ],
-    "year": 1998,
-    "notes": "还没好好地感受 雪花绽放的气候",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_064",
-    "title": "传奇 (Legend)",
-    "artist": "王菲 / 李健",
-    "section": "Verse (主歌)",
-    "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
-    "year": 2003,
-    "notes": "只因为在人群中 多看了你一眼",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_065",
-    "title": "遇见 (Meet)",
-    "artist": "孙燕姿 (Stefanie Sun)",
-    "section": "Verse (主歌)",
-    "key": "Ab major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "Ab",
-      "Eb",
-      "Fm",
-      "Db"
-    ],
-    "year": 2003,
-    "notes": "听见 冬天的离开 我在某年某月 醒过来",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_066",
-    "title": "我怀念的 (What I Miss)",
-    "artist": "孙燕姿 (Stefanie Sun)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
-    ],
-    "year": 2007,
-    "notes": "我怀念的是无话不说 我怀念的是一起做梦",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_067",
-    "title": "爱很简单 (I Love You)",
-    "artist": "陶喆 (David Tao)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
-    "year": 1997,
-    "notes": "I love you 一直在这里 在你身边 从不走开",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_068",
-    "title": "普通朋友 (Regular Friends)",
-    "artist": "陶喆 (David Tao)",
-    "section": "Chorus (副歌)",
-    "key": "A major",
-    "progression": "2,5,1",
-    "degrees": [
-      2,
-      5,
-      1
-    ],
-    "roman": "ii-V-I",
-    "chords": [
-      "Bm7",
-      "E7",
-      "Amaj7"
-    ],
-    "year": 1999,
-    "notes": "我只是比较慢热 但不是不想交朋友",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_069",
-    "title": "平凡之路 (The Ordinary Road)",
-    "artist": "朴树 (Pu Shu)",
-    "section": "Chorus (副歌)",
-    "key": "D major",
-    "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
-    "chords": [
-      "Bm",
-      "G",
-      "D",
-      "A"
-    ],
-    "year": 2014,
-    "notes": "我曾经跨过山和大海 也穿过人山人海",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_070",
-    "title": "消愁 (Sorrow Elimination)",
-    "artist": "毛不易 (Mao Buyi)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
-    "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
-    ],
-    "year": 2017,
-    "notes": "一杯敬朝阳 一杯敬月光",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_071",
-    "title": "像我这样的人 (Someone Like Me)",
-    "artist": "毛不易 (Mao Buyi)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
-    ],
-    "year": 2017,
-    "notes": "像我这样迷茫的人 像我这样寻找的人",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_072",
-    "title": "泡沫 (Bubble)",
-    "artist": "邓紫棋 (G.E.M.)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
-    "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
-    ],
-    "year": 2012,
-    "notes": "全都是泡沫 这一刹的花火",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_073",
-    "title": "光年之外 (Light Years Away)",
-    "artist": "邓紫棋 (G.E.M.)",
-    "section": "Chorus (副歌)",
-    "key": "Eb major",
-    "progression": "6,4,1,5",
-    "degrees": [
-      6,
-      4,
-      1,
-      5
-    ],
-    "roman": "vi-IV-I-V",
-    "chords": [
-      "Cm",
-      "Ab",
-      "Eb",
-      "Bb"
-    ],
-    "year": 2016,
-    "notes": "感受停在我发端的指尖 如何瞬间冻结时间",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_074",
-    "title": "童话 (Fairy Tale)",
-    "artist": "光良 (Michael Wong)",
-    "section": "Chorus (副歌)",
-    "key": "F major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "F",
-      "C",
-      "Dm",
-      "Bb"
-    ],
-    "year": 2005,
-    "notes": "我愿变成童话里 你爱的那个天使",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_075",
-    "title": "勇气 (Courage)",
-    "artist": "梁静茹 (Fish Leong)",
-    "section": "Chorus (副歌)",
-    "key": "F major",
-    "progression": "1,5,6,3,4,1,2,5",
-    "degrees": [
-      1,
-      5,
-      6,
-      3,
-      4,
-      1,
-      2,
-      5
-    ],
-    "roman": "I-V-vi-iii-IV-I-ii-V",
-    "chords": [
-      "F",
-      "C",
-      "Dm",
-      "Am",
-      "Bb",
-      "F",
-      "Gm",
-      "C"
-    ],
-    "year": 2000,
-    "notes": "爱真的需要勇气 来面对流言蜚语",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_076",
-    "title": "可惜不是你 (Unfortunately Not You)",
-    "artist": "梁静茹 (Fish Leong)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "4,5,3,6,2,5,1",
-    "degrees": [
-      4,
-      5,
-      3,
-      6,
-      2,
-      5,
-      1
-    ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
-    ],
-    "year": 2005,
-    "notes": "可惜不是你 陪我到最后",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_077",
-    "title": "情非得已 (Can't Help Falling for You)",
-    "artist": "庾澄庆 (Harlem Yu)",
-    "section": "Intro & Chorus",
-    "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
-    "year": 2001,
-    "notes": "只怕我自己会爱上你 不敢让自己靠得太近",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_078",
-    "title": "小情歌 (A Little Love Song)",
-    "artist": "苏打绿 (Sodagreen)",
-    "section": "Chorus (副歌)",
-    "key": "D major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "D",
-      "A",
-      "Bm",
-      "G"
-    ],
-    "year": 2006,
-    "notes": "这是一首简单的小情歌 唱着人们心肠的曲折",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_079",
-    "title": "爱我别走 (Love Me, Don't Go)",
-    "artist": "张震岳 (A-Yue)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,5,6,4",
-    "degrees": [
-      1,
-      5,
-      6,
-      4
-    ],
-    "roman": "I-V-vi-IV",
-    "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
-    ],
-    "year": 1998,
-    "notes": "爱我别走 如果你说 你不爱我",
-    "provenance": "POP909-CL Ground Truth"
-  },
-  {
-    "id": "pop909_080",
-    "title": "后来 (Latter)",
-    "artist": "刘若英 (Rene Liu)",
-    "section": "Chorus (副歌)",
-    "key": "C major",
-    "progression": "1,6,4,5",
-    "degrees": [
-      1,
-      6,
-      4,
-      5
-    ],
-    "roman": "I-vi-IV-V",
-    "chords": [
-      "C",
-      "Am",
-      "F",
-      "G"
-    ],
-    "year": 1999,
-    "notes": "后来 我总算学会了 如何去爱",
-    "provenance": "POP909-CL Ground Truth"
+    "notes": "再多的风景也从不停靠 只一心寻找我遗失的美好"
   }
 ]

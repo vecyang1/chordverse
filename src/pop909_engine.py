@@ -35,18 +35,30 @@ except ImportError:
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 POP909_INDEX_FILE = DATA_DIR / "pop909_indexed_chords.json"
+MODERN_CORPUS_FILE = DATA_DIR / "chinese_modern_corpus.json"
 
 
 class ChinesePopEngine:
     def __init__(self):
         self.corpus = CHINESE_POP_DATABASE
         self._pop909_data = self._load_or_build_pop909_index()
+        self._modern_data = self._load_modern_corpus()
 
     def _load_or_build_pop909_index(self) -> List[Dict[str, Any]]:
         """Load pre-indexed POP909 dataset if exists, or return empty."""
         if POP909_INDEX_FILE.exists():
             try:
                 with open(POP909_INDEX_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                return []
+        return []
+
+    def _load_modern_corpus(self) -> List[Dict[str, Any]]:
+        """Load modern harvested Chinese pop corpus if exists."""
+        if MODERN_CORPUS_FILE.exists():
+            try:
+                with open(MODERN_CORPUS_FILE, "r", encoding="utf-8") as f:
                     return json.load(f)
             except Exception:
                 return []
@@ -123,6 +135,27 @@ class ChinesePopEngine:
                     roman_progression=roman_str,
                     language="zh",
                     source="pop909"
+                )
+                results.append(song)
+
+        # 3. Search in Modern Harvested Corpus
+        for m_item in self._modern_data:
+            m_id = m_item.get("id", "")
+            if m_id in seen_ids:
+                continue
+            m_degrees = m_item.get("primary_degrees", []) or m_item.get("degrees", [])
+            if matches_progression_sequence(m_degrees, target_degrees, exact=exact):
+                seen_ids.add(m_id)
+                song = SongEntry(
+                    id=m_id,
+                    title=m_item.get("title", f"Modern #{m_id}"),
+                    artist=m_item.get("artist", "华语新歌"),
+                    section="Chorus",
+                    key=m_item.get("key", "C major"),
+                    progression=comma_str,
+                    roman_progression=roman_str,
+                    language="zh",
+                    source="modern_harvest"
                 )
                 results.append(song)
 

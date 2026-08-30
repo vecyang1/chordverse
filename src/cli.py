@@ -110,7 +110,9 @@ def cmd_search(args, analyzer: UnifiedChordAnalyzer):
 
 def cmd_next(args, analyzer: UnifiedChordAnalyzer):
     res = analyzer.get_next_chords(args.progression)
-    print(f"\n🔮 \033[1;36mNext Chord Probability Distribution for:\033[0m \033[1;32m{res['roman_progression']}\033[0m ({res['current_progression']})\n")
+    roman = res.get("prefix_roman") or res.get("roman_progression") or args.progression
+    prog = res.get("prefix_progression") or res.get("current_progression") or args.progression
+    print(f"\n🔮 \033[1;36mNext Chord Probability Distribution for:\033[0m \033[1;32m{roman}\033[0m ({prog})\n")
     
     probs = res.get("next_chord_probabilities", [])
     if not probs:
@@ -168,7 +170,7 @@ def cmd_export(args, analyzer: UnifiedChordAnalyzer):
         key_filter=args.key,
         max_pages=args.pages
     )
-    data = analyzer.export_data(res, format_type=args.format)
+    data = analyzer.export_data(res, export_format=args.format)
     out_path = Path(args.output).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
@@ -183,9 +185,49 @@ def cmd_web(args, analyzer: UnifiedChordAnalyzer):
     start_web_server(port=port)
 
 
-def cmd_doctor(args, analyzer: UnifiedChordAnalyzer):
-    print("\n🩺 \033[1;36mChord Analyzer Health Check & Diagnostics:\033[0m\n")
+def cmd_import_yopu(args):
+    from yopu_importer import YopuImporter
+    importer = YopuImporter()
     
+    print(f"\n📥 \033[1;36mFetching & Analyzing Score:\033[0m {args.score} ...")
+    try:
+        song = importer.parse_and_clean_score(
+            score_input=args.score,
+            custom_title=args.title,
+            custom_artist=args.artist,
+            custom_key=args.key,
+            custom_capo=args.capo or 0
+        )
+    except Exception as e:
+        print(f"❌ Failed to parse score: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    if args.format == "json":
+        print(json.dumps(song.to_dict(), ensure_ascii=False, indent=2))
+        return
+
+    print("\n" + "=" * 60)
+    print(f"🎵 \033[1;32m{song.title}\033[0m - \033[1;33m{song.artist}\033[0m")
+    print(f"🔑 Key: \033[1m{song.key}\033[0m (Original/Concert: \033[1m{song.original_key}\033[0m, Capo: {song.capo})")
+    print(f"🎼 Primary Progression: \033[1;36m{song.primary_roman}\033[0m ({song.primary_progression})")
+    if song.progression_name:
+        print(f"🏷️  Progression Name: \033[1;35m{song.progression_name}\033[0m")
+    print(f"🎹 Chords: {' - '.join(song.primary_chords)}")
+    print(f"🔗 Source: {song.source_url}")
+    if song.raw_lyrics_sample:
+        print(f"📝 Lyrics Snippet: {song.raw_lyrics_sample}...")
+    print("=" * 60)
+
+    if args.add:
+        importer.save_to_modern_corpus(song)
+        print(f"✅ Successfully added '{song.title}' to data/chinese_modern_corpus.json!\n")
+    else:
+        print("💡 Tip: Use '--add' to permanently save this song to ChordVerse's Chinese modern corpus.\n")
+
+
+def cmd_doctor(args, analyzer: UnifiedChordAnalyzer):
+    print("\n🩺 \033[1;36mRunning ChordVerse System Diagnostics...\033[0m\n")
+
     # 1. Check Roman Engine
     try:
         from roman_engine import normalize_progression_input
@@ -195,22 +237,30 @@ def cmd_doctor(args, analyzer: UnifiedChordAnalyzer):
     except Exception as e:
         print(f"  ❌ Roman Numeral Engine:           FAILED ({e})")
 
-    # 2. Check Chinese Corpus
+    # 2. Check Chinese Curated Corpus
     zh_count = len(analyzer.chinese_engine.corpus)
     print(f"  ✅ Chinese Ground-Truth Corpus:    OK ({zh_count} curated songs indexed)")
 
-    # 3. Check Hooktheory Cache
+    # 3. Check POP909 Index
+    pop909_count = len(analyzer.chinese_engine._pop909_data)
+    print(f"  ✅ POP909 Golden Base Index:       OK ({pop909_count} classic songs indexed)")
+
+    # 4. Check Modern Harvested Corpus
+    modern_count = len(analyzer.chinese_engine._modern_data)
+    print(f"  ✅ Modern 2020-2026 Corpus:        OK ({modern_count} modern hits indexed)")
+
+    # 5. Check Hooktheory Cache
     cache_items = len(analyzer.hooktheory._cache)
     print(f"  ✅ Local Hooktheory Cache:         OK ({cache_items} query caches stored)")
 
-    # 4. Check Hooktheory Search Index Connection
+    # 6. Check Hooktheory Remote API
     try:
-        sample_res = analyzer.hooktheory.search_songs("1,5,6,4", max_pages=1, use_cache=False)
-        print(f"  ✅ Hooktheory Remote API/Index:    OK ({len(sample_res)} hits live retrieved)")
+        sample_res = analyzer.hooktheory.search_songs("1,5,6,4", max_pages=1, use_cache=True)
+        print(f"  ✅ Hooktheory Engine & Cache:      OK ({len(sample_res)} hits ready)")
     except Exception as e:
-        print(f"  ⚠️  Hooktheory Remote API:          OFFLINE/RATE-LIMITED ({e}) - Local cache available")
+        print(f"  ⚠️  Hooktheory Remote Engine:       OFFLINE ({e}) - Local cache active")
 
-    # 5. Check Token Status
+    # 7. Check Token Status
     if analyzer.hooktheory.token:
         print("  🔑 Hooktheory Bearer Auth:         CONFIGURED")
     else:
@@ -246,6 +296,16 @@ def main():
     p_analyze.add_argument("--key", default="C", help="Root key (default: C)")
     p_analyze.add_argument("--scale", default="major", choices=["major", "minor"], help="Scale type")
 
+    # import-yopu
+    p_yopu = subparsers.add_parser("import-yopu", help="Import & clean a song from Yopu.co or lead sheet")
+    p_yopu.add_argument("score", help="Yopu URL, score ID (e.g. aXYaaOXZ), or raw chord sheet text")
+    p_yopu.add_argument("--title", help="Custom song title")
+    p_yopu.add_argument("--artist", help="Custom artist name")
+    p_yopu.add_argument("--key", help="Key override (e.g. 'C', 'G')")
+    p_yopu.add_argument("--capo", type=int, default=0, help="Capo fret number")
+    p_yopu.add_argument("--add", action="store_true", help="Save imported song directly to modern Chinese corpus")
+    p_yopu.add_argument("--format", default="table", choices=["table", "json"], help="Output display format")
+
     # chinese
     p_chinese = subparsers.add_parser("chinese", help="Browse iconic Chinese pop chord progression taxonomy")
     p_chinese.add_argument("--top", action="store_true", help="Show top progressions")
@@ -280,6 +340,8 @@ def main():
         cmd_next(args, analyzer)
     elif args.command == "analyze":
         cmd_analyze(args, analyzer)
+    elif args.command == "import-yopu":
+        cmd_import_yopu(args)
     elif args.command == "chinese":
         cmd_chinese(args, analyzer)
     elif args.command == "export":

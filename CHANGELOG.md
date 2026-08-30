@@ -2,6 +2,25 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.1.0] - 2026-08-30
+
+### Added
+- **3-Tier Harmonic Data Architecture**:
+  - **Tier 1 (POP909 Golden Base Index)**: 909 classic pop songs indexed with academic MIR ground truth.
+  - **Tier 2 (1-Click Yopu / UGC Harvester & Cleaner)**: `YopuImporter` with Capo compensation, reverse-engineered Svelte DOM extractor, and multi-scale N-gram loop detection (4/6/7/8-chord sliding window).
+  - **Tier 3 (Modern 2020-2026 Hits & Hooktheory 75,000+)**: Dynamic JSON layer for modern viral Mandopop hits.
+- **New CLI Subcommands & Tools**:
+  - `chord-analyzer import-yopu <url_or_id> [--add]` for 1-click lead sheet ingestion.
+  - Enhanced `chord-analyzer doctor` with multi-corpus status diagnostics.
+- **MCP Server Expansion (`src/mcp_server.py`)**:
+  - Added `import_yopu_song` tool for AI agents.
+- **Web UI & REST API Upgrades (`src/static/`, `src/web_server.py`)**:
+  - Added Dataset Provenance Badges (`[POP909 基准]`, `[华语精选]`, `[现代热歌]`, `[Hooktheory]`, `[欧美经典]`).
+  - Added interactive Yopu URL Harvester tab on Web Dashboard.
+  - Added `/api/import-yopu` endpoint.
+- **Expanded Test Suite**:
+  - 46 unit & integration tests covering symbolic math, POP909 search, Yopu parsing, MCP server, web server, and CLI commands.
+
 ## [1.0.0] - 2026-08-29
 
 ### Added

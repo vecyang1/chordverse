@@ -87,6 +87,8 @@ class ChordAnalyzerHTTPHandler(BaseHTTPRequestHandler):
                     {"progression": k, "name": v} for k, v in NAMED_PROGRESSIONS.items()
                 ],
                 "chinese_songs_count": len(ANALYZER.chinese_engine.corpus),
+                "pop909_count": len(ANALYZER.chinese_engine._pop909_data),
+                "modern_count": len(ANALYZER.chinese_engine._modern_data),
                 "hooktheory_cache_count": len(ANALYZER.hooktheory._cache)
             }
             self._send_json(res)
@@ -136,6 +138,31 @@ class ChordAnalyzerHTTPHandler(BaseHTTPRequestHandler):
 
             res = ANALYZER.analyze_chords(chords, key=key, scale_type=scale)
             self._send_json(res)
+            return
+
+        elif path == "/api/import-yopu":
+            length = int(self.headers.get("Content-Length", 0))
+            body_bytes = self.rfile.read(length)
+            try:
+                payload = json.loads(body_bytes.decode("utf-8"))
+            except Exception:
+                self._send_json({"error": "Invalid JSON body"}, 400)
+                return
+
+            score = payload.get("score", "")
+            add = payload.get("add_to_corpus", False)
+            key = payload.get("key")
+            capo = payload.get("capo", 0)
+
+            from yopu_importer import YopuImporter
+            importer = YopuImporter()
+            try:
+                song = importer.parse_and_clean_score(score, custom_key=key, custom_capo=capo)
+                if add:
+                    importer.save_to_modern_corpus(song)
+                self._send_json(song.to_dict())
+            except Exception as e:
+                self._send_json({"error": str(e)}, 500)
             return
 
         self.send_error(404, "Endpoint not found")

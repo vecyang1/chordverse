@@ -144,6 +144,79 @@ class YopuImporter:
             "article": raw_article
         }
 
+    def search_yopu(self, query: str, page: int = 0, instrument: str = "guitar", timeout: int = 15) -> Dict[str, Any]:
+        """
+        Search Yopu.co for lead sheets matching a song title, artist, or query keyword.
+        """
+        params = {
+            "q": query.strip(),
+            "page": page,
+            "instrument": instrument
+        }
+        api_url = "https://yopu.co/api/search/sheets?" + urllib.parse.urlencode(params)
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+            "Referer": "https://yopu.co/explore",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+        }
+
+        req = urllib.request.Request(api_url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                results = []
+                for item in data.get("results", []):
+                    sheet_id = item.get("_id") or item.get("id")
+                    if not sheet_id:
+                        continue
+                    author = item.get("author", {})
+                    author_name = author.get("name") if isinstance(author, dict) else str(author or "")
+                    results.append({
+                        "id": sheet_id,
+                        "title": item.get("title", ""),
+                        "artist": item.get("artist", ""),
+                        "key": item.get("key", ""),
+                        "capo": item.get("capo", 0),
+                        "author": author_name,
+                        "verified": bool(item.get("verified", False)),
+                        "views": item.get("views", 0),
+                        "fav_count": item.get("favCount", 0),
+                        "url": f"https://yopu.co/view/{sheet_id}"
+                    })
+                return {
+                    "query": query,
+                    "total_count": data.get("totalResultNum", len(results)),
+                    "results": results
+                }
+        except Exception as e:
+            raise ConnectionError(f"Failed to search Yopu.co for '{query}': {e}")
+
+    def import_from_search(self, query: str, pick_index: int = 0, add_to_corpus: bool = True) -> ImportedSong:
+        """
+        Search Yopu.co by keyword, auto-pick the top (or Nth) result, clean and import it.
+        """
+        search_res = self.search_yopu(query)
+        results = search_res.get("results", [])
+        if not results:
+            raise ValueError(f"No results found on Yopu.co for '{query}'")
+        
+        if pick_index < 0 or pick_index >= len(results):
+            raise IndexError(f"Pick index {pick_index} out of range (0-{len(results)-1})")
+
+        chosen = results[pick_index]
+        song = self.parse_and_clean_score(
+            score_input=chosen["id"],
+            custom_title=chosen["title"],
+            custom_artist=chosen["artist"],
+            custom_key=chosen.get("key") or None,
+            custom_capo=chosen.get("capo") or 0
+        )
+        if add_to_corpus:
+            self.save_to_modern_corpus(song)
+        return song
+
     def detect_harmonic_loops(self, chord_sequence: List[str], key_root: str = "C", scale_type: str = "major") -> List[Tuple[str, int]]:
         """
         Detect dominant 4-chord and 8-chord progressions using N-gram sliding window.

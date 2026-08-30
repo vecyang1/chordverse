@@ -2,6 +2,21 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.2.0] - 2026-08-30
+
+### Added
+- **Full Yopu (有谱么) Keyword Search & Discovery**:
+  - Reverse-engineered `/api/search/sheets` endpoint with instrument filtering.
+  - Implemented `search_yopu()` in `YopuImporter` and `search_yopu_scores()` in `yopu-cli`.
+  - Added CLI command `chord-analyzer yopu-search <query> [--pick <N>] [--add]`.
+  - Upgraded `yopu-cli` (`yp`) with `yp search <query>` and `--pick <N>` auto-selection.
+  - Added `search_yopu_scores` tool to Model Context Protocol (MCP) server.
+  - Added full live keyword search bar and interactive result cards to the Web Dashboard UI.
+- **REST API Extension**:
+  - Added `GET /api/yopu-search?q=...&instrument=...` endpoint.
+- **Expanded Test Coverage**:
+  - Added 4 new automated tests for Yopu search across CLI, SDK, Web Server, and MCP Server (total 50 passing tests).
+
 ## [1.1.0] - 2026-08-30
 
 ### Added

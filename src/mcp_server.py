@@ -120,6 +120,26 @@ TOOLS = [
             },
             "required": ["score"]
         }
+    },
+    {
+        "name": "search_yopu_scores",
+        "description": "Search song lead sheets on Yopu.co by keyword (title/artist). Returns matching scores with ID, Key, and URL.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Song title or artist search query (e.g. '再见青春' or '周杰伦 晴天')"
+                },
+                "instrument": {
+                    "type": "string",
+                    "enum": ["guitar", "ukulele", "piano"],
+                    "default": "guitar",
+                    "description": "Target instrument (default: guitar)"
+                }
+            },
+            "required": ["query"]
+        }
     }
 ]
 
@@ -181,6 +201,18 @@ def handle_tool_call(name: str, arguments: dict) -> dict:
         return {
             "content": [
                 {"type": "text", "text": json.dumps(song.to_dict(), ensure_ascii=False, indent=2)}
+            ]
+        }
+
+    elif name == "search_yopu_scores":
+        from yopu_importer import YopuImporter
+        importer = YopuImporter()
+        query = arguments.get("query", "")
+        instrument = arguments.get("instrument", "guitar")
+        data = importer.search_yopu(query, instrument=instrument)
+        return {
+            "content": [
+                {"type": "text", "text": json.dumps(data, ensure_ascii=False, indent=2)}
             ]
         }
 

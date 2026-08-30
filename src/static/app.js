@@ -429,11 +429,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 1-Click Yopu / UGC Harvester Handler
+  // 1-Click Yopu / UGC Harvester & Search Handler
+  const btnYopuSearch = document.getElementById("btn-yopu-search");
   const btnYopuImport = document.getElementById("btn-yopu-import");
   const yopuImportInput = document.getElementById("yopu-import-input");
+  const yopuSearchResultsBox = document.getElementById("yopu-search-results-box");
   const yopuImportResult = document.getElementById("yopu-import-result");
 
+  // Keyword Search on Yopu
+  btnYopuSearch?.addEventListener("click", async () => {
+    const query = yopuImportInput.value.trim();
+    if (!query) return;
+
+    btnYopuSearch.textContent = "搜索中...";
+    btnYopuSearch.disabled = true;
+    yopuSearchResultsBox.style.display = "block";
+    yopuSearchResultsBox.innerHTML = `<div class="loading-spinner">正在搜索有谱么曲库...</div>`;
+
+    try {
+      const res = await fetch(`/api/yopu-search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      const results = data.results || [];
+
+      if (results.length === 0) {
+        yopuSearchResultsBox.innerHTML = `<div style="font-size:12px;color:var(--text-muted);">未找到与 "${query}" 匹配的曲谱。</div>`;
+        return;
+      }
+
+      let html = `<div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#38bdf8;">🔍 找到 ${data.total_count} 个匹配曲谱（点击直接解析并入库）：</div>`;
+      html += `<div style="display:flex;flex-direction:column;gap:6px;">`;
+      results.forEach((r, idx) => {
+        const vTag = r.verified ? `<span style="color:#10b981;font-size:10px;font-weight:700;">✅ 认证</span>` : "";
+        const keyTag = r.key ? `<span style="font-size:10px;background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;">${r.key}调</span>` : "";
+        html += `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;">
+            <div>
+              <strong>${idx + 1}. ${r.title}</strong> - <span style="color:var(--text-secondary);">${r.artist || "未知歌手"}</span> ${keyTag} ${vTag}
+            </div>
+            <button class="btn btn-secondary btn-import-item" data-id="${r.id}" data-title="${r.title}" data-artist="${r.artist}" style="padding:2px 8px;font-size:11px;">
+              解析 ➔
+            </button>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      yopuSearchResultsBox.innerHTML = html;
+
+      // Attach click events to results
+      yopuSearchResultsBox.querySelectorAll(".btn-import-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const scoreId = btn.getAttribute("data-id");
+          yopuImportInput.value = scoreId;
+          btnYopuImport.click();
+        });
+      });
+
+    } catch (e) {
+      yopuSearchResultsBox.innerHTML = `<div style="font-size:12px;color:#ef4444;">搜索失败，请检查网络。</div>`;
+    } finally {
+      btnYopuSearch.textContent = "全网搜索";
+      btnYopuSearch.disabled = false;
+    }
+  });
+
+  // Direct Parse / Import by ID or URL
   btnYopuImport?.addEventListener("click", async () => {
     const raw = yopuImportInput.value.trim();
     if (!raw) return;
@@ -474,7 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {
       alert("网络请求失败");
     } finally {
-      btnYopuImport.textContent = "一键解析 & 检索";
+      btnYopuImport.textContent = "直接解析";
       btnYopuImport.disabled = false;
     }
   });

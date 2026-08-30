@@ -44,7 +44,11 @@ When asking Large Language Models (LLMs) *"What songs use the 1-5-6-4 chord prog
 # Search 4536251 (Royal Road / 王道进行)
 ./bin/chord-analyzer search 4536251
 
-# Import, clean, and analyze a song directly from Yopu (有谱么) with Capo compensation
+# Search lead sheets on Yopu (有谱么) by keyword & auto-import
+./bin/chord-analyzer yopu-search "再见青春"
+./bin/chord-analyzer yopu-search "汪峰 存在" --pick 1 --add
+
+# Import, clean, and analyze a song directly from Yopu by score ID with Capo compensation
 ./bin/chord-analyzer import-yopu aXYaaOXZ --add
 
 # Predict next chord probabilities for a progression prefix

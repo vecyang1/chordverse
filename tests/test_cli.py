@@ -46,6 +46,11 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(res.returncode, 0)
         self.assertTrue(Path(tmp_file).exists())
 
+    def test_cli_yopu_search(self):
+        res = self._run(["yopu-search", "再见青春", "--format", "json"])
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("3PbL9Wr1", res.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

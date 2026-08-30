@@ -83,6 +83,21 @@ class TestMCPServer(unittest.TestCase):
         data = json.loads(text_content)
         self.assertEqual(data["primary_progression"], "1,5,6,4")
 
+    def test_tool_call_search_yopu(self):
+        resp = self._rpc_call({
+            "jsonrpc": "2.0",
+            "id": 6,
+            "method": "tools/call",
+            "params": {
+                "name": "search_yopu_scores",
+                "arguments": {"query": "再见青春"}
+            }
+        })
+        text_content = resp["result"]["content"][0]["text"]
+        data = json.loads(text_content)
+        self.assertIn("results", data)
+        self.assertGreater(len(data["results"]), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

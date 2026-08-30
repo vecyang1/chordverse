@@ -1,3 +1,6 @@
+import os
+os.environ["no_proxy"] = "127.0.0.1,localhost"
+os.environ["NO_PROXY"] = "127.0.0.1,localhost"
 import unittest
 import threading
 import time
@@ -58,6 +61,14 @@ class TestWebServer(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
             self.assertEqual(data["progression_string"], "4,5,3,6,2,5,1")
+
+    def test_api_yopu_search(self):
+        url = f"http://127.0.0.1:{self.port}/api/yopu-search?q=%E5%86%8D%E8%A7%81%E9%9D%92%E6%98%A5"
+        with urllib.request.urlopen(url) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertIn("results", data)
+            self.assertGreater(len(data["results"]), 0)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ export async function onRequestGet(context) {
   const instrument = url.searchParams.get("instrument") || "guitar";
 
   if (!q.trim()) {
-    return new Response(JSON.stringify({ query: q, total: 0, results: [] }), {
+    return new Response(JSON.stringify({ query: q, total: 0, total_count: 0, results: [] }), {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
     });
   }
@@ -20,29 +20,37 @@ export async function onRequestGet(context) {
     });
 
     if (!resp.ok) {
-      return new Response(JSON.stringify({ query: q, total: 0, results: [], error: `Yopu returned HTTP ${resp.status}` }), {
+      return new Response(JSON.stringify({ query: q, total: 0, total_count: 0, results: [], error: `Yopu returned HTTP ${resp.status}` }), {
         headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
       });
     }
 
     const data = await resp.json();
     const rawResults = data.results || [];
-    const formatted = rawResults.map(item => ({
-      id: item._id || item.id,
-      title: item.title || "未知曲目",
-      artist: item.artist || "未知歌手",
-      key: item.key || item.originalKey || "-",
-      capo: item.capo ?? 0,
-      author: item.author?.name || item.author || "有谱么曲谱",
-      verified: item.verified || item.isVerified || false,
-      views: item.views || 0,
-      favCount: item.favCount || 0,
-      url: `https://yopu.co/view/${item._id || item.id}`
-    }));
+    const formatted = rawResults
+      .filter(item => item && (item._id || item.id))
+      .map(item => {
+        const id = item._id || item.id;
+        return {
+          id: id,
+          title: item.title || "未知曲目",
+          artist: item.artist || "未知歌手",
+          key: item.key || item.originalKey || "-",
+          capo: item.capo ?? 0,
+          author: item.author?.name || item.author || "有谱么曲谱",
+          verified: Boolean(item.verified || item.isVerified),
+          views: item.views || 0,
+          favCount: item.favCount || 0,
+          url: `https://yopu.co/view/${id}`
+        };
+      });
+
+    const totalNum = data.totalResultNum || formatted.length;
 
     return new Response(JSON.stringify({
       query: q,
-      total: data.totalResultNum || formatted.length,
+      total: totalNum,
+      total_count: totalNum,
       results: formatted
     }), {
       headers: {
@@ -52,7 +60,7 @@ export async function onRequestGet(context) {
       }
     });
   } catch (err) {
-    return new Response(JSON.stringify({ query: q, total: 0, results: [], error: err.message }), {
+    return new Response(JSON.stringify({ query: q, total: 0, total_count: 0, results: [], error: err.message }), {
       status: 500,
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
     });

@@ -497,11 +497,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      let html = `<div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#38bdf8;">🔍 找到 ${data.total_count} 个匹配曲谱（点击直接解析并入库）：</div>`;
+      const totalHits = data.total_count ?? data.total ?? results.length;
+      let html = `<div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#38bdf8;">🔍 找到 ${totalHits} 个匹配曲谱（点击直接解析并入库）：</div>`;
       html += `<div style="display:flex;flex-direction:column;gap:6px;">`;
       results.forEach((r, idx) => {
         const vTag = r.verified ? `<span style="color:#10b981;font-size:10px;font-weight:700;">✅ 认证</span>` : "";
-        const keyTag = r.key ? `<span style="font-size:10px;background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;">${r.key}调</span>` : "";
+        const keyTag = r.key && r.key !== "-" ? `<span style="font-size:10px;background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;">${r.key}调</span>` : "";
         html += `
           <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;">
             <div>
@@ -526,7 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     } catch (e) {
-      yopuSearchResultsBox.innerHTML = `<div style="font-size:12px;color:#ef4444;">搜索失败，请检查网络。</div>`;
+      yopuSearchResultsBox.innerHTML = `<div style="font-size:12px;color:#ef4444;">搜索失败: ${e.message}</div>`;
     } finally {
       btnYopuSearch.textContent = "全网搜索";
       btnYopuSearch.disabled = false;
@@ -539,6 +540,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!raw) return;
     btnYopuImport.textContent = "解析中...";
     btnYopuImport.disabled = true;
+    yopuImportResult.style.display = "block";
+    yopuImportResult.innerHTML = `<div class="loading-spinner">正在拉取并分析有谱么曲谱...</div>`;
 
     try {
       const res = await fetch("/api/import-yopu", {
@@ -549,18 +552,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       
       if (data.error) {
-        alert("解析失败: " + data.error);
+        yopuImportResult.innerHTML = `<div style="font-size:12px;color:#ef4444;">❌ 解析失败: ${data.error}</div>`;
         return;
       }
 
-      yopuImportResult.style.display = "block";
       yopuImportResult.innerHTML = `
         <div style="color:#10b981;font-weight:700;margin-bottom:6px;">✅ 解析成功并已入库！</div>
         <div><strong>歌名/歌手:</strong> ${data.title} - ${data.artist}</div>
-        <div><strong>原曲调性:</strong> ${data.key} (Capo: ${data.capo})</div>
+        <div><strong>原曲调性:</strong> ${data.key} (Capo: ${data.capo || 0})</div>
         <div><strong>核心 Loop 级数:</strong> <span style="color:var(--primary-accent);font-weight:700;">${data.primary_roman}</span> (${data.primary_progression})</div>
         ${data.progression_name ? `<div style="color:#38bdf8;font-size:12px;">🏷️ 对应进行: ${data.progression_name}</div>` : ""}
-        <div><strong>和弦走向:</strong> ${data.primary_chords.join(" - ")}</div>
+        <div><strong>和弦走向:</strong> ${(data.primary_chords || []).join(" - ")}</div>
         <button id="btn-use-yopu-prog" class="btn btn-secondary" style="margin-top:8px;padding:4px 8px;font-size:11px;">在曲库中检索此进行 ➔</button>
       `;
 
@@ -572,7 +574,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     } catch (e) {
-      alert("网络请求失败");
+      yopuImportResult.innerHTML = `<div style="font-size:12px;color:#ef4444;">❌ 网络请求失败: ${e.message}</div>`;
     } finally {
       btnYopuImport.textContent = "直接解析";
       btnYopuImport.disabled = false;

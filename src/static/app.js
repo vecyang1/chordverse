@@ -729,8 +729,13 @@ document.addEventListener("DOMContentLoaded", () => {
       presetChips.forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       const prog = chip.getAttribute("data-prog");
-      inputProg.value = prog;
-      activeDegrees = parseInputToDegrees(prog);
+      if (prog === "all" || !prog) {
+        inputProg.value = "";
+        activeDegrees = [];
+      } else {
+        inputProg.value = prog;
+        activeDegrees = parseInputToDegrees(prog);
+      }
       renderBuilderDisplay();
       executeSearch();
     });

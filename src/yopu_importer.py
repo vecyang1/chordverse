@@ -35,6 +35,25 @@ except ImportError:
     )
     from hooktheory_client import SongEntry
 
+try:
+    from yopu.fetcher import search_yopu_scores, fetch_score_data as yopu_fetch_score_data
+except ImportError:
+    import sys
+    yp_paths = [
+        Path.home() / ".gemini" / "antigravity" / "skills" / "yopu-cli",
+        Path.home() / "Documents" / "A-coding" / "vec-productivity-skills" / "yopu-cli"
+    ]
+    search_yopu_scores = None
+    yopu_fetch_score_data = None
+    for p in yp_paths:
+        if p.exists() and str(p) not in sys.path:
+            sys.path.insert(0, str(p))
+            try:
+                from yopu.fetcher import search_yopu_scores, fetch_score_data as yopu_fetch_score_data
+                break
+            except ImportError:
+                pass
+
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 MODERN_CORPUS_FILE = DATA_DIR / "chinese_modern_corpus.json"
 
@@ -102,11 +121,26 @@ class YopuImporter:
 
     def fetch_score_data(self, score_id_or_url: str) -> Dict[str, Any]:
         """
-        Fetches HTML from Yopu.co and extracts metadata and text.
+        Fetches score data from Yopu.co using canonical yopu client or fallback HTML.
         """
         score_id = self.extract_score_id(score_id_or_url)
         url = f"https://yopu.co/view/{score_id}"
         
+        if yopu_fetch_score_data is not None:
+            try:
+                sheet_data = yopu_fetch_score_data(score_id)
+                return {
+                    "id": score_id,
+                    "title": sheet_data.get("title", "Untitled"),
+                    "artist": sheet_data.get("artist", ""),
+                    "url": url,
+                    "html": "",
+                    "article": sheet_data.get("lyrics", ""),
+                    "sheet_data": sheet_data,
+                }
+            except Exception:
+                pass
+
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
             "Referer": "https://yopu.co/",
@@ -148,6 +182,12 @@ class YopuImporter:
         """
         Search Yopu.co for lead sheets matching a song title, artist, or query keyword.
         """
+        if search_yopu_scores is not None:
+            try:
+                return search_yopu_scores(query=query, page=page, instrument=instrument)
+            except Exception:
+                pass
+
         params = {
             "q": query.strip(),
             "page": page,

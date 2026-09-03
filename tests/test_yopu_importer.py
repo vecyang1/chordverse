@@ -1,5 +1,6 @@
 import unittest
 import sys
+import json
 from pathlib import Path
 
 SRC_DIR = Path(__file__).resolve().parent.parent / "src"
@@ -60,14 +61,29 @@ class TestYopuImporter(unittest.TestCase):
         self.assertEqual(song.primary_roman, "I-V-vi-IV")
 
     def test_save_and_load_modern_corpus(self):
+        import tempfile
+        from unittest.mock import patch
         raw_sheet = "C G Am F"
         song = self.importer.parse_and_clean_score(
             score_input=raw_sheet,
             custom_title="测试入库歌曲",
             custom_artist="测试入库歌手"
         )
-        saved = self.importer.save_to_modern_corpus(song)
-        self.assertTrue(saved)
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tf:
+            tf.write(b"[]")
+            tf.flush()
+            temp_path = Path(tf.name)
+        try:
+            with patch("yopu_importer.MODERN_CORPUS_FILE", temp_path):
+                saved = self.importer.save_to_modern_corpus(song)
+                self.assertTrue(saved)
+                with open(temp_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                self.assertEqual(len(data), 1)
+                self.assertEqual(data[0]["title"], "测试入库歌曲")
+        finally:
+            if temp_path.exists():
+                temp_path.unlink()
 
     def test_search_yopu(self):
         res = self.importer.search_yopu("再见青春")

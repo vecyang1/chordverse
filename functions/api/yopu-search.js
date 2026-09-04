@@ -29,6 +29,9 @@ const YOPU_INIT_URL = `${YOPU_ORIGIN}/explore`;
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 const UPSTREAM_TIMEOUT_MS = 12000;
+// One extra attempt for transient faults (timeout, reset, 5xx). An IP block is
+// not transient and is never retried.
+const TRANSIENT_RETRIES = 1;
 
 export const SOURCE_LIVE = "yopu_live";
 export const SOURCE_LOCAL = "local_corpus";
@@ -248,14 +251,17 @@ export async function onRequestGet(context) {
   }
 
   let upstreamError;
-  try {
-    const { results, total } = await fetchYopuLive(q, page, instrument);
-    return jsonResponse(
-      { ...base, source: SOURCE_LIVE, total, total_count: total, results },
-      { "Cache-Control": "public, max-age=1800" }
-    );
-  } catch (err) {
-    upstreamError = err && err.message ? err.message : String(err);
+  for (let attempt = 0; attempt <= TRANSIENT_RETRIES; attempt++) {
+    try {
+      const { results, total } = await fetchYopuLive(q, page, instrument);
+      return jsonResponse(
+        { ...base, source: SOURCE_LIVE, total, total_count: total, results },
+        { "Cache-Control": "public, max-age=1800" }
+      );
+    } catch (err) {
+      upstreamError = err && err.message ? err.message : String(err);
+      if (upstreamError === IP_BLOCK_MESSAGE) break;
+    }
   }
 
   const fallback = await searchLocalCorpus(url.origin, q);

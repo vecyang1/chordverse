@@ -71,5 +71,22 @@ class TestWebServer(unittest.TestCase):
             self.assertGreater(len(data["results"]), 0)
 
 
+
+class TestStaticAssetVersioning(unittest.TestCase):
+    """Cloudflare's edge caches compressed asset variants for up to 4 h across a
+    deploy (measured 2026-09-04: browsers ran the previous app.js while curl saw
+    the new bytes). Every script/stylesheet reference must carry the current
+    version as a cache-busting query, so a version bump changes the URL."""
+
+    def test_index_assets_carry_the_current_version(self):
+        import re
+        root = Path(__file__).resolve().parent.parent
+        version = re.search(r'^version = "([^"]+)"', (root / "pyproject.toml").read_text(encoding="utf-8"), re.M).group(1)
+        html = (root / "src" / "static" / "index.html").read_text(encoding="utf-8")
+        refs = re.findall(r'(?:src|href)="(/[^"]+\.(?:js|css))(\?[^"]*)?"', html)
+        self.assertGreaterEqual(len(refs), 3, refs)
+        for asset, query in refs:
+            self.assertEqual(query, f"?v={version}", f"{asset} must be referenced as {asset}?v={version}")
+
 if __name__ == "__main__":
     unittest.main()

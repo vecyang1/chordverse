@@ -123,7 +123,7 @@ test("live path: session cookie from /explore is sent to the /z/ URL and results
 });
 
 test("blocked path: empty 404 from /z/ falls back to the bundled corpora, tagged local_corpus, uncached", async () => {
-  installFetch((url) => {
+  const calls = installFetch((url) => {
     if (url === "https://yopu.co/explore") return EXPLORE_OK();
     if (url.startsWith("https://yopu.co/z/")) return new Response("", { status: 404 });
     return corpusPlan(url) || new Response("", { status: 404 });
@@ -133,6 +133,7 @@ test("blocked path: empty 404 from /z/ falls back to the bundled corpora, tagged
 
   assert.equal(resp.status, 200);
   assert.equal(body.source, SOURCE_LOCAL);
+  assert.equal(calls.filter((c) => c.url.startsWith("https://yopu.co/z/")).length, 1, "an IP block is never retried");
   assert.equal(resp.headers.get("cache-control"), "no-store");
   assert.match(body.upstream_error, /empty HTTP 404/);
   assert.ok(body.note && body.note.length > 0);
@@ -158,7 +159,7 @@ test("fallback requires every query token to match title or artist", async () =>
 });
 
 test("upstream failure with no local match reports the cause instead of a bare empty list", async () => {
-  installFetch((url) => {
+  const calls = installFetch((url) => {
     if (url === "https://yopu.co/explore") return EXPLORE_OK();
     if (url.startsWith("https://yopu.co/z/")) return new Response("nope", { status: 503 });
     return corpusPlan(url) || new Response("", { status: 404 });
@@ -167,9 +168,35 @@ test("upstream failure with no local match reports the cause instead of a bare e
   const { body } = await call("q=zzz-no-such-song");
 
   assert.equal(body.source, SOURCE_LOCAL);
+  assert.equal(calls.filter((c) => c.url.startsWith("https://yopu.co/z/")).length, 2, "a 5xx is retried exactly once");
   assert.equal(body.results.length, 0);
   assert.match(body.upstream_error, /HTTP 503/);
   assert.match(body.error, /HTTP 503/);
+});
+
+test("a transient failure on the first attempt is retried once and still answers live", async () => {
+  const vector = VECTORS.find((v) => v.q === "再见青春" && v.page === 0 && v.instrument === "guitar");
+  let exploreCalls = 0;
+  const calls = installFetch((url) => {
+    if (url === "https://yopu.co/explore") {
+      exploreCalls += 1;
+      if (exploreCalls === 1) throw new TypeError("fetch failed");
+      return EXPLORE_OK();
+    }
+    if (url === `https://yopu.co${vector.z}`) return new Response(RAW_SEARCH);
+    throw new Error(`unexpected fetch ${url}`);
+  });
+
+  const { body } = await call("q=%E5%86%8D%E8%A7%81%E9%9D%92%E6%98%A5");
+
+  assert.equal(body.source, SOURCE_LIVE);
+  assert.equal(body.results.length, 14);
+  assert.equal(body.upstream_error, undefined);
+  assert.deepEqual(calls.map((c) => c.url.replace(/z\/.*$/, "z/...")), [
+    "https://yopu.co/explore",
+    "https://yopu.co/explore",
+    "https://yopu.co/z/..."
+  ]);
 });
 
 test("empty query never touches the network", async () => {

@@ -1,3 +1,10 @@
+// Escape untrusted text (upstream titles, error strings) before HTML insertion.
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // DOM Elements
   const inputProg = document.getElementById("input-progression");
@@ -215,6 +222,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = inputProg.value.trim();
     const lang = filterLang.value || "all";
     const artist = filterArtist.value.trim();
+
+    // Clear the previous search's identity immediately: the edge round-trip takes
+    // 0.4-2 s and a stale title/count reads as the answer to the new query.
+    progTitle.textContent = "检索中…";
+    totalCountEl.textContent = "…";
 
     songsTbody.innerHTML = `
       <tr>
@@ -595,26 +607,42 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`/api/yopu-search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       const results = data.results || [];
+      const isLocalFallback = data.source === "local_corpus";
 
       if (results.length === 0) {
-        yopuSearchResultsBox.innerHTML = `<div style="font-size:12px;color:var(--text-muted);">未找到与 "${query}" 匹配的曲谱。</div>`;
+        const cause = data.error || data.upstream_error;
+        yopuSearchResultsBox.innerHTML = cause
+          ? `<div style="font-size:12px;color:#ef4444;">搜索失败: ${escapeHtml(cause)}</div>`
+          : `<div style="font-size:12px;color:var(--text-muted);">未找到与 "${escapeHtml(query)}" 匹配的曲谱。</div>`;
         return;
       }
 
       const totalHits = data.total_count ?? data.total ?? results.length;
-      let html = `<div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#38bdf8;">🔍 找到 ${totalHits} 个匹配曲谱（点击直接解析）：</div>`;
+      let html = "";
+      if (isLocalFallback) {
+        html += `<div class="yopu-fallback-note" style="font-size:11px;color:#fbbf24;margin-bottom:6px;">⚠️ ${escapeHtml(data.note || "有谱么当前不可达，以下为本站内置语料库的匹配结果")}</div>`;
+      }
+      html += `<div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#38bdf8;">🔍 找到 ${totalHits} 个匹配曲谱${isLocalFallback ? "（本地语料库）" : "（点击直接解析）"}：</div>`;
       html += `<div style="display:flex;flex-direction:column;gap:6px;">`;
       results.forEach((r, idx) => {
+        const title = escapeHtml(r.title || "未知曲目");
+        const artist = escapeHtml(r.artist || "未知歌手");
         const vTag = r.verified ? `<span style="color:#10b981;font-size:10px;font-weight:700;">✅ 认证</span>` : "";
-        const keyTag = r.key && r.key !== "-" ? `<span style="font-size:10px;background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;">${r.key}调</span>` : "";
+        const keyTag = r.key && r.key !== "-" ? `<span style="font-size:10px;background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;">${escapeHtml(r.key)}调</span>` : "";
+        let action;
+        if (r.source === "local_corpus") {
+          const prog = r.roman ? `${escapeHtml(r.roman)} (${escapeHtml(r.progression || "")})` : escapeHtml(r.progression || "");
+          const link = r.source_url ? ` <a href="${escapeHtml(r.source_url)}" target="_blank" rel="noopener" style="font-size:11px;">来源 ↗</a>` : "";
+          action = `<span style="font-size:11px;color:#38bdf8;white-space:nowrap;">${prog}${link}</span>`;
+        } else {
+          action = `<button class="btn btn-secondary btn-import-item" data-id="${escapeHtml(r.id)}" data-title="${title}" data-artist="${artist}" style="padding:2px 8px;font-size:11px;">解析 ➔</button>`;
+        }
         html += `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;">
+          <div class="yopu-result-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;">
             <div>
-              <strong>${idx + 1}. ${r.title}</strong> - <span style="color:var(--text-secondary);">${r.artist || "未知歌手"}</span> ${keyTag} ${vTag}
+              <strong>${idx + 1}. ${title}</strong> - <span style="color:var(--text-secondary);">${artist}</span> ${keyTag} ${vTag}
             </div>
-            <button class="btn btn-secondary btn-import-item" data-id="${r.id}" data-title="${r.title}" data-artist="${r.artist}" style="padding:2px 8px;font-size:11px;">
-              解析 ➔
-            </button>
+            ${action}
           </div>
         `;
       });

@@ -1,6 +1,6 @@
 # Progress: Chord Progression Analyzer (ChordVerse)
 
-## Status: Production-Ready (v1.0.0)
+## Status: Production-Ready (v1.2.1)
 
 ### Completed Milestones
 - **2026-08-29**:
@@ -13,3 +13,7 @@
   - Built responsive dark obsidian Web Dashboard (`src/static/`) with visual progression step builder, probability bars, and chord decoder.
   - Authored 18 automated tests in `tests/` with 100% pass rate.
   - Verified live Web UI via `chrome-devtools` browser inspection and visual screenshot.
+- **2026-09-04** (v1.2.1):
+  - Found and fixed the production `GET /api/yopu-search` edge Function: it called Yopu's retired `/api/search/sheets` path and answered `Yopu returned HTTP 404` for every query. Ported the `/z/` codec + session-cookie protocol from `yopu-cli`, added a bundled-corpus fallback tagged `source`, and proved it live on a Cloudflare preview branch (14 live rows for 再见青春).
+  - Fixed the stale progression title during the edge round-trip and the fixed-sleep races in both Playwright suites; the Yopu e2e step now fails on empty/error output.
+  - Added `tests/functions/` (node --test, 7 tests, mutation-checked) and wired it into CI; set the Cloudflare repo secrets so `deploy.yml` actually publishes; re-exported the stale modern-corpus bundle.

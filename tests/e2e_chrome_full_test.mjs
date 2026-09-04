@@ -2,6 +2,30 @@ import { chromium } from 'playwright';
 import path from 'path';
 
 const TARGET_URL = 'https://chord.worldinspirelab.com/';
+
+// Wait for the edge search round-trip (0.4-2 s live) instead of a fixed sleep.
+async function searchKeywordAndWait(page, keyword) {
+  await page.fill('#input-progression', keyword);
+  await Promise.all([
+    page.waitForResponse(r => r.url().includes('/api/search?') && r.status() === 200, { timeout: 20000 }),
+    page.click('#btn-search')
+  ]);
+  await page.waitForFunction(() => {
+    const tbody = document.querySelector('#songs-tbody');
+    return tbody && !tbody.querySelector('.loading-spinner') && tbody.querySelector('tr');
+  }, null, { timeout: 20000 });
+}
+
+async function clickChipAndWait(page, prog) {
+  await Promise.all([
+    page.waitForResponse(r => r.url().includes('/api/search?') && r.status() === 200, { timeout: 20000 }),
+    page.click(`.chip[data-prog="${prog}"]`)
+  ]);
+  await page.waitForFunction(() => {
+    const t = document.querySelector('#progression-name-title')?.textContent || '';
+    return t.length > 0 && !t.includes('检索中');
+  }, null, { timeout: 20000 });
+}
 console.log(`🌐 Launching Chrome to execute multi-progression interactive E2E tests on ${TARGET_URL}...`);
 
 (async () => {
@@ -39,8 +63,7 @@ console.log(`🌐 Launching Chrome to execute multi-progression interactive E2E 
 
   // 2. Test 6-4-1-5 Chip Click
   console.log(`🚀 Step 2: Clicking '6-4-1-5 (伤感六四一五)' preset chip...`);
-  await page.click('.chip[data-prog="6,4,1,5"]');
-  await page.waitForTimeout(600);
+  await clickChipAndWait(page, '6,4,1,5');
 
   const prog6415Title = await page.textContent('#progression-name-title');
   const count6415 = await page.textContent('#total-songs-count');
@@ -51,8 +74,7 @@ console.log(`🌐 Launching Chrome to execute multi-progression interactive E2E 
 
   // 3. Test 4-5-3-6-2-5-1 (王道进行) Chip Click
   console.log(`🚀 Step 3: Clicking '4-5-3-6-2-5-1 (王道进行)' preset chip...`);
-  await page.click('.chip[data-prog="4,5,3,6,2,5,1"]');
-  await page.waitForTimeout(600);
+  await clickChipAndWait(page, '4,5,3,6,2,5,1');
 
   const progRoyalTitle = await page.textContent('#progression-name-title');
   const countRoyal = await page.textContent('#total-songs-count');
@@ -63,9 +85,7 @@ console.log(`🌐 Launching Chrome to execute multi-progression interactive E2E 
 
   // 4. Test Keyword Search for '青花瓷' (Jay Chou)
   console.log(`🚀 Step 4: Typing '青花瓷' into search bar...`);
-  await page.fill('#input-progression', '青花瓷');
-  await page.click('#btn-search');
-  await page.waitForTimeout(600);
+  await searchKeywordAndWait(page, '青花瓷');
 
   const firstSongTitle = await page.textContent('#songs-tbody tr:first-child .song-title');
   const firstSongProg = await page.textContent('#songs-tbody tr:first-child td:nth-child(4)');
@@ -76,9 +96,7 @@ console.log(`🌐 Launching Chrome to execute multi-progression interactive E2E 
 
   // 5. Test Keyword Search for '北京北京' (Wang Feng 6415)
   console.log(`🚀 Step 5: Typing '北京北京' into search bar...`);
-  await page.fill('#input-progression', '北京北京');
-  await page.click('#btn-search');
-  await page.waitForTimeout(600);
+  await searchKeywordAndWait(page, '北京北京');
 
   const bjSongTitle = await page.textContent('#songs-tbody tr:first-child .song-title');
   const bjSongProg = await page.textContent('#songs-tbody tr:first-child td:nth-child(4)');

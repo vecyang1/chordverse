@@ -184,7 +184,8 @@ class YopuImporter:
         """
         if search_yopu_scores is not None:
             try:
-                return search_yopu_scores(query=query, page=page, instrument=instrument)
+                live = search_yopu_scores(query=query, page=page, instrument=instrument)
+                return {**live, "source": "yopu_live"}
             except Exception:
                 pass
 
@@ -228,7 +229,8 @@ class YopuImporter:
                 return {
                     "query": query,
                     "total_count": data.get("totalResultNum", len(results)),
-                    "results": results
+                    "results": results,
+                    "source": "yopu_live"
                 }
         except Exception as e:
             fallback = self._search_local_corpus(query)
@@ -236,7 +238,10 @@ class YopuImporter:
                 return {
                     "query": query,
                     "total_count": len(fallback),
-                    "results": fallback
+                    "results": fallback,
+                    "source": "local_corpus",
+                    "note": "有谱么当前不可达，以下为本地语料库的匹配结果",
+                    "upstream_error": str(e)
                 }
             raise ConnectionError(f"Failed to search Yopu.co for '{query}': {e}")
 
@@ -260,10 +265,12 @@ class YopuImporter:
                         "key": item.get("key", "C"),
                         "capo": item.get("capo", 0),
                         "author": item.get("artist", ""),
-                        "verified": True,
-                        "views": 1000,
-                        "fav_count": 500,
-                        "url": item.get("source_url", f"https://yopu.co/view/{item.get('id', '')}")
+                        "verified": False,
+                        "progression": item.get("primary_progression") or item.get("progression", ""),
+                        "roman": item.get("primary_roman") or item.get("roman", ""),
+                        "url": item.get("source_url") or "",
+                        "source_url": item.get("source_url") or "",
+                        "source": "local_corpus"
                     })
             return matched
         except Exception:

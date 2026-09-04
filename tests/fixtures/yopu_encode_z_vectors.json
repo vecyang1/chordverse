@@ -1,0 +1,59 @@
+{
+ "_generated_by": "yopu-cli yopu/codec.py encode_z (Python reference), 2026-09-04",
+ "vectors": [
+  {
+   "q": "再见青春",
+   "page": 0,
+   "instrument": "guitar",
+   "path": "/api/search/sheets?q=%E5%86%8D%E8%A7%81%E9%9D%92%E6%98%A5&page=0&instrument=guitar",
+   "z": "/z/ND1kMhl5ZWFkczl5KDt5eTl5eWNlKDkvHT01L3MsHWFkMWkZay5hLHo1PS89ZShzLWRsLmplKXlpeS8ZeXp5eRhkNG5tKDs_GS4YOXkyaik1OQ"
+  },
+  {
+   "q": "Hotel California",
+   "page": 0,
+   "instrument": "guitar",
+   "path": "/api/search/sheets?q=Hotel+California&page=0&instrument=guitar",
+   "z": "/z/NTk9emE6KXM5L2woMzU9MCwuYSg0MigzczI7LzU_KDk1PT0pLHo7LTkoLz13MC40H2EvOTJjcz05FC4xLjU"
+  },
+  {
+   "q": "a",
+   "page": 0,
+   "instrument": "guitar",
+   "path": "/api/search/sheets?q=a&page=0&instrument=guitar",
+   "z": "/z/c3ovLC8uNTQoejkyPTQyP2xzKTU9Oy8sYTk9LjsuKHM5LWMoYT09OSg1LzEpOWE"
+  },
+  {
+   "q": "周杰伦 晴天",
+   "page": 1,
+   "instrument": "piano",
+   "path": "/api/search/sheets?q=%E5%91%A8%E6%9D%B0%E4%BC%A6+%E6%99%B4%E5%A4%A9&page=1&instrument=piano",
+   "z": "/z/ahh5Lj00YRl5YWUyY21qZR1leXkvPT1pMzseLhl5eS9lHmgZOTUdeXNzGR4pdz8ZeS15KCgsMih5ZTkvHWh5ND1tajFhaDksejIsc2R6bHkveR1pOTU5H3l5NQ"
+  },
+  {
+   "q": "x",
+   "page": 3,
+   "instrument": "ukulele",
+   "path": "/api/search/sheets?q=x&page=3&instrument=ukulele",
+   "z": "/z/OzkoNHo5emFzYSk3MT0yLm9zOSwvNCljMDItKS89YT1zKC85OTkwLz8oNSw5LjUk"
+  },
+  {
+   "q": "Faded Alan Walker",
+   "page": 0,
+   "instrument": "guitar",
+   "path": "/api/search/sheets?q=Faded+Alan+Walker&page=0&instrument=guitar",
+   "z": "/z/bCgyKTIyNDk9PXotLDlzNS45MTUwNTk9ODguPXdjL3M0OwsoOz83cz0vYTkoKRovLC49dz0vMGF6HS45KGE5"
+  },
+  {
+   "q": "存在",
+   "page": 2,
+   "instrument": "guitar",
+   "path": "/api/search/sheets?q=%E5%AD%98%E5%9C%A8&page=2&instrument=guitar",
+   "z": "/z/eXMoPTUuHz96enMoOXk9Ly95YTV5O2kxYXlkYygvYTkuKBk7GWUscz15Ljk0aRgpZTk1biwdL2QtNDI5Mj0pHQ"
+  },
+  {
+   "path": "/view/3PbL9Wr1",
+   "z": "/view/3PbL9Wr1",
+   "note": "non-API paths pass through unchanged"
+  }
+ ]
+}

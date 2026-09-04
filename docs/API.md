@@ -65,3 +65,22 @@ Analyze arbitrary chord list into Roman numerals.
     "scale": "major"
   }
   ```
+
+### 4. `GET /api/yopu-search`
+
+Keyword search of Yopu.co (有谱么) lead sheets, served by the Cloudflare Pages Function `functions/api/yopu-search.js` (and by `src/web_server.py` locally).
+
+| Param | Default | Notes |
+|---|---|---|
+| `q` | required | song title, artist, or keyword |
+| `page` | `0` | Yopu result page |
+| `instrument` | `guitar` | `guitar` / `piano` / `ukulele` |
+
+Response fields:
+
+- `source`: `"yopu_live"` when Yopu answered, `"local_corpus"` when the bundled corpora were searched instead. Read this before trusting counts: a fallback answer is a substitute, not Yopu's index.
+- `results[]`: `id`, `title`, `artist`, `key`, `capo`, `author`, `verified`, `url`, `source`; live rows add `views`, `rating`, `tags`; local rows add `progression`, `roman`, `chords`, `corpus`, `source_url`.
+- `total` / `total_count`: Yopu's `totalResultNum` for live answers, the match count for local ones.
+- Fallback only: `note` (human-readable), `upstream_error` (why Yopu could not be used), and `error` when nothing matched locally either. Fallback responses are `Cache-Control: no-store`; live ones are cached 30 minutes.
+
+Yopu's gateway rejects plain `/api/...` requests with an empty HTTP 404. The Function obtains the `c=` session cookie from `https://yopu.co/explore`, encodes the internal path to `/z/<token>` (UTF-8 XOR 92, seeded Fisher-Yates, custom base64 alphabet) and XOR-157-decodes the body, mirroring `yopu-cli`'s `yopu/codec.py`.

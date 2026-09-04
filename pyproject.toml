@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chordverse"
-version = "1.1.0"
+version = "1.2.1"
 description = "Zero-Hallucination Chord Progression Search Engine & Music Theory Analyzer (Hooktheory 75k+ & Mandopop Ground Truth)"
 readme = "README.md"
 authors = [{ name = "V" }]

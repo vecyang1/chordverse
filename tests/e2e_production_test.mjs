@@ -256,7 +256,12 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
       page.waitForResponse(r => r.url().includes('/api/import-yopu') && r.status() === 200, { timeout: 25000 }),
       firstImportBtn.click()
     ]);
-    await page.waitForSelector('#yopu-import-result:not(:empty)', { timeout: 10000 });
+    // The response has arrived, but the app still has to await res.json() and
+    // render: wait for the loading spinner to be replaced, not merely for text.
+    await page.waitForFunction(() => {
+      const box = document.querySelector('#yopu-import-result');
+      return box && box.textContent.trim().length > 0 && !box.querySelector('.loading-spinner');
+    }, null, { timeout: 30000 });
     const importOutput = await page.textContent('#yopu-import-result');
     console.log(`   Yopu Import Sheet Output: ${importOutput.trim().replace(/\s+/g, ' ').slice(0, 160)}...`);
     if (!importOutput.includes('再见青春') && !importOutput.includes('汪峰')) {
@@ -266,17 +271,32 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
 
   // 10. Test Language and Artist Filtering
   console.log(`🚀 Step 10: Testing Language and Artist Filters...`);
+  // A settled table: no spinner, at least one rendered row. waitForResponse alone
+  // resolves before the app has parsed the JSON and rendered.
+  const waitForTableSettled = () => page.waitForFunction(() => {
+    const tbody = document.querySelector('#songs-tbody');
+    return tbody && !tbody.querySelector('.loading-spinner') && tbody.querySelector('tr');
+  }, null, { timeout: 20000 });
+  const waitForSearch = (predicate) => page.waitForResponse(
+    r => r.url().includes('/api/search?') && r.status() === 200 && predicate(decodeURIComponent(r.url())),
+    { timeout: 20000 }
+  );
+
   // Reset search to 1,5,6,4
   await page.fill('#input-progression', '1,5,6,4');
-  await page.locator('#btn-search').click();
-  await page.waitForTimeout(500);
+  await Promise.all([
+    waitForSearch(u => u.includes('progression=1,5,6,4') && !u.includes('lang=zh')),
+    page.locator('#btn-search').click()
+  ]);
+  await waitForTableSettled();
 
-  // Filter to Chinese
+  // Filter to Chinese: wait for THIS filter's response, then for the render.
   const langSelect = page.locator('#select-lang');
   await Promise.all([
-    page.waitForResponse(r => r.url().includes('/api/search?') && r.status() === 200, { timeout: 20000 }),
+    waitForSearch(u => u.includes('lang=zh') && !u.includes('artist=')),
     langSelect.selectOption('zh')
   ]);
+  await waitForTableSettled();
   const zhBadgeCount = await page.locator('#songs-tbody .badge-zh').count();
   const enBadgeCount = await page.locator('#songs-tbody .badge-en').count();
   console.log(`   Language Filter (zh) -> Chinese Badges: ${zhBadgeCount}, Western Badges: ${enBadgeCount}`);
@@ -287,9 +307,10 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
   // Filter to specific artist "汪峰"
   const artistInput = page.locator('#input-artist');
   await Promise.all([
-    page.waitForResponse(r => r.url().includes('/api/search?') && r.status() === 200, { timeout: 20000 }),
+    waitForSearch(u => u.includes('artist=汪峰')),
     artistInput.fill('汪峰')
   ]);
+  await waitForTableSettled();
   const artistResultText = await page.textContent('#songs-tbody');
   console.log(`   Artist Filter ('汪峰') verified.`);
   if (!artistResultText.includes('汪峰')) {
@@ -298,8 +319,11 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
 
   // Reset filters
   await artistInput.fill('');
-  await langSelect.selectOption('all');
-  await page.waitForTimeout(500);
+  await Promise.all([
+    waitForSearch(u => !u.includes('lang=zh') && !u.includes('artist=')),
+    langSelect.selectOption('all')
+  ]);
+  await waitForTableSettled();
 
   // 11. Test Export Modals / Triggers
   console.log(`🚀 Step 11: Testing CSV & Markdown Exporters...`);

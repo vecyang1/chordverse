@@ -46,6 +46,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let activeDegrees = [1, 5, 6, 4];
   let currentSearchResults = null;
   let isLoopPlaying = false;
+  // Only the most recent executeSearch() may render: a slower earlier response
+  // (e.g. the 1,000-row "all" listing) must not overwrite a newer answer.
+  let searchSeq = 0;
+
+  function isDegreeQueryText(val) {
+    return /^[1-7\s,\-\>\|/]+$/.test(val) || /^[ivxIVX\s,\-\>\|/]+$/.test(val);
+  }
 
   // Diatonic scale mappings for C Major / standard major
   const romanMap = {
@@ -316,6 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const lang = filterLang.value || "all";
     const artist = filterArtist.value.trim();
     const key = filterKey ? filterKey.value : "";
+    const seq = ++searchSeq;
     writeUrlState(query, lang, artist, key);
     syncProgressionChips(query);
 
@@ -353,6 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
         data = await performClientSideSearch(query, lang, artist, key);
       }
 
+      if (seq !== searchSeq) return; // superseded by a newer search
       currentSearchResults = data;
       renderResults(data);
 
@@ -372,6 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (err) {
       console.error(err);
+      if (seq !== searchSeq) return;
       songsTbody.innerHTML = `
         <tr>
           <td colspan="6" class="empty-state">
@@ -943,7 +953,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Search Input listener (triggers on enter or input)
   inputProg.addEventListener("change", () => {
     const val = inputProg.value.trim();
+    // A title/artist query is searched by Enter or the button; syncing the
+    // builder here would blank the text and fire a second, empty search.
+    if (val && !isDegreeQueryText(val)) return;
     const degs = parseInputToDegrees(val);
+    if (degs.join(",") === activeDegrees.join(",") && val === activeDegrees.join(",")) return;
     activeDegrees = degs;
     renderBuilderDisplay();
     executeSearch();
@@ -1071,8 +1085,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Initial Boot: a URL that carries ?q= is the source of truth.
-  readUrlState();
+  const hadUrlQuery = readUrlState();
+  const bootQuery = inputProg.value.trim();
   renderBuilderDisplay();
+  if (hadUrlQuery && bootQuery && !isDegreeQueryText(bootQuery)) inputProg.value = bootQuery;
   executeSearch();
   loadLeaderboard();
 });

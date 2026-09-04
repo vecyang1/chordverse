@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import path from 'path';
 
-const TARGET_URL = 'https://chord.worldinspirelab.com/';
+const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'https://chord.worldinspirelab.com/';
 
 // Wait for the edge search round-trip (0.4-2 s live) instead of a fixed sleep.
 async function searchKeywordAndWait(page, keyword) {

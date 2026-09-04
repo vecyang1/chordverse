@@ -52,7 +52,10 @@ NAMED_PROGRESSIONS = {
     "2,5,1": "Jazz ii-V-I Standard (爵士标准进行)",
     "1,4,5": "I-IV-V Classic Rock & Blues (经典摇滚三和弦)",
     "1,4,6,5": "Modern Pop Variation (1-4-6-5 进行)",
-    "4,5,6,1": "J-Pop Variant (四五六一进行)"
+    "4,5,6,1": "J-Pop Variant (四五六一进行)",
+    "4,5,3,6": "Royal Road 4-Chord Variant (小王道进行 / 4536)",
+    "6,2,5,1": "vi-ii-V-I Circle Loop (华语抒情 6251 循环 / POP909 最常见循环)",
+    "3,6,2,5": "iii-vi-ii-V Circle-of-Fifths Turnaround (3625 五度循环进行)"
 }
 
 
@@ -246,6 +249,56 @@ def matches_progression_sequence(song_degrees: List[int], target_degrees: List[i
         if song_degrees[i:i + t_len] == target_degrees:
             return True
     return False
+
+
+def count_occurrences(song_degrees: List[int], target_degrees: List[int]) -> int:
+    """How many times target occurs as a contiguous run inside song_degrees."""
+    t_len = len(target_degrees)
+    if not target_degrees or len(song_degrees) < t_len:
+        return 0
+    return sum(1 for i in range(len(song_degrees) - t_len + 1) if song_degrees[i:i + t_len] == target_degrees)
+
+
+def parse_degree_sequence(sequence: str) -> List[List[int]]:
+    """'1,5,6,4,x,2,5,1' -> [[1,5,6,4],[2,5,1]]; 'x' marks a non-diatonic break."""
+    runs: List[List[int]] = []
+    for run in str(sequence or "").split("x"):
+        degs = [int(tok) for tok in run.split(",") if tok.strip().isdigit()]
+        if degs:
+            runs.append(degs)
+    return runs
+
+
+def match_loop_or_sequence(
+    loop_degrees: List[int],
+    target_degrees: List[int],
+    sequence_runs: Optional[List[List[int]]] = None,
+    min_sequence_occurrences: int = 2,
+) -> Optional[str]:
+    """
+    Decide whether a song matches a queried progression.
+
+    A stored loop repeats, so the query is matched against the loop played
+    twice (6-4-1-5 therefore also answers 1-5-6-4). When the whole-song degree
+    sequence is available, a query that occurs at least `min_sequence_occurrences`
+    times anywhere in it also matches — that is how an 8-chord Canon query finds
+    a song whose primary loop was indexed as 4 chords.
+
+    Returns "loop", "sequence", or None.
+    """
+    if not target_degrees:
+        return None
+    if loop_degrees and len(loop_degrees) >= 2:
+        doubled = list(loop_degrees) + list(loop_degrees)
+        if matches_progression_sequence(doubled, target_degrees):
+            return "loop"
+    elif loop_degrees and matches_progression_sequence(loop_degrees, target_degrees):
+        return "loop"
+    if sequence_runs:
+        hits = sum(count_occurrences(run, target_degrees) for run in sequence_runs)
+        if hits >= min_sequence_occurrences:
+            return "sequence"
+    return None
 
 
 def get_progression_name(prog_str: str) -> Optional[str]:

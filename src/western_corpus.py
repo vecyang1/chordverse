@@ -172,7 +172,7 @@ WESTERN_POP_DATABASE: List[Dict[str, Any]] = [
         "artist": "Eagle-Eye Cherry",
         "key": "A minor / C major",
         "section": "Full Song Loop",
-        "progression": "1,5,6,4",
+        "progression": "6,4,1,5",
         "chords": ["Am", "F", "C", "G"],
         "roman": "vi-IV-I-V",
         "description": "90s acoustic rock standard 4-chord loop",

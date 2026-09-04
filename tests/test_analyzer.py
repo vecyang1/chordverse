@@ -37,12 +37,22 @@ class TestUnifiedChordAnalyzer(unittest.TestCase):
             self.assertIn("周杰伦", s["artist"])
 
     def test_next_chord_probabilities(self):
+        """1-5-6 is followed by 4 more often than anything else, and the answer
+        is counted evidence from the corpus, not a hand-written table."""
         res = self.analyzer.get_next_chords("1,5,6")
         probs = res["next_chord_probabilities"]
-        self.assertTrue(len(probs) > 0)
+        self.assertGreater(len(probs), 0)
+        self.assertEqual(res["source"], "corpus_ngram")
+        self.assertEqual(res["context_used"], "1,5,6")
+        self.assertGreaterEqual(res["sample_songs"], 100)
         top = probs[0]
+        self.assertEqual(top["chord"], "4")
         self.assertEqual(top["roman"], "IV")
-        self.assertGreaterEqual(top["probability"], 0.70)
+        # Measured 2026-09-04 on 1,087 songs: 0.33. A fabricated table said 0.78.
+        self.assertGreater(top["probability"], 0.2)
+        self.assertLess(top["probability"], 0.6)
+        self.assertGreaterEqual(top["song_count"], 100)
+        self.assertAlmostEqual(sum(p["probability"] for p in probs), 1.0, delta=0.15)
 
     def test_analyze_chords(self):
         res = self.analyzer.analyze_chords(["F", "G", "Em", "Am", "Dm", "G", "C"], key="C")

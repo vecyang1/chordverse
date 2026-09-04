@@ -542,7 +542,7 @@ code, pre {
 
 .filter-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr;
   gap: 12px;
 }
 
@@ -587,9 +587,24 @@ code, pre {
 
 .prob-row {
   display: grid;
-  grid-template-columns: 48px 1fr 44px;
+  grid-template-columns: 48px 1fr 44px 52px;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+  transition: background 0.15s ease;
+}
+
+.prob-row:hover {
+  background: rgba(0, 210, 255, 0.06);
+}
+
+.prob-songs {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  white-space: nowrap;
 }
 
 .prob-roman {
@@ -885,4 +900,219 @@ code, pre {
   padding: 16px;
   font-size: 12px;
   color: var(--text-muted);
+}
+
+
+/* ==========================================================================
+   v1.3: corpus evidence surfaces (leaderboard, probability provenance, match tags)
+   ========================================================================== */
+
+.prob-meta {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin: -6px 0 10px;
+  line-height: 1.6;
+}
+
+.prob-meta code {
+  font-size: 11px;
+  color: var(--primary-accent);
+}
+
+.source-pill {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  margin-right: 6px;
+  letter-spacing: 0.02em;
+}
+
+.source-pill.measured {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #34d399;
+}
+
+.source-pill.heuristic {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.leaderboard-box {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 12px;
+}
+
+.leaderboard-meta {
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+.leaderboard-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 6px;
+}
+
+.lb-chip {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  grid-template-areas: "rank prog count" "rank roman count";
+  column-gap: 8px;
+  align-items: center;
+  text-align: left;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.lb-chip:hover {
+  border-color: var(--primary-accent);
+  background: rgba(0, 210, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.lb-chip.active {
+  border-color: var(--primary-accent);
+  background: rgba(0, 210, 255, 0.14);
+}
+
+.lb-rank {
+  grid-area: rank;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.lb-chip:nth-child(-n+3) .lb-rank {
+  color: #fbbf24;
+}
+
+.lb-prog {
+  grid-area: prog;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-accent);
+}
+
+.lb-roman {
+  grid-area: roman;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+}
+
+.lb-count {
+  grid-area: count;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.results-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.results-note:empty {
+  display: none;
+}
+
+.match-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.match-tag.match-loop {
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.match-tag.match-seq {
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.key-analysis {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.btn.copied {
+  border-color: var(--success-color);
+  color: var(--success-color);
+}
+
+@media (max-width: 768px) {
+  .leaderboard-chips {
+    grid-template-columns: 1fr 1fr;
+  }
+  .prob-row {
+    grid-template-columns: 44px 1fr 40px 46px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-chips {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Grid items default to min-width:auto, so an <input>'s intrinsic width could
+   push the whole query card past a 375px viewport. */
+.main-grid > .card {
+  min-width: 0;
+}
+
+.input-group input,
+.analyze-input-row input,
+.analyze-input-row select,
+.filter-item input,
+.filter-item select {
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .analyze-input-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .analyze-input-row input {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Declared last on purpose: the base .filter-row rule above would otherwise
+   outrank the earlier responsive block (same specificity, later source order). */
+@media (max-width: 768px) {
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
 }

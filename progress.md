@@ -1,6 +1,6 @@
 # Progress: Chord Progression Analyzer (ChordVerse)
 
-## Status: Production-Ready (v1.2.1)
+## Status: Production-Ready (v1.3.0)
 
 ### Completed Milestones
 - **2026-08-29**:
@@ -17,3 +17,8 @@
   - Found and fixed the production `GET /api/yopu-search` edge Function: it called Yopu's retired `/api/search/sheets` path and answered `Yopu returned HTTP 404` for every query. Ported the `/z/` codec + session-cookie protocol from `yopu-cli`, added a bundled-corpus fallback tagged `source`, and proved it live on a Cloudflare preview branch (14 live rows for 再见青春).
   - Fixed the stale progression title during the edge round-trip and the fixed-sleep races in both Playwright suites; the Yopu e2e step now fails on empty/error output.
   - Added `tests/functions/` (node --test, 7 tests, mutation-checked) and wired it into CI; set the Cloudflare repo secrets so `deploy.yml` actually publishes; re-exported the stale modern-corpus bundle.
+- **2026-09-04** (v1.3.0):
+  - Rebuilt the POP909 index: 813/909 rows had degrees contradicting their own roman/chords (minor keys mangled, loop vs. opening-bars mismatch). New ingest uses relative-major degrees, breaks at non-diatonic chords, keeps whole-song sequences; every row now consistent and graded by `tests/test_ingest_pop909.py`.
+  - Replaced the hand-written next-chord table with a corpus n-gram model (1,850 contexts from 1,087 songs; 1-5-6→4 measured 31%, not 78%); `/api/next`, CLI, MCP and local server share it and label any fallback.
+  - Search matches loops by rotation and whole-song recurrence, orders by evidence; added leaderboard, URL state + share link, key filter, provenance surfaces; fixed mobile overflow (query card 617px → 359px at 375px).
+  - Verified locally on `wrangler pages dev` (Functions + UI, both Playwright suites via `CHORDVERSE_BASE_URL`), then on production after the CI publish.

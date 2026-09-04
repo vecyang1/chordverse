@@ -20,6 +20,7 @@ try:
         is_subsequence,
         NAMED_PROGRESSIONS
     )
+    from .ngram_model import NextChordModel
     from .hooktheory_client import HooktheoryClient, SongEntry
     from .pop909_engine import ChinesePopEngine
     from .western_corpus import WESTERN_POP_DATABASE
@@ -32,6 +33,7 @@ except ImportError:
         is_subsequence,
         NAMED_PROGRESSIONS
     )
+    from ngram_model import NextChordModel
     from hooktheory_client import HooktheoryClient, SongEntry
     from pop909_engine import ChinesePopEngine
     from western_corpus import WESTERN_POP_DATABASE
@@ -39,6 +41,7 @@ except ImportError:
 
 class UnifiedChordAnalyzer:
     def __init__(self, hooktheory_token: Optional[str] = None):
+        self.next_model = NextChordModel.load()
         self.hooktheory = HooktheoryClient(token=hooktheory_token)
         self.chinese_engine = ChinesePopEngine()
 
@@ -157,13 +160,24 @@ class UnifiedChordAnalyzer:
 
     def get_next_chords(self, progression: str) -> Dict[str, Any]:
         """
-        Predict probability distribution of next chord transitions.
+        Probability distribution of the next chord after a progression prefix.
+
+        Evidence comes from the corpus n-gram model (data/next_chord_model.json);
+        every row carries its occurrence and song counts and the response says
+        which context was actually used. The hand-written table is only a
+        fallback when the model file is missing, and is labelled as such.
         """
-        comma_str, roman_str, degrees = normalize_progression_input(progression)
+        comma_str, _, degrees = normalize_progression_input(progression)
+        if self.next_model is not None and degrees:
+            predicted = self.next_model.predict(degrees)
+            if predicted is not None:
+                return predicted
         probs = self.hooktheory.get_next_chord_probabilities(comma_str)
         return {
             "prefix_progression": comma_str,
-            "prefix_roman": roman_str,
+            "context_used": comma_str,
+            "backoff": False,
+            "source": "heuristic_table",
             "next_chord_probabilities": probs
         }
 

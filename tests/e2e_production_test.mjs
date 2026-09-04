@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 
-const TARGET_URL = 'https://chord.worldinspirelab.com/';
+const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'https://chord.worldinspirelab.com/';
 console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_URL}...`);
 
 (async () => {
@@ -342,5 +342,5 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
   }
 
   await browser.close();
-  console.log(`🎉 ALL BROWSER E2E TESTS PASSED ON PRODUCTION (https://chord.worldinspirelab.com/)!`);
+  console.log(`🎉 ALL BROWSER E2E TESTS PASSED ON ${TARGET_URL}`);
 })();

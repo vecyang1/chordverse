@@ -21,7 +21,8 @@
 - `src/roman_engine.py`: Pure-math symbolic music theory engine (note parsing, key intervals, Roman numerals, diatonic chord mapping).
 - `src/hooktheory_client.py`: Resilient Hooktheory API & Meilisearch index client with rate limiting, cache, and next-chord probability distribution.
 - `src/chinese_corpus.py`: Curated ground-truth database of Mandopop & Cantopop songs with exact section analysis.
-- `src/pop909_engine.py`: POP909 dataset indexer and matcher for Chinese songs.
+- `src/pop909_engine.py`: POP909 dataset matcher for Chinese songs (loop-rotation + whole-song sequence matching via `roman_engine.match_loop_or_sequence`).
+- `src/ngram_model.py`: corpus next-chord model (`data/next_chord_model.json`); the only source of `/api/next` numbers. `scripts/ingest_pop909.py` builds the POP909 index, `scripts/build_ngram_model.py` the model + leaderboard, `scripts/export_web_bundle.py` publishes all of it to `src/static/data/`.
 - `src/analyzer.py`: Unified search and analysis engine connecting Western and Chinese sources.
 - `src/cli.py` & `bin/chord-analyzer`: Rich CLI supporting `search`, `next`, `analyze`, `chinese`, `export`, `web`, `doctor`.
 - `src/web_server.py` & `src/static/`: High-performance HTTP server and reactive visual dashboard.
@@ -53,6 +54,11 @@ Before claiming any task complete:
 4. For anything that ships to `chord.worldinspirelab.com`, the gate is the live URL, not green
    CI: `node tests/e2e_production_test.mjs` (Playwright) against production after the deploy.
    Deploy identity, secrets, and manual/preview commands live in `PROJECT_LINKS.md` → *Deploy
-   Path*. Run `python3 scripts/export_web_bundle.py` after editing `data/*.json`, or the edge
-   serves stale corpora.
+   Path*. Run `python3 scripts/export_web_bundle.py` after editing `data/*.json` or any corpus
+   module, or the edge serves stale corpora and a stale model (`tests/test_ngram_model.py` fails
+   when the committed model differs from a fresh build). Both Playwright suites accept
+   `CHORDVERSE_BASE_URL=http://localhost:8788/` to run against `npx wrangler pages dev`.
+5. Degree convention is non-negotiable: degrees are relative to the MAJOR key; minor-key songs
+   are analysed against their relative major (`analysis_key`). Never write a probability, count
+   or "N songs" claim by hand — it comes from the model or it is labelled `heuristic_table`.
 

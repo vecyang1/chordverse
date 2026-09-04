@@ -31,10 +31,14 @@
 ## 🛠️ Verification & Quality Standard
 
 Before claiming any task complete:
-1. Run hermetic test suite:
+1. Run both hermetic test suites (CI runs the same two):
    ```bash
    python3 -m unittest discover -s tests
+   node --test 'tests/functions/*.test.mjs'
    ```
+   The node suite covers the Cloudflare Pages Functions in `functions/api/` (the edge is what
+   production serves; the Python web server is local only). `node --test` needs the file glob;
+   a bare directory path fails on Node 22.
 2. Verify CLI commands:
    ```bash
    ./bin/chord-analyzer doctor
@@ -46,4 +50,9 @@ Before claiming any task complete:
    ```bash
    ./bin/chord-analyzer web --port 9482
    ```
+4. For anything that ships to `chord.worldinspirelab.com`, the gate is the live URL, not green
+   CI: `node tests/e2e_production_test.mjs` (Playwright) against production after the deploy.
+   Deploy identity, secrets, and manual/preview commands live in `PROJECT_LINKS.md` → *Deploy
+   Path*. Run `python3 scripts/export_web_bundle.py` after editing `data/*.json`, or the edge
+   serves stale corpora.
 

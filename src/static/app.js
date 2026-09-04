@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const playBtnText = document.getElementById("play-btn-text");
   const playKeySelect = document.getElementById("play-key-select");
   const activeChipsContainer = document.getElementById("prog-display-box") || document.getElementById("active-chips");
-  const chordBtns = document.querySelectorAll(".chord-btn");
+  const chordBtns = document.querySelectorAll(".chord-btn[data-degree]");
   const presetChips = document.querySelectorAll(".chip");
   const filterLang = document.getElementById("select-lang") || document.getElementById("filter-lang");
   const filterArtist = document.getElementById("input-artist") || document.getElementById("filter-artist");
@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Render Step Builder Chips
   function renderBuilderDisplay() {
+    inputProg.value = activeDegrees.join(",");
     activeChipsContainer.innerHTML = "";
     if (activeDegrees.length === 0) {
       activeChipsContainer.innerHTML = `<span style="color: var(--text-muted); font-size: 13px;">点击下方和弦按钮构建进行...</span>`;
@@ -114,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
       chip.querySelector(".chip-remove").addEventListener("click", (e) => {
         e.stopPropagation();
         activeDegrees.splice(idx, 1);
-        inputProg.value = activeDegrees.join(",");
         renderBuilderDisplay();
         executeSearch();
       });
@@ -127,8 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       activeChipsContainer.appendChild(chip);
     });
-
-    inputProg.value = activeDegrees.join(",");
   }
 
   // Subsequence matching for degree arrays
@@ -258,7 +256,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       currentSearchResults = data;
       renderResults(data);
-      loadNextChordProbabilities(query);
+
+      const isDegreeQuery = /^[1-7\s,\-\>\|/]+$/.test(query) || /^[ivxIVX\s,\-\>\|/]+$/.test(query);
+      if (query && !isDegreeQuery && data.progression && data.songs && data.songs.length > 0) {
+        const matchedSongProg = data.songs[0]?.progression || data.progression;
+        const matchedDegs = parseInputToDegrees(matchedSongProg);
+        if (matchedDegs.length > 0) {
+          activeDegrees = matchedDegs;
+          renderBuilderDisplay();
+          loadNextChordProbabilities(matchedSongProg);
+        } else {
+          loadNextChordProbabilities(query);
+        }
+      } else {
+        loadNextChordProbabilities(query);
+      }
     } catch (err) {
       console.error(err);
       songsTbody.innerHTML = `
@@ -439,7 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load Next Chord Probabilities
   async function loadNextChordProbabilities(queryProg) {
     probContainer.innerHTML = `<div class="loading-spinner">计算下一个和弦概率...</div>`;
-    const clean = queryProg.replace(/[\s\->|/]+/g, ",").replace(/^,+|,+$/g, "");
+    const clean = (queryProg || "").replace(/[\s\->|/]+/g, ",").replace(/^,+|,+$/g, "");
     if (!clean) {
       probContainer.innerHTML = `<div style="color:var(--text-muted); font-size:12px;">构建进行后显示统计概率</div>`;
       return;
@@ -453,23 +465,26 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {
       // Client-side probability fallback
       const dist = {
-        "1,5,6": [{ degree: 4, roman: "IV", probability: 0.65, count: 52 }, { degree: 3, roman: "iii", probability: 0.20, count: 16 }, { degree: 5, roman: "V", probability: 0.10, count: 8 }],
-        "4,5,3": [{ degree: 6, roman: "vi", probability: 0.88, count: 42 }, { degree: 1, roman: "I", probability: 0.08, count: 4 }],
-        "1,6": [{ degree: 4, roman: "IV", probability: 0.72, count: 36 }, { degree: 2, roman: "ii", probability: 0.18, count: 9 }],
-        "2,5": [{ degree: 1, roman: "I", probability: 0.85, count: 68 }, { degree: 6, roman: "vi", probability: 0.10, count: 8 }]
+        "1,5,6": [{ degree: 4, chord_degree: 4, chord: "4", roman: "IV", probability: 0.78, description: "Axis of Awesome standard" }, { degree: 3, chord_degree: 3, chord: "3", roman: "iii", probability: 0.14, description: "Canon line" }, { degree: 5, chord_degree: 5, chord: "5", roman: "V", probability: 0.04, description: "Dominant" }],
+        "1,5,6,4": [{ degree: 1, chord_degree: 1, chord: "1", roman: "I", probability: 0.82, description: "Loop resolution to tonic" }, { degree: 5, chord_degree: 5, chord: "5", roman: "V", probability: 0.10, description: "Dominant turnaround" }, { degree: 6, chord_degree: 6, chord: "6", roman: "vi", probability: 0.05, description: "Deceptive turnaround" }],
+        "4,5,3": [{ degree: 6, chord_degree: 6, chord: "6", roman: "vi", probability: 0.88, description: "Royal Road core" }, { degree: 1, chord_degree: 1, chord: "1", roman: "I", probability: 0.08, description: "Tonic" }],
+        "4,5,3,6": [{ degree: 2, chord_degree: 2, chord: "2", roman: "ii", probability: 0.76, description: "Royal Road ii extension" }, { degree: 4, chord_degree: 4, chord: "4", roman: "IV", probability: 0.15, description: "Subdominant restart" }],
+        "6,4,1": [{ degree: 5, chord_degree: 5, chord: "5", roman: "V", probability: 0.92, description: "Emotional 6415 cadence" }],
+        "6,4,1,5": [{ degree: 6, chord_degree: 6, chord: "6", roman: "vi", probability: 0.85, description: "Minor loop resolution" }, { degree: 4, chord_degree: 4, chord: "4", roman: "IV", probability: 0.10, description: "Plagal shift" }],
+        "1,6": [{ degree: 4, chord_degree: 4, chord: "4", roman: "IV", probability: 0.72, description: "50s Doo-Wop" }, { degree: 2, chord_degree: 2, chord: "2", roman: "ii", probability: 0.18, description: "Circle of fifths" }],
+        "2,5": [{ degree: 1, chord_degree: 1, chord: "1", roman: "I", probability: 0.85, description: "Jazz standard resolution" }]
       };
       const found = dist[clean] || [
-        { degree: 1, roman: "I", probability: 0.35, count: 20 },
-        { degree: 4, roman: "IV", probability: 0.30, count: 18 },
-        { degree: 5, roman: "V", probability: 0.25, count: 15 },
-        { degree: 6, roman: "vi", probability: 0.10, count: 6 }
+        { degree: 4, chord_degree: 4, chord: "4", roman: "IV", probability: 0.50, description: "Subdominant transition" },
+        { degree: 5, chord_degree: 5, chord: "5", roman: "V", probability: 0.35, description: "Dominant tension" },
+        { degree: 1, chord_degree: 1, chord: "1", roman: "I", probability: 0.15, description: "Tonic resolution" }
       ];
-      renderProbabilities({ progression: clean, next_chords: found });
+      renderProbabilities({ progression: clean, next_chord_probabilities: found });
     }
   }
 
   function renderProbabilities(data) {
-    const list = data.next_chords || [];
+    const list = data.next_chord_probabilities || data.next_chords || [];
     if (list.length === 0) {
       probContainer.innerHTML = `<div style="color:var(--text-muted); font-size:12px;">暂无足够的下一个和弦统计样本</div>`;
       return;
@@ -479,12 +494,14 @@ document.addEventListener("DOMContentLoaded", () => {
     list.slice(0, 5).forEach(item => {
       const row = document.createElement("div");
       row.className = "prob-row";
+      const deg = item.degree ?? item.chord_degree ?? Number(item.chord || 1);
+      const roman = item.roman || romanMap[deg] || String(deg);
       const pct = Math.round(item.probability * 100);
 
       row.innerHTML = `
         <div class="prob-degree-label">
-          <strong>${item.degree}</strong>
-          <span>${item.roman}</span>
+          <strong>${deg}</strong>
+          <span>${roman}</span>
         </div>
         <div class="prob-bar-container">
           <div class="prob-bar-fill" style="width: ${pct}%;"></div>
@@ -493,7 +510,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       row.addEventListener("click", () => {
-        activeDegrees.push(item.degree);
+        activeDegrees.push(deg);
+        inputProg.value = activeDegrees.join(",");
         renderBuilderDisplay();
         executeSearch();
       });
@@ -501,6 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
       probContainer.appendChild(row);
     });
   }
+
 
   // Custom Chord Sheet Analyzer (POST /api/analyze with client-side fallback)
   btnCustomAnalyze.addEventListener("click", async () => {
@@ -727,6 +746,7 @@ document.addEventListener("DOMContentLoaded", () => {
   chordBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       const deg = Number(btn.getAttribute("data-degree"));
+      if (!deg || isNaN(deg)) return;
       activeDegrees.push(deg);
       
       const key = playKeySelect.value || "C";
@@ -773,10 +793,8 @@ document.addEventListener("DOMContentLoaded", () => {
   inputProg.addEventListener("change", () => {
     const val = inputProg.value.trim();
     const degs = parseInputToDegrees(val);
-    if (degs.length > 0) {
-      activeDegrees = degs;
-      renderBuilderDisplay();
-    }
+    activeDegrees = degs;
+    renderBuilderDisplay();
     executeSearch();
   });
 

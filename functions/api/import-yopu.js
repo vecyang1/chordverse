@@ -41,6 +41,31 @@ function chordToDegree(chordStr, keyCenter = "C") {
   return { deg, rom };
 }
 
+const TITLE_STRIP_REGEX = /\s*(?:吉他弹唱谱|尤克里里弹唱谱|吉他和弦谱|尤克里里和弦谱|吉他谱|和弦谱|尤克里里谱|钢琴谱|弹唱谱|简谱|吉他|尤克里里|钢琴)\s*$/i;
+
+function extractScoreId(inputStr) {
+  const str = String(inputStr || "").trim();
+  const urlMatch = str.match(/yopu\.co\/(?:view|sheet)\/([a-zA-Z0-9_-]+)/i);
+  if (urlMatch) return urlMatch[1];
+  const clean = str.replace(/^https?:\/\/[^\/]+\//, "").trim().split(/[?#]/)[0];
+  const idMatch = clean.match(/[a-zA-Z0-9_-]{6,32}/);
+  return idMatch ? idMatch[0] : clean;
+}
+
+function cleanTitleAndArtist(rawTitle) {
+  const cleaned = rawTitle.replace(/_.*$/, "").replace(TITLE_STRIP_REGEX, "").trim();
+  const parts = cleaned.split(/\s*[-—]\s*/);
+  let title = "未知曲目";
+  let artist = "未知歌手";
+  if (parts.length >= 2) {
+    title = parts[0].trim();
+    artist = parts[1].replace(TITLE_STRIP_REGEX, "").trim();
+  } else {
+    title = cleaned;
+  }
+  return { title, artist };
+}
+
 export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
@@ -49,8 +74,7 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: "请输入曲谱链接、ID 或歌名" }), { status: 400 });
     }
 
-    const idMatch = urlOrId.match(/[a-zA-Z0-9_-]{6,16}/);
-    const sheetId = idMatch ? idMatch[0] : urlOrId;
+    const sheetId = extractScoreId(urlOrId);
     const targetUrl = `https://yopu.co/view/${sheetId}`;
 
     const resp = await fetch(targetUrl, {
@@ -71,14 +95,9 @@ export async function onRequestPost(context) {
 
     const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
     if (titleMatch) {
-      const rawTitle = titleMatch[1].replace(/_.*$/, "").replace(/\s*(?:吉他和弦谱|吉他谱|和弦谱|尤克里里谱|钢琴谱|弹唱谱)\s*$/i, "").trim();
-      const parts = rawTitle.split(/\s*[-—]\s*/);
-      if (parts.length >= 2) {
-        title = parts[0].trim();
-        artist = parts[1].trim();
-      } else {
-        title = rawTitle;
-      }
+      const parsed = cleanTitleAndArtist(titleMatch[1]);
+      title = parsed.title;
+      artist = parsed.artist;
     }
 
     // Extract key and capo
@@ -93,7 +112,8 @@ export async function onRequestPost(context) {
     let m;
     while ((m = chordRegex.exec(html)) !== null) {
       const c = m[1];
-      if (!["A", "I", "C", "D", "E", "F", "G"].includes(c) || chords.length > 0) {
+      // Only filter out single-letter words 'A' or 'I' before chord list starts
+      if (!["A", "I"].includes(c) || chords.length > 0) {
         if (chords.length === 0 || chords[chords.length - 1] !== c) {
           chords.push(c);
         }
@@ -132,13 +152,18 @@ export async function onRequestPost(context) {
 
     if (degrees.length >= 4) {
       const counts = {};
+      const firstIndex = {};
       for (let i = 0; i <= degrees.length - 4; i++) {
         const k = degrees.slice(i, i + 4).join(",");
         counts[k] = (counts[k] || 0) + 1;
+        if (firstIndex[k] === undefined) firstIndex[k] = i;
       }
       let topK = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
       if (topK && new Set(topK.split(",")).size >= 3) {
         loopDegs = topK.split(",").map(Number);
+        const idx = firstIndex[topK] ?? 0;
+        loopRomans = romans.slice(idx, idx + 4);
+        loopChords = chords.slice(idx, idx + 4);
       }
     }
 

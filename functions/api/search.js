@@ -169,7 +169,7 @@ export async function onRequestGet(context) {
   }
 
   const degs = cleanProg ? cleanProg.split(",").map(Number).filter(n => !isNaN(n)) : (matchedSongs[0]?.degrees || [1, 5, 6, 4]);
-  const progName = taxonomy[cleanProg] || (textKeyword ? `歌曲/歌手检索: "${rawQuery}"` : "自定义和弦进行");
+  const progName = taxonomy[cleanProg] || (textKeyword ? `歌曲/歌手检索: "${rawQuery}"` : (!rawQuery || rawQuery === "all" ? "全部曲库全览 (All Songs Collection - 1000+ Songs)" : "自定义和弦进行"));
 
   return new Response(JSON.stringify({
     query: rawQuery,

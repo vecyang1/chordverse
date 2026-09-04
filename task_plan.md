@@ -15,3 +15,11 @@
 - [x] Phase 6: Interactive Web Server & Reactive Dashboard (web_server.py, static/)
 - [x] Phase 7: Automated Test Suite & Live E2E Verification (tests/)
 - [x] Phase 8: Documentation, Capability Card & Registry Writeback
+- [x] Phase 9: Full Production First-Principles Verification & Edge Hardening
+  - [x] Verify Uptime Kuma monitoring & taxonomy contract (Monitor #36 `ChordVerse (Cloudflare Pages)`, interval 60s, UP)
+  - [x] Audit unexecuted frontend & edge paths (Next chord probability field drift, Yopu 24-char score ID truncation, empty query progression naming, search-to-builder sync)
+  - [x] Write edge unit tests for `/api/next` and `/api/import-yopu`
+  - [x] Implement fixes in `src/static/app.js`, `functions/api/next.js`, `functions/api/import-yopu.js`, `functions/api/search.js`, and `src/static/styles.css`
+  - [x] Run full test suites: Python unit tests (52/52 passing), Node function tests (18/18 passing)
+  - [x] Build & deploy to Cloudflare Pages production (`chordverse`)
+  - [x] Execute comprehensive Playwright E2E suite covering all 14 paths on `https://chord.worldinspirelab.com/` and capture desktop & mobile verification screenshots

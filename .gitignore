@@ -37,3 +37,6 @@ Thumbs.db
 .env.local
 *.uploading.cfg
 graphify-out/
+
+# wrangler pages dev local state
+.wrangler/

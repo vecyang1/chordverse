@@ -51,7 +51,7 @@ When asking Large Language Models (LLMs) *"What songs use the 1-5-6-4 chord prog
 # Import, clean, and analyze a song directly from Yopu by score ID with Capo compensation
 ./bin/chord-analyzer import-yopu aXYaaOXZ --add
 
-# Predict next chord probabilities for a progression prefix
+# Next-chord distribution counted from the corpus (says how many songs/transitions back each row)
 ./bin/chord-analyzer next 1,5,6
 
 # Analyze an arbitrary chord sheet & detect classic song patterns
@@ -73,7 +73,7 @@ When asking Large Language Models (LLMs) *"What songs use the 1-5-6-4 chord prog
 │                        ChordVerse Data Layers                          │
 ├────────────────────────────────────────────────────────────────────────┤
 │ 💎 Tier 1: POP909 Golden Base & Curated Mandopop                        │
-│    • POP909 Dataset (909 classic pop songs, MIR academic benchmark)   │
+│    • POP909 Dataset (909 songs, MIR benchmark; whole-song sequences)  │
 │    • Curated Golden Era Corpus (Jay Chou, Mayday, JJ Lin, Beyond, etc.)│
 ├────────────────────────────────────────────────────────────────────────┤
 │ 🚀 Tier 2: 1-Click Yopu / UGC Harvester & Cleaner Engine               │
@@ -87,6 +87,20 @@ When asking Large Language Models (LLMs) *"What songs use the 1-5-6-4 chord prog
 ```
 
 ---
+
+### Degree convention & rebuilding the data
+
+- Scale degrees are always relative to the **major** key. A minor-key song is analysed against its relative major (A minor → C major), so Am-F-C-G is `6-4-1-5` — the 简谱 convention every preset and the probability panel use. POP909 rows carry `key` (POP909's label) and `analysis_key` (the major key the degrees refer to).
+- A stored progression is the song's **main loop**; search matches any rotation of it, and a query that recurs ≥ 2× in a POP909 song's whole sequence also matches.
+- Next-chord probabilities are **counted**, not written by hand: `data/next_chord_model.json` holds context → next counts (orders 1–4) with per-song and per-occurrence tallies; the API reports which context it used and backs off instead of guessing.
+
+```bash
+# Re-index POP909 from the raw dataset (downloads once into ~/.cache/chordverse/pop909/)
+python3 scripts/ingest_pop909.py
+
+# Rebuild the n-gram model + leaderboard and publish every data asset to src/static/data/
+python3 scripts/export_web_bundle.py
+```
 
 ## 🤖 MCP Server (Model Context Protocol)
 
@@ -129,7 +143,7 @@ ChordVerse includes a native, zero-dependency MCP server for AI agents:
 ## 🧪 Testing & Verification
 
 ```bash
-# Run complete test suite (46 tests)
+# Run complete test suite (Python 84 + Node 30)
 python3 -m unittest discover -s tests
 ```
 

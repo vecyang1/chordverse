@@ -16,6 +16,8 @@ try:
         normalize_progression_input,
         progression_to_scale_degrees,
         matches_progression_sequence,
+        match_loop_or_sequence,
+        parse_degree_sequence,
         chord_to_scale_degree,
         NAMED_PROGRESSIONS
     )
@@ -26,6 +28,8 @@ except ImportError:
         normalize_progression_input,
         progression_to_scale_degrees,
         matches_progression_sequence,
+        match_loop_or_sequence,
+        parse_degree_sequence,
         chord_to_scale_degree,
         NAMED_PROGRESSIONS
     )
@@ -117,13 +121,21 @@ class ChinesePopEngine:
                 )
                 results.append(song)
 
-        # 2. Search in POP909 Index if available
+        # 2. Search in POP909 Index if available. A stored loop repeats, so it is
+        #    matched as loop+loop (any rotation), and a query that recurs in the
+        #    whole-song degree sequence also counts (long Canon/Royal Road queries).
         for p_item in self._pop909_data:
             p_id = p_item.get("id", "")
             if p_id in seen_ids:
                 continue
             p_degrees = p_item.get("degrees", [])
-            if matches_progression_sequence(p_degrees, target_degrees, exact=exact):
+            if exact:
+                matched_kind = "loop" if p_degrees == target_degrees else None
+            else:
+                matched_kind = match_loop_or_sequence(
+                    p_degrees, target_degrees, parse_degree_sequence(p_item.get("degree_sequence", ""))
+                )
+            if matched_kind:
                 seen_ids.add(p_id)
                 song = SongEntry(
                     id=p_id,

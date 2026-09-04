@@ -2,6 +2,28 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.3.0] - 2026-09-04
+
+### Fixed
+- **The POP909 index (909 of the 1,087 songs) contradicted itself.** 813 rows had a `progression` that disagreed with their own `roman`/`chords`, because the ingest computed the loop from the whole song but described the song's *opening* chords, mapped minor keys through major-scale intervals (dropping every chord outside the parallel major), and picked the key from the first line rather than the longest segment. Searching `1,5,6,4` therefore returned songs that never play 1-5-6-4. The rebuilt `scripts/ingest_pop909.py` analyses minor keys against their relative major (Am-F-C-G = 6-4-1-5, the 简谱 convention the UI speaks; recorded as `analysis_key`), breaks the degree sequence at non-diatonic chords instead of splicing across them, reports the loop's own chords, prefers a genuine 6/7/8-chord loop (王道进行, 卡农) over its 4-chord fragments, and ships the whole-song `degree_sequence`. Every row is now internally consistent (`tests/test_ingest_pop909.py` grades all 909).
+- `Save Tonight` (western corpus) was filed as `1,5,6,4` while its chords are Am-F-C-G; corrected to `6,4,1,5`.
+- Key filter compared substrings, so `B major` matched `Db major`; it now compares whole keys and accepts a bare root (`C`).
+- Search results and the probability list now HTML-escape upstream titles, artists and URLs.
+- Mobile: the query card was pushed to 617px by grid items' default `min-width:auto`, and the responsive `.filter-row` rule was outranked by the base rule; both fixed (verified at 375px).
+
+### Changed
+- **`GET /api/next` answers from counted evidence instead of a hand-written table.** A corpus n-gram model (`data/next_chord_model.json`, built by `scripts/build_ngram_model.py` from POP909 whole-song sequences plus the curated loops walked once around their cycle) provides `probability`, `occurrences` and `song_count` per row, `sample_songs`/`sample_occurrences` for the context, `context_used`/`backoff` when a prefix has fewer than 5 songs, and `source: "corpus_ngram"`. Measured: after 1-5-6 the next chord is 4 in 31% of 2,237 transitions (the old table claimed 78%). The hand-written table survives only as a fallback labelled `source: "heuristic_table"`, served `no-store`. The CLI, MCP `predict_next_chords` and the local web server read the same model.
+- **`GET /api/search` matches loops as loops.** A stored progression is matched against itself played twice, so `6,4,1,5` also answers `1,5,6,4`; a query that recurs at least twice anywhere in a POP909 song's whole sequence also matches (`match_kind: "sequence"`, `match_occurrences`), which is how an 8-chord Canon query reaches a song indexed by a 4-chord loop. Results are ordered by evidence (hand-verified loops, then POP909 loops by repetitions, then sequence matches) and the response carries `match_summary` and `total_count`. The Python engine (`match_loop_or_sequence`) applies the same rule.
+- POP909 index and the two model files are written compact (no indent); `scripts/export_web_bundle.py` rebuilds the model and leaderboard on every export, so CI publishes them fresh.
+
+### Added
+- **曲库真实热门循环** leaderboard on the dashboard (`data/progression_stats.json`): the 12 most common loops by song count, exact labels with the rotation-group total in the tooltip, click to search.
+- **URL as state**: `?q=6,2,5,1&lang=zh&key=C%20major&artist=` restores the search on load and is kept in sync (`history.replaceState`); a **复制链接** header button copies it.
+- **调性过滤** select (12 major keys; a minor-key song is filed under its relative major).
+- Probability panel shows its provenance: `真实语料统计 · 基于 N 首歌曲 / M 次转移 · 上下文 …` (or the backoff note), a per-row song count, and an amber `经验估计` pill whenever the fallback table is what you are looking at. Results header shows `主循环命中 / 全曲复现` counts; POP909 rows show `循环 ×N` / `复现 ×N` and the analysis key for minor songs.
+- Named progressions: `4,5,3,6` (小王道), `6,2,5,1` (POP909's most common loop, 41 songs) and `3,6,2,5`; a `6-2-5-1` preset chip.
+- Tests: `tests/test_ingest_pop909.py` (23), `tests/test_ngram_model.py` (14, including "committed model equals a fresh build"), `tests/functions/search.test.mjs` (9), `tests/functions/next.test.mjs` rewritten against the real model (9). Python 84, Node 30. Both Playwright suites accept `CHORDVERSE_BASE_URL` so they can run against a local `wrangler pages dev`.
+
 ## [1.2.1] - 2026-09-04
 
 ### Fixed

@@ -23,10 +23,17 @@
         </div>
         <div>
           <h1 class="brand-title">ChordVerse <span class="brand-badge">Ground Truth</span></h1>
-          <p class="brand-sub">零幻觉和弦进行检索与乐理级数分析系统 (Hooktheory 7.5万+ 曲库 + 华语真值库)</p>
+          <p class="brand-sub">零幻觉和弦进行检索与乐理级数分析系统 (POP909 学术标注 + 华语真值库 + Hooktheory 7.5万+ 曲库 · 概率来自真实语料统计)</p>
         </div>
       </div>
       <div class="header-actions">
+        <button id="btn-share-link" class="btn btn-secondary" title="复制当前检索的分享链接（URL 即状态）">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          <span id="share-btn-text">复制链接</span>
+        </button>
         <button id="btn-export-csv" class="btn btn-secondary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -68,7 +75,14 @@
             <button class="chip" data-prog="1,5,6,3,4,1,2,5">1-5-6-3-4-1-2-5 (卡农进行)</button>
             <button class="chip" data-prog="1,6,4,5">1-6-4-5 (50年代进行)</button>
             <button class="chip" data-prog="2,5,1">2-5-1 (爵士标准进行)</button>
+            <button class="chip" data-prog="6,2,5,1">6-2-5-1 (华语抒情循环)</button>
           </div>
+        </div>
+
+        <!-- Corpus leaderboard: loops counted from the indexed songs, not a hand-written list -->
+        <div class="leaderboard-box" id="leaderboard-box">
+          <label class="section-label">📈 曲库真实热门循环 <span class="leaderboard-meta" id="leaderboard-meta">按主循环歌曲数统计</span></label>
+          <div class="leaderboard-chips" id="leaderboard-chips"><span class="prog-empty-hint">统计加载中…</span></div>
         </div>
 
         <!-- Visual Piano Roll / Step Builder -->
@@ -159,6 +173,24 @@
               <label>歌手/歌名过滤：</label>
               <input type="text" id="input-artist" placeholder="如 Richard Marx / 周杰伦 / Adele">
             </div>
+            <div class="filter-item">
+              <label>调性过滤：</label>
+              <select id="select-key" title="小调歌曲按其关系大调归类，例如 Am 归入 C 调">
+                <option value="" selected>🎹 全部调性</option>
+                <option value="C major">C 调 (含 Am)</option>
+                <option value="Db major">Db 调 (含 Bbm)</option>
+                <option value="D major">D 调 (含 Bm)</option>
+                <option value="Eb major">Eb 调 (含 Cm)</option>
+                <option value="E major">E 调 (含 C#m)</option>
+                <option value="F major">F 调 (含 Dm)</option>
+                <option value="Gb major">Gb 调 (含 Ebm)</option>
+                <option value="G major">G 调 (含 Em)</option>
+                <option value="Ab major">Ab 调 (含 Fm)</option>
+                <option value="A major">A 调 (含 F#m)</option>
+                <option value="Bb major">Bb 调 (含 Gm)</option>
+                <option value="B major">B 调 (含 G#m)</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -171,6 +203,7 @@
             </svg>
             下一个和弦出现概率预测 (Next Chord Probability)
           </h3>
+          <div id="prob-meta" class="prob-meta"></div>
           <div id="prob-container" class="prob-list">
             <div class="loading-spinner">计算中...</div>
           </div>
@@ -238,6 +271,7 @@
               <span><strong>C 调:</strong> C - G - Am - F</span>
               <span><strong>G 调:</strong> G - D - Em - C</span>
             </div>
+            <div class="results-note" id="results-note"></div>
           </div>
           <div class="results-stat-box">
             <div class="stat-num" id="total-songs-count">0</div>

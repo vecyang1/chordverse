@@ -9,5 +9,8 @@
   "2,5,1": "Jazz ii-V-I Standard (爵士标准进行)",
   "1,4,5": "I-IV-V Classic Rock & Blues (经典摇滚三和弦)",
   "1,4,6,5": "Modern Pop Variation (1-4-6-5 进行)",
-  "4,5,6,1": "J-Pop Variant (四五六一进行)"
+  "4,5,6,1": "J-Pop Variant (四五六一进行)",
+  "4,5,3,6": "Royal Road 4-Chord Variant (小王道进行 / 4536)",
+  "6,2,5,1": "vi-ii-V-I Circle Loop (华语抒情 6251 循环 / POP909 最常见循环)",
+  "3,6,2,5": "iii-vi-ii-V Circle-of-Fifths Turnaround (3625 五度循环进行)"
 }

@@ -28,6 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const probContainer = document.getElementById("prob-container");
   const btnExportCsv = document.getElementById("btn-export-csv");
   const btnExportMd = document.getElementById("btn-export-md");
+  const btnShareLink = document.getElementById("btn-share-link");
+  const shareBtnText = document.getElementById("share-btn-text");
+  const filterKey = document.getElementById("select-key");
+  const probMeta = document.getElementById("prob-meta");
+  const resultsNote = document.getElementById("results-note");
+  const leaderboardChips = document.getElementById("leaderboard-chips");
+  const leaderboardMeta = document.getElementById("leaderboard-meta");
 
   // Custom Analyzer Elements
   const customChordsInput = document.getElementById("custom-chords-input");
@@ -74,7 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
     "1,6,4,5": "50s Doo-Wop Progression (经典50年代进行 / 倒卡农)",
     "2,5,1": "Jazz ii-V-I Standard (爵士标准进行)",
     "6,5,4,3": "Andalusian Cadence / 弗拉门戈下行",
-    "1,4,5,1": "Classic Tonic-Subdominant-Dominant Cadence (经典正格终止进行)"
+    "1,4,5,1": "Classic Tonic-Subdominant-Dominant Cadence (经典正格终止进行)",
+    "6,2,5,1": "vi-ii-V-I Circle Loop (华语抒情 6251 循环 / POP909 最常见循环)",
+    "3,6,2,5": "iii-vi-ii-V Circle-of-Fifths Turnaround (3625 五度循环进行)"
   };
 
   function degreeToChord(degree, key = "C") {
@@ -215,11 +224,100 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // URL as state: ?q=1,5,6,4&lang=zh&artist=&key= is shareable and survives reload.
+  const URL_PARAM_QUERY = "q";
+  function optionExists(select, value) {
+    return !!select && Array.from(select.options).some(o => o.value === value);
+  }
+  function readUrlState() {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get(URL_PARAM_QUERY);
+    if (q !== null) {
+      inputProg.value = q.trim();
+      activeDegrees = parseInputToDegrees(q);
+    }
+    const lang = params.get("lang");
+    if (lang && optionExists(filterLang, lang)) filterLang.value = lang;
+    const artist = params.get("artist");
+    if (artist && filterArtist) filterArtist.value = artist;
+    const key = params.get("key");
+    if (key && optionExists(filterKey, key)) filterKey.value = key;
+    return q !== null;
+  }
+  function writeUrlState(query, lang, artist, key) {
+    const params = new URLSearchParams();
+    if (query) params.set(URL_PARAM_QUERY, query);
+    if (lang && lang !== "all") params.set("lang", lang);
+    if (artist) params.set("artist", artist);
+    if (key) params.set("key", key);
+    const qs = params.toString();
+    const next = `${window.location.pathname}${qs ? "?" + qs : ""}`;
+    if (next !== `${window.location.pathname}${window.location.search}`) {
+      window.history.replaceState(null, "", next);
+    }
+  }
+  function syncProgressionChips(query) {
+    const clean = query.replace(/[\s\->|/]+/g, ",").replace(/^,+|,+$/g, "");
+    presetChips.forEach(c => c.classList.toggle("active", (c.getAttribute("data-prog") || "") === (clean || "all")));
+    document.querySelectorAll(".lb-chip").forEach(c => c.classList.toggle("active", c.getAttribute("data-prog") === clean));
+  }
+
+  // Client-side mirror of functions/api/search.js matching rules (used only when the edge is unreachable).
+  const MIN_SEQUENCE_OCCURRENCES = 2;
+  const CURATED_SOURCES = new Set(["chinese_curated", "chinese_modern", "western_hooktheory"]);
+  function parseDegreeList(value) {
+    return String(value || "").split(",").map(s => s.trim()).filter(s => /^[1-7]$/.test(s)).map(Number);
+  }
+  function countOccurrences(run, target) {
+    if (target.length === 0 || run.length < target.length) return 0;
+    let hits = 0;
+    for (let i = 0; i <= run.length - target.length; i++) {
+      let ok = true;
+      for (let j = 0; j < target.length; j++) {
+        if (run[i + j] !== target[j]) { ok = false; break; }
+      }
+      if (ok) hits++;
+    }
+    return hits;
+  }
+  function matchSongClient(song, target) {
+    const loop = parseDegreeList(song.progression);
+    if (loop.length >= 2 && countOccurrences(loop.concat(loop), target) > 0) {
+      return { kind: "loop", occurrences: Number(song.loop_repetitions || 0) };
+    }
+    if (loop.length === 1 && countOccurrences(loop, target) > 0) {
+      return { kind: "loop", occurrences: Number(song.loop_repetitions || 0) };
+    }
+    if (song.degree_sequence) {
+      const hits = String(song.degree_sequence).split("x").map(parseDegreeList)
+        .reduce((sum, run) => sum + countOccurrences(run, target), 0);
+      if (hits >= MIN_SEQUENCE_OCCURRENCES) return { kind: "sequence", occurrences: hits };
+    }
+    return null;
+  }
+  function keyMatchesClient(song, filter) {
+    const wanted = String(filter || "").trim().toLowerCase().replace(/\s+/g, " ");
+    if (!wanted) return true;
+    const candidates = [song.key, song.analysis_key].filter(Boolean).map(k => String(k).trim().toLowerCase().replace(/\s+/g, " "));
+    if (candidates.some(k => k === wanted)) return true;
+    if (!wanted.includes(" ")) return candidates.some(k => k.split(" ")[0] === wanted);
+    return false;
+  }
+  function sortByEvidenceClient(songs) {
+    const rank = s => [s.match_kind === "loop" ? 0 : 1, CURATED_SOURCES.has(s.source) ? 0 : 1, -(s.match_occurrences || 0)];
+    return songs.map((song, index) => ({ song, index, r: rank(song) }))
+      .sort((a, b) => a.r[0] - b.r[0] || a.r[1] - b.r[1] || a.r[2] - b.r[2] || a.index - b.index)
+      .map(e => e.song);
+  }
+
   // Execute Search against Edge API with Client-Side fallback
   async function executeSearch() {
     const query = inputProg.value.trim();
     const lang = filterLang.value || "all";
     const artist = filterArtist.value.trim();
+    const key = filterKey ? filterKey.value : "";
+    writeUrlState(query, lang, artist, key);
+    syncProgressionChips(query);
 
     // Clear the previous search's identity immediately: the edge round-trip takes
     // 0.4-2 s and a stale title/count reads as the answer to the new query.
@@ -241,6 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pages: "5"
       });
       if (artist) params.append("artist", artist);
+      if (key) params.append("key", key);
 
       let data = null;
       try {
@@ -251,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (e) {}
 
       if (!data || !data.songs) {
-        data = await performClientSideSearch(query, lang, artist);
+        data = await performClientSideSearch(query, lang, artist, key);
       }
 
       currentSearchResults = data;
@@ -284,10 +383,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Client-Side Search Fallback using static data JSON
-  async function performClientSideSearch(query, lang, artist) {
+  async function performClientSideSearch(query, lang, artist, key = "") {
     const isDegreeQuery = /^[1-7\s,\-\>\|/]+$/.test(query) || /^[ivxIVX\s,\-\>\|/]+$/.test(query);
     const clean = isDegreeQuery ? query.replace(/[\s\->|/]+/g, ",").replace(/^,+|,+$/g, "") : "";
     const textKeyword = !isDegreeQuery ? query.toLowerCase().trim() : "";
+    const targetDegs = parseDegreeList(clean);
 
     let zhSongs = [];
     let popSongs = [];
@@ -324,6 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
       progression: s.primary_progression || s.progression,
       chords: s.primary_chords || s.chords,
       roman: s.primary_roman || s.roman,
+      source_url: s.source_url,
       language: "zh",
       source: "chinese_modern"
     }));
@@ -338,44 +439,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const sTitle = (s.title || "").toLowerCase();
       const sArtist = (s.artist || "").toLowerCase();
-      const sProg = s.progression || "";
 
+      if (key && !keyMatchesClient(s, key)) continue;
       if (artist && !sArtist.includes(artist.toLowerCase()) && !sTitle.includes(artist.toLowerCase())) continue;
 
-      let isMatch = false;
+      let match = null;
       if (textKeyword) {
-        if (sTitle.includes(textKeyword) || sArtist.includes(textKeyword)) {
-          isMatch = true;
-        }
-      } else if (clean) {
-        if (hasProgressionMatch(sProg, clean)) {
-          isMatch = true;
-        }
+        if (sTitle.includes(textKeyword) || sArtist.includes(textKeyword)) match = { kind: "text", occurrences: 0 };
+      } else if (targetDegs.length > 0) {
+        match = matchSongClient(s, targetDegs);
       } else {
-        isMatch = true;
+        match = { kind: "all", occurrences: 0 };
       }
+      if (!match) continue;
 
-      if (isMatch) {
-        const k = `${s.title}|${s.artist}|${s.section || ''}`.toLowerCase();
-        if (!seen.has(k)) {
-          seen.add(k);
-          matches.push(s);
-        }
-      }
+      const k = `${s.title}|${s.artist}|${s.section || ''}`.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      const { degree_sequence: _seq, ...row } = s;
+      matches.push({ ...row, match_kind: match.kind, match_occurrences: match.occurrences });
     }
 
-    const degs = clean ? clean.split(",").map(Number).filter(n => !isNaN(n)) : (matches[0]?.degrees || [1, 5, 6, 4]);
+    const ordered = targetDegs.length > 0 ? sortByEvidenceClient(matches) : matches;
+    const degs = targetDegs.length > 0 ? targetDegs : (ordered[0]?.degrees || [1, 5, 6, 4]);
     const refC = degs.map(d => degreeToChord(d, "C"));
     const refG = degs.map(d => degreeToChord(d, "G"));
 
     return {
-      progression: clean || (matches[0]?.progression || "1,5,6,4"),
-      roman_progression: matches[0]?.roman || degs.map(d => romanMap[d] || d).join("-"),
-      progression_name: taxonomy[clean] || (textKeyword ? `关键词: "${query}"` : "自定义和弦进行"),
+      progression: clean || (ordered[0]?.progression || "1,5,6,4"),
+      roman_progression: targetDegs.length > 0 ? degs.map(d => romanMap[d] || d).join("-") : (ordered[0]?.roman || "I-V-vi-IV"),
+      progression_name: taxonomy[clean] || (textKeyword ? `关键词: "${query}"` : (!query ? "全部曲库全览 (All Songs Collection)" : "自定义和弦进行")),
       degrees: degs,
       reference_chords: { in_C_major: refC, in_G_major: refG },
-      total_count: matches.length,
-      songs: matches
+      total_count: ordered.length,
+      match_summary: {
+        loop: ordered.filter(s => s.match_kind === "loop").length,
+        sequence: ordered.filter(s => s.match_kind === "sequence").length
+      },
+      offline: true,
+      songs: ordered
     };
   }
 
@@ -392,6 +494,20 @@ document.addEventListener("DOMContentLoaded", () => {
       <span><strong>C 调参考:</strong> ${refC}</span>
       <span><strong>G 调参考:</strong> ${refG}</span>
     `;
+
+    if (resultsNote) {
+      const summary = data.match_summary;
+      if (summary && (summary.loop || summary.sequence)) {
+        resultsNote.innerHTML = `
+          <span class="match-tag match-loop">主循环命中 ${summary.loop}</span>
+          <span class="match-tag match-seq">全曲复现 ≥2 次 ${summary.sequence}</span>
+          <span>循环按任意旋转匹配（6-4-1-5 也命中 1-5-6-4）；小调歌曲级数按关系大调计（Am-F-C-G = 6-4-1-5）。</span>
+          ${data.offline ? `<span class="source-pill heuristic">离线检索</span>` : ""}
+        `;
+      } else {
+        resultsNote.innerHTML = "";
+      }
+    }
 
     const songs = data.songs || [];
     if (songs.length === 0) {
@@ -416,10 +532,10 @@ document.addEventListener("DOMContentLoaded", () => {
         : `<span class="badge badge-en">欧美</span>`;
 
       let listenLink = "-";
-      if (song.source_url) {
-        listenLink = `<a href="${song.source_url}" target="_blank" rel="noopener">曲谱/来源 ↗</a>`;
+      if (song.source_url && /^https?:\/\//i.test(song.source_url)) {
+        listenLink = `<a href="${escapeHtml(song.source_url)}" target="_blank" rel="noopener">曲谱/来源 ↗</a>`;
       } else if (song.youtube_id) {
-        listenLink = `<a href="https://www.youtube.com/watch?v=${song.youtube_id}" target="_blank" rel="noopener">试听 ↗</a>`;
+        listenLink = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener">试听 ↗</a>`;
       } else if (isZh) {
         listenLink = `<a href="https://yopu.co/search?q=${encodeURIComponent(song.title + ' ' + song.artist)}" target="_blank" rel="noopener">有谱么 ↗</a>`;
       }
@@ -427,20 +543,32 @@ document.addEventListener("DOMContentLoaded", () => {
       const songProg = song.progression || activeDegrees.join(",");
       const songRoman = song.roman || songProg.split(",").map(d => romanMap[d] || d).join("-");
 
+      let matchTag = "";
+      if (song.match_kind === "sequence") {
+        matchTag = `<span class="match-tag match-seq" title="该进行在整首歌中出现 ${song.match_occurrences} 次（非主循环）">复现 ×${song.match_occurrences}</span>`;
+      } else if (song.match_kind === "loop" && song.loop_repetitions) {
+        matchTag = `<span class="match-tag match-loop" title="主循环在整首歌中重复 ${song.loop_repetitions} 次">循环 ×${song.loop_repetitions}</span>`;
+      }
+
+      const keyLabel = escapeHtml(song.key || "C major");
+      const analysisKey = song.analysis_key && song.analysis_key !== song.key
+        ? `<span class="key-analysis" title="小调按关系大调计算级数">级数按 ${escapeHtml(song.analysis_key.replace(" major", ""))} 大调</span>`
+        : "";
+
       tr.innerHTML = `
         <td>${idx + 1}</td>
         <td>
           <div class="song-title-cell">
-            <span class="song-title">${song.title}</span>
+            <span class="song-title">${escapeHtml(song.title)}</span>
             ${langBadge}
           </div>
         </td>
-        <td class="song-artist">${song.artist || "未知歌手"}</td>
+        <td class="song-artist">${escapeHtml(song.artist || "未知歌手")}</td>
         <td>
-          <span style="font-size:12px; color:var(--text-secondary);">${song.section || "Chorus"}</span>
-          <div style="font-size:10px; color:var(--primary-accent); font-family:var(--font-mono); font-weight:600;">${songRoman} (${songProg})</div>
+          <span style="font-size:12px; color:var(--text-secondary);">${escapeHtml(song.section || "Chorus")}</span> ${matchTag}
+          <div style="font-size:10px; color:var(--primary-accent); font-family:var(--font-mono); font-weight:600;">${escapeHtml(songRoman)} (${escapeHtml(songProg)})</div>
         </td>
-        <td><span class="key-badge">${song.key || "C major"}</span></td>
+        <td><span class="key-badge">${keyLabel}</span>${analysisKey}</td>
         <td class="listen-link">${listenLink}</td>
       `;
 
@@ -479,12 +607,32 @@ document.addEventListener("DOMContentLoaded", () => {
         { degree: 5, chord_degree: 5, chord: "5", roman: "V", probability: 0.35, description: "Dominant tension" },
         { degree: 1, chord_degree: 1, chord: "1", roman: "I", probability: 0.15, description: "Tonic resolution" }
       ];
-      renderProbabilities({ progression: clean, next_chord_probabilities: found });
+      renderProbabilities({
+        progression: clean,
+        source: "heuristic_table",
+        note: "无法连接边缘 API：以下为经验估计，不是语料统计",
+        next_chord_probabilities: found
+      });
+    }
+  }
+
+  function renderProbabilityMeta(data) {
+    if (!probMeta) return;
+    if (data.source === "corpus_ngram") {
+      const backoff = data.backoff
+        ? `<span class="note-backoff">（前缀 <code>${escapeHtml(data.prefix_progression)}</code> 样本不足，退回 <code>${escapeHtml(data.context_used)}</code>）</span>`
+        : "";
+      probMeta.innerHTML = `<span class="source-pill measured">真实语料统计</span>基于 <strong>${data.sample_songs}</strong> 首歌曲 / <strong>${data.sample_occurrences}</strong> 次转移 · 上下文 <code>${escapeHtml(data.context_used)}</code>${backoff}`;
+    } else if (data.source === "heuristic_table") {
+      probMeta.innerHTML = `<span class="source-pill heuristic">经验估计</span>${escapeHtml(data.note || "语料模型不可用，以下为经验估计")}`;
+    } else {
+      probMeta.innerHTML = "";
     }
   }
 
   function renderProbabilities(data) {
     const list = data.next_chord_probabilities || data.next_chords || [];
+    renderProbabilityMeta(data);
     if (list.length === 0) {
       probContainer.innerHTML = `<div style="color:var(--text-muted); font-size:12px;">暂无足够的下一个和弦统计样本</div>`;
       return;
@@ -497,16 +645,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const deg = item.degree ?? item.chord_degree ?? Number(item.chord || 1);
       const roman = item.roman || romanMap[deg] || String(deg);
       const pct = Math.round(item.probability * 100);
+      const songs = item.song_count ? `${item.song_count} 首` : "";
+      if (item.description) row.title = item.description;
 
       row.innerHTML = `
         <div class="prob-degree-label">
           <strong>${deg}</strong>
-          <span>${roman}</span>
+          <span>${escapeHtml(roman)}</span>
         </div>
         <div class="prob-bar-container">
           <div class="prob-bar-fill" style="width: ${pct}%;"></div>
         </div>
         <div class="prob-val">${pct}%</div>
+        <div class="prob-songs">${songs}</div>
       `;
 
       row.addEventListener("click", () => {
@@ -816,6 +967,63 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Corpus leaderboard (static asset built by scripts/build_ngram_model.py)
+  const LEADERBOARD_ROWS = 12;
+  async function loadLeaderboard() {
+    if (!leaderboardChips) return;
+    try {
+      const res = await fetch("/data/progression_stats.json");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const stats = await res.json();
+      const top = (stats.top || []).slice(0, LEADERBOARD_ROWS);
+      if (leaderboardMeta) leaderboardMeta.textContent = `按主循环歌曲数统计 · 全库 ${stats.total_songs} 首`;
+      leaderboardChips.innerHTML = "";
+      top.forEach((row, idx) => {
+        const chip = document.createElement("button");
+        chip.className = "lb-chip";
+        chip.type = "button";
+        chip.dataset.prog = row.progression;
+        const group = row.rotation_group_songs && row.rotation_group_songs !== row.songs
+          ? ` · 含旋转变体共 ${row.rotation_group_songs} 首` : "";
+        chip.title = `${row.name || row.roman}${group}`;
+        chip.innerHTML = `
+          <span class="lb-rank">${idx + 1}</span>
+          <span class="lb-prog">${escapeHtml(row.progression.replace(/,/g, "-"))}</span>
+          <span class="lb-roman">${escapeHtml(row.roman)}</span>
+          <span class="lb-count">${row.songs} 首</span>
+        `;
+        chip.addEventListener("click", () => {
+          inputProg.value = row.progression;
+          activeDegrees = parseInputToDegrees(row.progression);
+          renderBuilderDisplay();
+          executeSearch();
+        });
+        leaderboardChips.appendChild(chip);
+      });
+      syncProgressionChips(inputProg.value.trim());
+    } catch (e) {
+      leaderboardChips.innerHTML = `<span class="prog-empty-hint">热门循环统计暂不可用 (${escapeHtml(e.message)})</span>`;
+    }
+  }
+
+  // Share the current search: the URL already carries q/lang/artist/key.
+  btnShareLink?.addEventListener("click", async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      if (shareBtnText) shareBtnText.textContent = "已复制 ✓";
+      btnShareLink.classList.add("copied");
+    } catch (e) {
+      window.prompt("复制此链接：", url);
+    }
+    setTimeout(() => {
+      if (shareBtnText) shareBtnText.textContent = "复制链接";
+      btnShareLink.classList.remove("copied");
+    }, 1800);
+  });
+
+  filterKey?.addEventListener("change", executeSearch);
+
   // Exporters
   btnExportCsv?.addEventListener("click", () => {
     if (!currentSearchResults || !currentSearchResults.songs) return;
@@ -862,7 +1070,9 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   });
 
-  // Initial Boot
+  // Initial Boot: a URL that carries ?q= is the source of truth.
+  readUrlState();
   renderBuilderDisplay();
   executeSearch();
+  loadLeaderboard();
 });

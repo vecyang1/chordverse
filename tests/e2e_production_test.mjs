@@ -69,8 +69,15 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
 
   for (const preset of presets) {
     const btn = page.locator(`.chip[data-prog="${preset.prog}"]`);
-    await btn.click();
-    await page.waitForTimeout(300);
+    // Wait for the edge round-trip (0.4-2 s live) instead of a fixed sleep.
+    await Promise.all([
+      page.waitForResponse(r => r.url().includes('/api/search?') && r.status() === 200, { timeout: 20000 }),
+      btn.click()
+    ]);
+    await page.waitForFunction(() => {
+      const t = document.querySelector('#progression-name-title')?.textContent || '';
+      return t.length > 0 && !t.includes('检索中');
+    }, null, { timeout: 20000 });
     const progTitle = await page.textContent('#progression-name-title');
     console.log(`   Clicked chip [${preset.prog}] -> Progression Title: "${progTitle}"`);
     if (!progTitle.includes(preset.expectedTitle)) {
@@ -118,9 +125,18 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
   console.log(`🚀 Step 6: Testing Yopu Score Search Engine UI...`);
   await page.fill('#yopu-import-input', '再见青春');
   await page.locator('#btn-yopu-search').click();
-  await page.waitForSelector('#yopu-search-results-box:not(:empty)', { timeout: 10000 });
+  await page.waitForFunction(() => {
+    const box = document.querySelector('#yopu-search-results-box');
+    return box && box.textContent.trim().length > 0 && !box.querySelector('.loading-spinner');
+  }, null, { timeout: 20000 });
   const yopuResultText = await page.textContent('#yopu-search-results-box');
+  const yopuRows = await page.locator('#yopu-search-results-box .yopu-result-row').count();
+  const yopuFallback = (await page.locator('#yopu-search-results-box .yopu-fallback-note').count()) > 0;
   console.log(`   Yopu Search Output Summary: ${yopuResultText.slice(0, 150).replace(/\s+/g, ' ')}...`);
+  console.log(`   Yopu rows rendered: ${yopuRows} (${yopuFallback ? 'local corpus fallback' : 'live Yopu'})`);
+  if (yopuRows === 0 || /搜索失败|未找到/.test(yopuResultText)) {
+    throw new Error(`Yopu search rendered no usable results: ${yopuResultText.slice(0, 200)}`);
+  }
 
   // 7. Test Export Modals / Buttons
   console.log(`🚀 Step 7: Testing CSV & Markdown Exporters...`);

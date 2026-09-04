@@ -2,6 +2,19 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.2.1] - 2026-09-04
+
+### Fixed
+- **Edge `GET /api/yopu-search` returned "Yopu returned HTTP 404" for every query in production.** Yopu.co no longer serves `/api/search/sheets` directly; the Function now speaks the real protocol mirrored from `yopu-cli` (session cookie from `/explore`, `/z/<token>` path obfuscation, XOR-157 body) and falls back to the bundled corpora when Yopu is unreachable. Every response carries `source: "yopu_live" | "local_corpus"` so a substitute answer is never mistaken for a live one; fallback responses add `note` and `upstream_error` and are served `no-store`.
+- **Stale progression title during a search.** The dashboard cleared nothing while the 0.4-2 s edge round-trip ran, so the previous query's name and count stayed on screen and read as the new answer. The header now shows `检索中…` until results arrive.
+- **Production E2E suites raced the edge.** Both Playwright suites slept 300/600 ms after clicking a preset chip and then read the title; they now wait for the `/api/search` response and for the loading state to clear. The Yopu step now fails on an empty or error result instead of passing on any non-empty box.
+- **Stale exported bundle.** `src/static/data/chinese_modern_corpus.json` lagged `data/` by 56 lines; re-exported.
+- Local web server: `search_yopu()` results are tagged `source`, and the offline fallback no longer reports invented `verified`/`views`/`fav_count` values.
+
+### Added
+- `tests/functions/yopu_search.test.mjs` (`node --test 'tests/functions/*.test.mjs'`, also run in CI): the `/z/` codec against 8 vectors pinned from the Python reference, a captured raw `/z/` body, the live cookie path, the blocked-IP fallback, multi-token matching, and the no-network empty query. Verified red under three mutations (XOR constant, dropped cookie, token `every`→`some`).
+- Frontend escapes upstream titles, artists, keys and error strings before inserting them as HTML.
+
 ## [1.2.0] - 2026-08-30
 
 ### Added

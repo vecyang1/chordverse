@@ -36,7 +36,19 @@ Thumbs.db
 .env
 .env.local
 *.uploading.cfg
+.*.uploading.cfg
 graphify-out/
 
 # wrangler pages dev local state
 .wrangler/
+
+# Local private files and indices
+PROJECT_LINKS.md
+handoff.md
+progress.md
+task_plan.md
+VAULT.md
+decisions.md
+CLAUDE.md
+GEMINI.md
+

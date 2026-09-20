@@ -2,9 +2,20 @@ import {
   GUITAR_CHORD_LIBRARY,
   renderGuitarChordSVG,
   calculateCapo,
+  normalizeKeyRoot,
   getProgressionVoicings,
   detectSecondaryDominant
 } from "./guitar_suite.js";
+
+// Clean parenthesized subtitles from Yopu search queries and links
+function cleanYopuQuery(str) {
+  const raw = String(str || "").trim();
+  const stripped = raw
+    .replace(/[\(（\[【][^\)）\]】]*[\)）\]】]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return stripped || raw.replace(/[\(（\)）\[\]【】]/g, " ").trim();
+}
 
 // Escape untrusted text (upstream titles, error strings) before HTML insertion.
 function escapeHtml(value) {
@@ -352,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!wanted.includes(" ")) return candidates.some(k => k.split(" ")[0] === wanted);
     return false;
   }
-  const ICONIC_ROYAL_ROAD = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"];
+  const ICONIC_ROYAL_ROAD = ["水星记", "漠河舞厅", "乌梅子酱", "青花瓷"];
   function sortByEvidenceClient(songs, queryProg = "") {
     const rank = s => {
       let iconicOrder = 99;
@@ -361,10 +372,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const idx = ICONIC_ROYAL_ROAD.findIndex(t => rawTitle.includes(t));
         if (idx !== -1) iconicOrder = idx;
       }
+      const curated = CURATED_SOURCES.has(s.source) ? 0 : 1;
+      let matchTypeRank = 0;
+      if (s.match_kind === "sequence") {
+        matchTypeRank = 1;
+      } else if (s.match_kind === "loop") {
+        if (queryProg) {
+          const target = parseDegreeList(queryProg);
+          const loop = parseDegreeList(s.progression || s.primary_loop_progression);
+          const isDirect = countOccurrences(loop, target) > 0 || (target.length > loop.length && loop.length > 0 && target[0] === loop[0]);
+          matchTypeRank = isDirect ? 0 : 2;
+        } else {
+          matchTypeRank = 0;
+        }
+      }
       return [
         iconicOrder,
-        s.match_kind === "loop" ? 0 : 1,
-        CURATED_SOURCES.has(s.source) ? 0 : 1,
+        matchTypeRank,
+        curated,
         -(s.match_occurrences || 0)
       ];
     };
@@ -622,12 +647,16 @@ document.addEventListener("DOMContentLoaded", () => {
         : `<span class="badge badge-en">欧美</span>`;
 
       let listenLink = "-";
-      if (song.source_url && /^https?:\/\//i.test(song.source_url)) {
+      const isFakeYopuSlug = song.source_url && /yopu\.co\/view\/[a-z_]+$/i.test(song.source_url) && !/yopu\.co\/view\/[0-9a-f]{24}$/i.test(song.source_url) && !/yopu\.co\/view\/[A-Za-z0-9]{8}$/i.test(song.source_url);
+      if (song.source_url && /^https?:\/\//i.test(song.source_url) && !isFakeYopuSlug && !song.source_url.startsWith("local://")) {
         listenLink = `<a href="${escapeHtml(song.source_url)}" target="_blank" rel="noopener">曲谱/来源 ↗</a>`;
       } else if (song.youtube_id) {
         listenLink = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener">试听 ↗</a>`;
       } else if (isZh) {
-        listenLink = `<a href="https://yopu.co/search?q=${encodeURIComponent(song.title + ' ' + song.artist)}" target="_blank" rel="noopener">有谱么 ↗</a>`;
+        const cleanTitle = cleanYopuQuery(song.title);
+        const cleanArtist = cleanYopuQuery(song.artist);
+        const queryTerm = `${cleanTitle} ${cleanArtist}`.trim() || cleanTitle || song.title || "";
+        listenLink = `<a href="https://yopu.co/search?q=${encodeURIComponent(queryTerm)}" target="_blank" rel="noopener">有谱么 ↗</a>`;
       }
 
       const songProg = song.progression || activeDegrees.join(",");
@@ -673,7 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tr.classList.add("selected-song-row");
 
         const targetKey = song.key || song.analysis_key || "C";
-        const cleanKey = targetKey.replace(/\s*(major|minor|m|maj)\b/i, "").trim() || "C";
+        const cleanKey = normalizeKeyRoot(targetKey);
 
         if (playKeySelect && optionExists(playKeySelect, cleanKey)) {
           playKeySelect.value = cleanKey;
@@ -697,9 +726,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Update Guitar Learning Suite with current progression & authentic top song key
     const initialKey = songs[0]?.key 
-      ? songs[0].key.replace(/\s*(major|minor|m|maj)\b/i, "").trim() 
+      ? normalizeKeyRoot(songs[0].key || songs[0].analysis_key) 
       : (playKeySelect ? playKeySelect.value : "C");
-    if (playKeySelect && songs[0]?.key && optionExists(playKeySelect, initialKey)) {
+    if (playKeySelect && optionExists(playKeySelect, initialKey)) {
       playKeySelect.value = initialKey;
     }
     updateGuitarSuite(data.progression, initialKey);
@@ -1004,7 +1033,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const yopuImportResult = document.getElementById("yopu-import-result");
 
   btnYopuSearch?.addEventListener("click", async () => {
-    const query = yopuImportInput.value.trim();
+    const rawQuery = yopuImportInput.value.trim();
+    const query = cleanYopuQuery(rawQuery);
     if (!query) return;
 
     btnYopuSearch.textContent = "搜索中...";

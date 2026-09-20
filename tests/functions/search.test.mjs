@@ -234,4 +234,35 @@ test("Royal Road search deduplicates identical songs with differing English tran
   assert.equal(titles[1], "乌梅子酱 (Plum Sauce)");
   assert.equal(titles[2], "青花瓷");
 });
+test("scaleDegreesToChords handles minor keys and slash keys accurately", () => {
+  // A minor / C major relative: [6, 4, 1, 5] -> Am, F, C, G
+  assert.deepEqual(scaleDegreesToChords([6, 4, 1, 5], "A minor / C major"), ["Am", "F", "C", "G"]);
+  assert.deepEqual(scaleDegreesToChords([6, 4, 1, 5], "A minor"), ["Am", "F", "C", "G"]);
 
+  // C minor / Eb major relative: [6, 4, 1, 5] -> Cm, Ab, Eb, Bb
+  assert.deepEqual(scaleDegreesToChords([6, 4, 1, 5], "C minor / Eb major"), ["Cm", "Ab", "Eb", "Bb"]);
+  assert.deepEqual(scaleDegreesToChords([6, 4, 1, 5], "C minor"), ["Cm", "Ab", "Eb", "Bb"]);
+
+  // Bb minor / Db major relative: [6, 4, 1, 5] -> Bbm, Gb, Db, Ab
+  assert.deepEqual(scaleDegreesToChords([6, 4, 1, 5], "Bb minor / Db major"), ["Bbm", "Gb", "Db", "Ab"]);
+  assert.deepEqual(scaleDegreesToChords([6, 4, 1, 5], "Bb minor"), ["Bbm", "Gb", "Db", "Ab"]);
+
+  // D minor / F major: [6, 5, 4, 3] -> Dm, C, Bb, Am
+  assert.deepEqual(scaleDegreesToChords([6, 5, 4, 3], "D minor / F major"), ["Dm", "C", "Bb", "Am"]);
+});
+
+test("sortByEvidence prioritizes direct loop matches over rotations for 6-4-1-5", () => {
+  const songs = [
+    { id: "wangfeng_1564", title: "怒放的生命", progression: "1,5,6,4", match_kind: "loop", source: "chinese_curated" },
+    { id: "beijing_6415", title: "北京北京", progression: "6,4,1,5", match_kind: "loop", source: "chinese_curated" },
+    { id: "g勇者_6415", title: "孤勇者", progression: "6,4,1,5", match_kind: "loop", source: "chinese_modern" }
+  ];
+
+  const sortedFor6415 = sortByEvidence(songs, "6,4,1,5");
+  assert.equal(sortedFor6415[0].id, "beijing_6415", "direct 6-4-1-5 must be first");
+  assert.equal(sortedFor6415[1].id, "g勇者_6415", "direct 6-4-1-5 must be second");
+  assert.equal(sortedFor6415[2].id, "wangfeng_1564", "rotated 1-5-6-4 must be ranked last");
+
+  const sortedFor1564 = sortByEvidence(songs, "1,5,6,4");
+  assert.equal(sortedFor1564[0].id, "wangfeng_1564", "direct 1-5-6-4 must be first");
+});

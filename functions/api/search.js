@@ -16,7 +16,7 @@ export const MIN_SEQUENCE_OCCURRENCES = 2;
 
 export const ROMAN_MAP = { 1: "I", 2: "ii", 3: "iii", 4: "IV", 5: "V", 6: "vi", 7: "vii°" };
 export const CURATED_SOURCES = new Set(["chinese_curated", "chinese_modern", "western_hooktheory"]);
-export const ICONIC_ROYAL_ROAD = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"];
+export const ICONIC_ROYAL_ROAD = ["水星记", "漠河舞厅", "乌梅子酱", "青花瓷"];
 
 export const KEY_CHORDS = {
   "C":  { 1: "C", 2: "Dm", 3: "Em", 4: "F", 5: "G", 6: "Am", 7: "Bdim" },
@@ -35,8 +35,41 @@ export const KEY_CHORDS = {
   "C#": { 1: "C#", 2: "D#m", 3: "E#m", 4: "F#", 5: "G#", 6: "A#m", 7: "B#dim" }
 };
 
+export const MINOR_TO_RELATIVE_MAJOR = {
+  "Am": "C", "A minor": "C", "Amin": "C",
+  "Em": "G", "E minor": "G", "Emin": "G",
+  "Bm": "D", "B minor": "D", "Bmin": "D",
+  "F#m": "A", "F# minor": "A", "F#min": "A",
+  "C#m": "E", "C# minor": "E", "C#min": "E",
+  "G#m": "B", "G# minor": "B", "G#min": "B",
+  "Dm": "F", "D minor": "F", "Dmin": "F",
+  "Gm": "Bb", "G minor": "Bb", "Gmin": "Bb",
+  "Cm": "Eb", "C minor": "Eb", "Cmin": "Eb",
+  "Fm": "Ab", "F minor": "Ab", "Fmin": "Ab",
+  "Bbm": "Db", "Bb minor": "Db", "Bbmin": "Db",
+  "Ebm": "Gb", "Eb minor": "Gb", "Ebmin": "Gb"
+};
+
 export function scaleDegreesToChords(degrees, keyStr) {
-  const root = String(keyStr || "C").trim().split(/[\s/]+/)[0];
+  let root = "C";
+  const str = String(keyStr || "C").trim();
+  if (str.includes("/")) {
+    const parts = str.split("/").map((p) => p.trim());
+    const majorPart = parts.find((p) => /major/i.test(p));
+    if (majorPart) {
+      root = majorPart.split(/[\s/]+/)[0];
+    } else {
+      const nonMinor = parts.find((p) => !/minor\b|min\b/i.test(p)) || parts[0];
+      root = nonMinor.split(/[\s/]+/)[0];
+    }
+  } else if (/minor\b|min\b/i.test(str)) {
+    const cleanStr = str.replace(/\s+/g, " ");
+    const m = cleanStr.match(/^[A-G][#b]?/i);
+    const mRoot = m ? (m[0][0].toUpperCase() + (m[0][1] ? m[0][1].toLowerCase() : "")) : "";
+    root = MINOR_TO_RELATIVE_MAJOR[cleanStr] || MINOR_TO_RELATIVE_MAJOR[mRoot + " minor"] || MINOR_TO_RELATIVE_MAJOR[mRoot + "m"] || str.split(/[\s/]+/)[0];
+  } else {
+    root = str.split(/[\s/]+/)[0];
+  }
   const scale = KEY_CHORDS[root] || KEY_CHORDS["C"];
   return degrees.map((d) => scale[d] || "C");
 }
@@ -123,8 +156,22 @@ function evidenceRank(song, queryProg = "") {
     if (idx !== -1) iconicOrder = idx;
   }
   const curated = CURATED_SOURCES.has(song.source) ? 0 : 1;
-  const kind = song.match_kind === "loop" ? 0 : 1;
-  return [iconicOrder, kind, curated, -(song.match_occurrences || 0)];
+
+  let matchTypeRank = 0;
+  if (song.match_kind === "sequence") {
+    matchTypeRank = 1;
+  } else if (song.match_kind === "loop") {
+    if (queryProg) {
+      const target = parseDegrees(queryProg);
+      const loop = parseDegrees(song.progression || song.primary_loop_progression);
+      const isDirect = countOccurrences(loop, target) > 0 || (target.length > loop.length && loop.length > 0 && target[0] === loop[0]);
+      matchTypeRank = isDirect ? 0 : 2; // Direct loop (0) > Sequence (1) > Rotated loop (2)
+    } else {
+      matchTypeRank = 0;
+    }
+  }
+
+  return [iconicOrder, matchTypeRank, curated, -(song.match_occurrences || 0)];
 }
 
 export function sortByEvidence(songs, queryProg = "") {

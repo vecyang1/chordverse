@@ -52,6 +52,16 @@ function zMod(t, n) {
   return r < 0 ? r + n : r;
 }
 
+/** Sanitize query by stripping English/Chinese parenthesized subtitles */
+export function cleanYopuQuery(query) {
+  const raw = String(query || "").trim();
+  const stripped = raw
+    .replace(/[\(（\[【][^\)）\]】]*[\)）\]】]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return stripped || raw.replace(/[\(（\)）\[\]【】]/g, " ").trim();
+}
+
 /** Port of yopu-cli `encode_z`: internal path -> "/z/<token>". */
 export function encodeZ(path) {
   if (!Z_PREFIXES.some((prefix) => path.startsWith(prefix))) return path;
@@ -215,7 +225,8 @@ function localRow(item, corpus) {
 
 /** Every whitespace-separated token must appear in "title artist" (case-insensitive). */
 export async function searchLocalCorpus(origin, q) {
-  const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const cleanQ = cleanYopuQuery(q);
+  const tokens = cleanQ.toLowerCase().split(/\s+/).filter(Boolean);
   if (tokens.length === 0) return [];
 
   const matches = [];
@@ -241,7 +252,8 @@ function jsonResponse(body, extraHeaders = {}) {
 
 export async function onRequestGet(context) {
   const url = new URL(context.request.url);
-  const q = (url.searchParams.get("q") || "").trim();
+  const rawQ = url.searchParams.get("q") || "";
+  const q = cleanYopuQuery(rawQ);
   const page = Number.parseInt(url.searchParams.get("page") || "0", 10) || 0;
   const instrument = url.searchParams.get("instrument") || "guitar";
   const base = { query: q, page, instrument };

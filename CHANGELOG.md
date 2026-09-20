@@ -2,6 +2,29 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.8.0] - 2026-09-21
+
+### Fixed
+- **Yopu Search Query Sanitization & Clean URLs (`src/static/app.js`, `functions/api/yopu-search.js`, `src/yopu_importer.py`)**:
+  - Eliminated zero-result failures on yopu.co caused by contaminated queries containing bilingual parentheses and record labels (e.g. `水星记 (Mercury Records) 郭顶 (Guo Ding)`).
+  - Implemented `cleanYopuQuery()` across frontend, edge functions, and python importers to strip English subtitles, record company tags, and full/half-width bracketed noise, producing clean queries like `水星记 郭顶` that reliably match community tabs.
+  - Added query cleaning to frontend Yopu sheet search input before sending API requests.
+- **Minor Key Harmonic Mapping Engine (`functions/api/search.js`, `src/static/guitar_suite.js`, `src/static/app.js`)**:
+  - Resolved minor key chord distortion bug where minor keys (e.g. `A minor / C major`, `C minor / Eb major`, `Bb minor / Db major`) were improperly truncated to their tonic and treated as major keys, generating phantom sharp chords (e.g. $A\text{ minor}$ generating $F\#m - D - A - E$).
+  - Added `MINOR_TO_RELATIVE_MAJOR` dictionary to accurately resolve relative major keys ($A\text{m} \to C$, $D\text{m} \to F$, $E\text{m} \to G$, $B\text{m} \to D$, $C\text{m} \to E\flat$, $G\text{m} \to B\flat$, $B\flat\text{m} \to D\flat$).
+  - Exported `MINOR_TO_RELATIVE_MAJOR` and upgraded `normalizeKeyRoot` in guitar suite, ensuring fretboard chord diagrams and capo suggestions accurately reflect the authentic chords.
+- **Progression Match Ranking & Cyclic Permutation Deprioritization (`functions/api/search.js`, `src/static/app.js`)**:
+  - Structured `evidenceRank` to strictly rank exact direct continuous loop matches (`isDirect = true`) first (Rank 0), followed by full-song sequence matches (Rank 1), and cyclic permutation variants (e.g. 1-5-6-4 matching a 6-4-1-5 query) last (Rank 2).
+  - Fixed false-positive ranking where searching for 6-4-1-5 songs showed 1-5-6-4 songs at the top of results.
+- **Corpus Ground-Truth Corrections (`src/chinese_corpus.py`, `data/chinese_modern_corpus.json`)**:
+  - Corrected *水星记* (`zh_new_01`, `zh_064`) metadata to remove record label pollution.
+  - Corrected Jay Chou's *夜曲* (`zh_027`) key to `Bb minor / Db major` with true absolute chords `["Bbm", "Gb", "Db", "Ab"]` (with Capo 3 Gm reference).
+  - Re-exported all static web bundles and n-gram transition models via `scripts/export_web_bundle.py`.
+
+### Verified
+- Automated Tests: 150/150 tests passing (53/53 Node.js edge tests, 97/97 Python test suite).
+- Ego-Browser E2E Acceptance: Executed real headless browser verification against production (`https://chord.worldinspirelab.com`), validating clean Yopu URLs, 6-4-1-5 exact loop matching, and accurate chord display for minor songs. Saved verification screenshot to `tests/ego_browser_production_verified.png`.
+
 ## [1.7.0] - 2026-09-20
 
 ### Added

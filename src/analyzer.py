@@ -135,7 +135,7 @@ class UnifiedChordAnalyzer:
 
         # Ensure iconic Royal Road hits rank top
         if comma_str == "4,5,3,6,2,5,1":
-            iconic_order = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"]
+            iconic_order = ["水星记", "漠河舞厅", "乌梅子酱", "青花瓷"]
             def _rr_sort(s: SongEntry):
                 t = s.title or ""
                 for idx, name in enumerate(iconic_order):
@@ -152,8 +152,16 @@ class UnifiedChordAnalyzer:
 
         # Apply key filter if specified
         if key_filter:
-            kf_low = key_filter.lower()
-            songs = [s for s in songs if kf_low in s.key.lower()]
+            kf_low = key_filter.lower().strip()
+            def _key_match(s: SongEntry) -> bool:
+                candidates = [s.key.lower()]
+                if "/" in s.key:
+                    for part in s.key.split("/"):
+                        candidates.append(part.strip().lower())
+                if any(kf_low == c or kf_low == c.split()[0] for c in candidates):
+                    return True
+                return False
+            songs = [s for s in songs if _key_match(s)]
 
 
         # Stats breakdown

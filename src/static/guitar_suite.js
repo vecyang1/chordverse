@@ -53,16 +53,52 @@ export const GUITAR_CHORD_LIBRARY = {
   "B7":     { frets: [-1, 2, 1, 2, 0, 2], fingers: [0, 2, 1, 3, 0, 4], baseFret: 1, isSecondaryDominant: true, target: "Em" },
   "Bdim":   { frets: [-1, 2, 3, 4, 3, -1], fingers: [0, 1, 2, 4, 3, 0], baseFret: 1 },
 
-  // Sharp & Flat Modulations
+  // Sharp & Flat Modulations & Extensions
+  "F#":     { frets: [2, 4, 4, 3, 2, 2], fingers: [1, 3, 4, 2, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 } },
+  "F#maj7": { frets: [2, 4, 3, 3, 2, 2], fingers: [1, 4, 2, 3, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 } },
   "F#m":    { frets: [2, 4, 4, 2, 2, 2], fingers: [1, 3, 4, 1, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 } },
-  "F#7":    { frets: [2, 4, 2, 3, 2, 2], fingers: [1, 3, 1, 2, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 } },
+  "F#m7":   { frets: [2, 4, 2, 2, 2, 2], fingers: [1, 3, 1, 1, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 } },
+  "F#7":    { frets: [2, 4, 2, 3, 2, 2], fingers: [1, 3, 1, 2, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 }, isSecondaryDominant: true, target: "Bm" },
   "F#dim":  { frets: [-1, -1, 1, 2, 1, 2], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
+  "Gb":     { frets: [2, 4, 4, 3, 2, 2], fingers: [1, 3, 4, 2, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 } },
+  "Gbmaj7": { frets: [2, 4, 3, 3, 2, 2], fingers: [1, 4, 2, 3, 1, 1], baseFret: 2, barre: { fret: 2, fromString: 6, toString: 1 } },
   "Bb":     { frets: [-1, 1, 3, 3, 3, 1], fingers: [0, 1, 2, 3, 4, 1], baseFret: 1, barre: { fret: 1, fromString: 5, toString: 1 } },
   "Bbmaj7": { frets: [-1, 1, 3, 2, 3, 1], fingers: [0, 1, 3, 2, 4, 1], baseFret: 1, barre: { fret: 1, fromString: 5, toString: 1 } },
+  "Bb7":    { frets: [-1, 1, 3, 1, 3, 1], fingers: [0, 1, 3, 1, 4, 1], baseFret: 1, barre: { fret: 1, fromString: 5, toString: 1 }, isSecondaryDominant: true, target: "Ebm" },
+  "Bbm":    { frets: [-1, 1, 3, 3, 2, 1], fingers: [0, 1, 3, 4, 2, 1], baseFret: 1, barre: { fret: 1, fromString: 5, toString: 1 } },
+  "Bbm7":   { frets: [-1, 1, 3, 1, 2, 1], fingers: [0, 1, 3, 1, 2, 1], baseFret: 1, barre: { fret: 1, fromString: 5, toString: 1 } },
+  "Bmaj7":  { frets: [-1, 2, 4, 3, 4, 2], fingers: [0, 1, 3, 2, 4, 1], baseFret: 2, barre: { fret: 2, fromString: 5, toString: 1 } },
   "Ab":     { frets: [4, 6, 6, 5, 4, 4], fingers: [1, 3, 4, 2, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
+  "Abmaj7": { frets: [4, 6, 5, 5, 4, 4], fingers: [1, 4, 2, 3, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
+  "Ab7":    { frets: [4, 6, 4, 5, 4, 4], fingers: [1, 3, 1, 2, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
   "Eb":     { frets: [-1, -1, 1, 3, 4, 3], fingers: [0, 0, 1, 3, 4, 2], baseFret: 1 },
+  "Ebmaj7": { frets: [-1, -1, 1, 3, 3, 3], fingers: [0, 0, 1, 2, 3, 4], baseFret: 1 },
+  "Eb7":    { frets: [-1, -1, 1, 3, 2, 3], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
+  "Emaj7":  { frets: [0, 2, 1, 1, 0, 0], fingers: [0, 2, 1, 1, 0, 0], baseFret: 1 },
+  "Cm7":    { frets: [-1, 3, 5, 3, 4, 3], fingers: [0, 1, 3, 1, 2, 1], baseFret: 3, barre: { fret: 3, fromString: 5, toString: 1 } },
+  "C#":     { frets: [-1, 4, 6, 6, 6, 4], fingers: [0, 1, 2, 3, 4, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
+  "C#maj7": { frets: [-1, 4, 6, 5, 6, 4], fingers: [0, 1, 3, 2, 4, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
+  "C#7":    { frets: [-1, 4, 6, 4, 6, 4], fingers: [0, 1, 3, 1, 4, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 }, isSecondaryDominant: true, target: "F#m" },
   "C#m":    { frets: [-1, 4, 6, 6, 5, 4], fingers: [0, 1, 3, 4, 2, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
-  "G#m":    { frets: [4, 6, 6, 4, 4, 4], fingers: [1, 3, 4, 1, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } }
+  "C#m7":   { frets: [-1, 4, 6, 4, 5, 4], fingers: [0, 1, 3, 1, 2, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
+  "C#dim":  { frets: [-1, 4, 5, 3, 5, -1], fingers: [0, 2, 3, 1, 4, 0], baseFret: 3 },
+  "Db":     { frets: [-1, 4, 6, 6, 6, 4], fingers: [0, 1, 2, 3, 4, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
+  "Dbmaj7": { frets: [-1, 4, 6, 5, 6, 4], fingers: [0, 1, 3, 2, 4, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
+  "D#m":    { frets: [-1, 6, 8, 8, 7, 6], fingers: [0, 1, 3, 4, 2, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 } },
+  "D#7":    { frets: [-1, 6, 8, 6, 8, 6], fingers: [0, 1, 3, 1, 4, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 }, isSecondaryDominant: true, target: "G#m" },
+  "D#m7":   { frets: [-1, 6, 8, 6, 7, 6], fingers: [0, 1, 3, 1, 2, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 } },
+  "D#dim":  { frets: [-1, -1, 1, 2, 1, 2], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
+  "G#":     { frets: [4, 6, 6, 5, 4, 4], fingers: [1, 3, 4, 2, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
+  "G#7":    { frets: [4, 6, 4, 5, 4, 4], fingers: [1, 3, 1, 2, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 }, isSecondaryDominant: true, target: "C#m" },
+  "G#m":    { frets: [4, 6, 6, 4, 4, 4], fingers: [1, 3, 4, 1, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
+  "G#m7":   { frets: [4, 6, 4, 4, 4, 4], fingers: [1, 3, 1, 1, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
+  "G#dim":  { frets: [-1, -1, 3, 4, 3, 4], fingers: [0, 0, 1, 3, 2, 4], baseFret: 3 },
+  "Adim":   { frets: [-1, 0, 1, 2, 1, 2], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
+  "Ddim":   { frets: [-1, -1, 0, 1, 0, 1], fingers: [0, 0, 0, 1, 0, 2], baseFret: 1 },
+  "Cdim":   { frets: [-1, -1, 1, 2, 1, 2], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
+  "Gdim":   { frets: [-1, -1, 2, 3, 2, 3], fingers: [0, 0, 1, 3, 2, 4], baseFret: 2 },
+  "Fdim":   { frets: [-1, -1, 0, 1, 0, 1], fingers: [0, 0, 0, 1, 0, 2], baseFret: 1 },
+  "Fm7":    { frets: [1, 3, 1, 1, 1, 1], fingers: [1, 3, 1, 1, 1, 1], baseFret: 1, barre: { fret: 1, fromString: 6, toString: 1 } }
 };
 
 /**
@@ -261,7 +297,7 @@ export function calculateCapo(key) {
 }
 
 /**
- * Diatonic degree chords map for standard keys.
+ * Diatonic degree chords map for standard keys (14 keys).
  */
 export const DIATONIC_TRIADS = {
   "C":  { 1: "C",  2: "Dm",  3: "Em",   4: "F",  5: "G",  6: "Am",  7: "Bdim" },
@@ -269,56 +305,63 @@ export const DIATONIC_TRIADS = {
   "D":  { 1: "D",  2: "Em",  3: "F#m",  4: "G",  5: "A",  6: "Bm",  7: "C#dim" },
   "A":  { 1: "A",  2: "Bm",  3: "C#m",  4: "D",  5: "E",  6: "F#m", 7: "G#dim" },
   "E":  { 1: "E",  2: "F#m", 3: "G#m",  4: "A",  5: "B",  6: "C#m", 7: "D#dim" },
+  "B":  { 1: "B",  2: "C#m", 3: "D#m",  4: "E",  5: "F#", 6: "G#m", 7: "Adim" },
+  "F#": { 1: "F#", 2: "G#m", 3: "Bbm",  4: "B",  5: "C#", 6: "D#m", 7: "Fdim" },
+  "Gb": { 1: "Gb", 2: "Abm", 3: "Bbm",  4: "B",  5: "Db", 6: "Ebm", 7: "Fdim" },
   "F":  { 1: "F",  2: "Gm",  3: "Am",   4: "Bb", 5: "C",  6: "Dm",  7: "Edim" },
   "Bb": { 1: "Bb", 2: "Cm",  3: "Dm",   4: "Eb", 5: "F",  6: "Gm",  7: "Adim" },
   "Eb": { 1: "Eb", 2: "Fm",  3: "Gm",   4: "Ab", 5: "Bb", 6: "Cm",  7: "Ddim" },
-  "Ab": { 1: "Ab", 2: "Bbm", 3: "Cm",   4: "Db", 5: "Eb", 6: "Fm",  7: "Gdim" }
+  "Ab": { 1: "Ab", 2: "Bbm", 3: "Cm",   4: "Db", 5: "Eb", 6: "Fm",  7: "Gdim" },
+  "Db": { 1: "Db", 2: "Ebm", 3: "Fm",   4: "Gb", 5: "Ab", 6: "Bbm", 7: "Cdim" },
+  "C#": { 1: "C#", 2: "D#m", 3: "Fm",   4: "F#", 5: "G#", 6: "Bbm", 7: "Cdim" }
 };
 
 /**
- * 7th chords voicing mapping for popular Mandopop/J-Pop progressions.
- * In Royal Road (4,5,3,6,2,5,1), 3 leading to 6 is upgraded to secondary dominant E7 (III7).
+ * 7th chords voicing mapping for popular Mandopop/J-Pop progressions across all 14 keys.
+ * In Royal Road (4,5,3,6,2,5,1), 3 leading to 6 is upgraded to secondary dominant III7 (3_sec).
  */
 export const SEVENTH_CHORDS_MAP = {
   "C": {
-    1: "Cmaj7",
-    2: "Dm7",
-    3: "Em7", // Upgraded to E7 when followed by 6
-    "3_sec": "E7",
-    4: "Fmaj7",
-    5: "G7",
-    6: "Am7",
-    7: "Bdim"
+    1: "Cmaj7", 2: "Dm7", 3: "Em7", "3_sec": "E7", 4: "Fmaj7", 5: "G7", 6: "Am7", 7: "Bdim"
   },
   "G": {
-    1: "Gmaj7",
-    2: "Am7",
-    3: "Bm7",
-    "3_sec": "B7",
-    4: "Cmaj7",
-    5: "D7",
-    6: "Em7",
-    7: "F#dim"
+    1: "Gmaj7", 2: "Am7", 3: "Bm7", "3_sec": "B7", 4: "Cmaj7", 5: "D7", 6: "Em7", 7: "F#dim"
   },
   "D": {
-    1: "Dmaj7",
-    2: "Em7",
-    3: "F#m",
-    "3_sec": "F#7",
-    4: "Gmaj7",
-    5: "A7",
-    6: "Bm7",
-    7: "C#dim"
+    1: "Dmaj7", 2: "Em7", 3: "F#m7", "3_sec": "F#7", 4: "Gmaj7", 5: "A7", 6: "Bm7", 7: "C#dim"
+  },
+  "A": {
+    1: "Amaj7", 2: "Bm7", 3: "C#m7", "3_sec": "C#7", 4: "Dmaj7", 5: "E7", 6: "F#m7", 7: "G#dim"
+  },
+  "E": {
+    1: "Emaj7", 2: "F#m7", 3: "G#m7", "3_sec": "G#7", 4: "Amaj7", 5: "B7", 6: "C#m7", 7: "D#dim"
+  },
+  "B": {
+    1: "Bmaj7", 2: "C#m7", 3: "D#m7", "3_sec": "D#7", 4: "Emaj7", 5: "F#7", 6: "G#m7", 7: "Adim"
+  },
+  "F#": {
+    1: "F#maj7", 2: "G#m7", 3: "Bbm7", "3_sec": "Bb7", 4: "Bmaj7", 5: "C#7", 6: "D#m7", 7: "Fdim"
+  },
+  "Gb": {
+    1: "Gbmaj7", 2: "Abm7", 3: "Bbm7", "3_sec": "Bb7", 4: "Bmaj7", 5: "Db7", 6: "Ebm7", 7: "Fdim"
   },
   "F": {
-    1: "Fmaj7",
-    2: "Gm7",
-    3: "Am7",
-    "3_sec": "A7",
-    4: "Bbmaj7",
-    5: "C7",
-    6: "Dm7",
-    7: "Edim"
+    1: "Fmaj7", 2: "Gm7", 3: "Am7", "3_sec": "A7", 4: "Bbmaj7", 5: "C7", 6: "Dm7", 7: "Edim"
+  },
+  "Bb": {
+    1: "Bbmaj7", 2: "Cm7", 3: "Dm7", "3_sec": "D7", 4: "Ebmaj7", 5: "F7", 6: "Gm7", 7: "Adim"
+  },
+  "Eb": {
+    1: "Ebmaj7", 2: "Fm7", 3: "Gm7", "3_sec": "G7", 4: "Abmaj7", 5: "Bb7", 6: "Cm7", 7: "Ddim"
+  },
+  "Ab": {
+    1: "Abmaj7", 2: "Bbm7", 3: "Cm7", "3_sec": "C7", 4: "Dbmaj7", 5: "Eb7", 6: "Fm7", 7: "Gdim"
+  },
+  "Db": {
+    1: "Dbmaj7", 2: "Ebm7", 3: "Fm7", "3_sec": "F7", 4: "Gbmaj7", 5: "Ab7", 6: "Bbm7", 7: "Cdim"
+  },
+  "C#": {
+    1: "C#maj7", 2: "D#m7", 3: "Fm7", "3_sec": "F7", 4: "F#maj7", 5: "G#7", 6: "Bbm7", 7: "Cdim"
   }
 };
 
@@ -338,7 +381,7 @@ export function getProgressionVoicings(degrees, key = "C", voicing = "triad") {
     if (voicing === "seventh") {
       // Check if degree 3 leads to degree 6 (Secondary Dominant III7 -> vi)
       const nextDeg = degArray[idx + 1];
-      if (deg === 3 && (nextDeg === 6 || idx === degArray.length - 1 && degArray[0] === 6)) {
+      if (deg === 3 && (nextDeg === 6 || (idx === degArray.length - 1 && degArray[0] === 6))) {
         return seventhDict["3_sec"] || "E7";
       }
       return seventhDict[deg] || triadDict[deg] || "C";
@@ -348,12 +391,33 @@ export function getProgressionVoicings(degrees, key = "C", voicing = "triad") {
 }
 
 /**
- * Detect Secondary Dominant (E7 -> Am / III7 -> vi) in progression.
+ * Secondary dominant profile definitions for all keys.
+ */
+export const SEC_DOM_PROFILES = {
+  "C":  { pair: "E7 → Am",   sec: "E7",  target: "Am",  scale3: "Em",  leadTone: "G#" },
+  "G":  { pair: "B7 → Em",   sec: "B7",  target: "Em",  scale3: "Bm",  leadTone: "D#" },
+  "D":  { pair: "F#7 → Bm",  sec: "F#7", target: "Bm",  scale3: "F#m", leadTone: "A#" },
+  "A":  { pair: "C#7 → F#m", sec: "C#7", target: "F#m", scale3: "C#m", leadTone: "E#" },
+  "E":  { pair: "G#7 → C#m", sec: "G#7", target: "C#m", scale3: "G#m", leadTone: "B#" },
+  "B":  { pair: "D#7 → G#m", sec: "D#7", target: "G#m", scale3: "D#m", leadTone: "Fx" },
+  "F":  { pair: "A7 → Dm",   sec: "A7",  target: "Dm",  scale3: "Am",  leadTone: "C#" },
+  "Bb": { pair: "D7 → Gm",   sec: "D7",  target: "Gm",  scale3: "Dm",  leadTone: "F#" },
+  "Eb": { pair: "G7 → Cm",   sec: "G7",  target: "Cm",  scale3: "Gm",  leadTone: "B" },
+  "Ab": { pair: "C7 → Fm",   sec: "C7",  target: "Fm",  scale3: "Cm",  leadTone: "E" },
+  "Db": { pair: "F7 → Bbm",  sec: "F7",  target: "Bbm", scale3: "Fm",  leadTone: "A" },
+  "F#": { pair: "Bb7 → D#m", sec: "Bb7", target: "D#m", scale3: "Bbm", leadTone: "D" },
+  "Gb": { pair: "Bb7 → Ebm", sec: "Bb7", target: "Ebm", scale3: "Bbm", leadTone: "D" },
+  "C#": { pair: "F7 → Bbm",  sec: "F7",  target: "Bbm", scale3: "Fm",  leadTone: "A" }
+};
+
+/**
+ * Detect Secondary Dominant (III7 -> vi) in progression across all keys.
  */
 export function detectSecondaryDominant(progressionStr, chordsList = [], key = "C") {
   const prog = String(progressionStr || "");
   const chords = chordsList || [];
   const root = normalizeKeyRoot(key);
+  const profile = SEC_DOM_PROFILES[root] || SEC_DOM_PROFILES["C"];
 
   // Check degree pattern: "3,6" sequence anywhere in progression
   const degs = prog.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
@@ -369,24 +433,24 @@ export function detectSecondaryDominant(progressionStr, chordsList = [], key = "
     hasDegree3to6 = true;
   }
 
-  // Check explicit chords: E7 -> Am or presence of E7, B7, A7
-  let hasE7toAm = false;
+  // Check explicit chords matching profile secondary dominant pair
+  let hasChordPair = false;
   for (let i = 0; i < chords.length - 1; i++) {
-    if (chords[i] === "E7" && chords[i + 1].startsWith("Am")) {
-      hasE7toAm = true;
+    if (chords[i] === profile.sec && chords[i + 1].startsWith(profile.target)) {
+      hasChordPair = true;
       break;
     }
   }
-  if (chords.includes("E7") && chords.includes("Am")) {
-    hasE7toAm = true;
+  if (chords.includes(profile.sec) && chords.some(c => c.startsWith(profile.target))) {
+    hasChordPair = true;
   }
 
-  const isMatched = hasDegree3to6 || hasE7toAm || prog === "4,5,3,6,2,5,1";
+  const isMatched = hasDegree3to6 || hasChordPair || prog === "4,5,3,6,2,5,1";
 
   return {
     isSecondaryDominant: isMatched,
-    chordPair: root === "C" ? "E7 → Am" : (root === "G" ? "B7 → Em" : "III7 → vi"),
-    explanation: `💡 乐理精讲：副属和弦 E7 (III7) → Am (vi) 的神级推动力。在 C 大调中，三级自然小三和弦为 Em (E-G-B)。升级为副属七和弦 E7 (E-G#-B-D) 引入了调外半音变化音 G#，与六级 Am 根音 A 构成极其强烈的半音导向（G# → A），同时 E7 与 Am 构成局部的属到主解决（V7/vi → vi），赋予流行大金曲（如《凄美地》《水星记》《青花瓷》）无可替代的叙事张力与情感爆发！`
+    chordPair: profile.pair,
+    explanation: `💡 乐理精讲：副属和弦 ${profile.pair} (III7 → vi) 的神级推动力。在 ${root} 大调中，三级自然小三和弦为 ${profile.scale3}。升级为副属七和弦 ${profile.sec} 引入了调外变化音（导音 ${profile.leadTone}），与六级 ${profile.target} 构成强烈的半音导向解决（V7/vi → vi），赋予流行大金曲（如《凄美地》《水星记》《青花瓷》）无可替代的叙事张力与情感爆发！`
   };
 }
 
@@ -400,4 +464,7 @@ if (typeof window !== "undefined") {
   window.calculateCapo = calculateCapo;
   window.getProgressionVoicings = getProgressionVoicings;
   window.detectSecondaryDominant = detectSecondaryDominant;
+  window.SEC_DOM_PROFILES = SEC_DOM_PROFILES;
+  window.DIATONIC_TRIADS = DIATONIC_TRIADS;
+  window.SEVENTH_CHORDS_MAP = SEVENTH_CHORDS_MAP;
 }

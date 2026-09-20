@@ -13,6 +13,22 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
+function showToast(msg) {
+  let toast = document.getElementById("chordverse-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "chordverse-toast";
+    toast.className = "chordverse-toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add("visible");
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.remove("visible");
+  }, 2600);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // DOM Elements
   const inputProg = document.getElementById("input-progression");
@@ -406,7 +422,14 @@ document.addEventListener("DOMContentLoaded", () => {
       renderResults(data);
 
       const isDegreeQuery = /^[1-7\s,\-\>\|/]+$/.test(query) || /^[ivxIVX\s,\-\>\|/]+$/.test(query);
-      if (query && !isDegreeQuery && data.progression && data.songs && data.songs.length > 0) {
+      if (isDegreeQuery) {
+        const queryDegs = parseInputToDegrees(query);
+        if (queryDegs.length > 0 && queryDegs.join(",") !== activeDegrees.join(",")) {
+          activeDegrees = queryDegs;
+          renderBuilderDisplay();
+        }
+        loadNextChordProbabilities(query);
+      } else if (query && data.progression && data.songs && data.songs.length > 0) {
         const matchedSongProg = data.songs[0]?.progression || data.progression;
         const matchedDegs = parseInputToDegrees(matchedSongProg);
         if (matchedDegs.length > 0) {
@@ -639,11 +662,47 @@ document.addEventListener("DOMContentLoaded", () => {
         <td class="listen-link">${listenLink}</td>
       `;
 
+      if (idx === 0) tr.classList.add("selected-song-row");
+      tr.style.cursor = "pointer";
+      tr.title = `点击载入《${song.title}》吉他指法与原调`;
+
+      tr.addEventListener("click", (e) => {
+        if (e.target.closest("a")) return;
+
+        songsTbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected-song-row"));
+        tr.classList.add("selected-song-row");
+
+        const targetKey = song.key || song.analysis_key || "C";
+        const cleanKey = targetKey.replace(/\s*(major|minor|m|maj)\b/i, "").trim() || "C";
+
+        if (playKeySelect && optionExists(playKeySelect, cleanKey)) {
+          playKeySelect.value = cleanKey;
+        }
+
+        const effectiveSongProg = song.progression || song.primary_loop_progression;
+        if (effectiveSongProg) {
+          const songDegs = parseInputToDegrees(effectiveSongProg);
+          if (songDegs.length > 0) {
+            activeDegrees = songDegs;
+            renderBuilderDisplay();
+          }
+        }
+
+        updateGuitarSuite(effectiveSongProg || activeDegrees.join(","), cleanKey);
+        showToast(`已载入《${song.title}》原调 (${cleanKey} 调) 吉他指法与 Capo 方案`);
+      });
+
       songsTbody.appendChild(tr);
     });
 
-    // Update Guitar Learning Suite with current progression & key
-    updateGuitarSuite(data.progression, playKeySelect ? playKeySelect.value : "C");
+    // Update Guitar Learning Suite with current progression & authentic top song key
+    const initialKey = songs[0]?.key 
+      ? songs[0].key.replace(/\s*(major|minor|m|maj)\b/i, "").trim() 
+      : (playKeySelect ? playKeySelect.value : "C");
+    if (playKeySelect && songs[0]?.key && optionExists(playKeySelect, initialKey)) {
+      playKeySelect.value = initialKey;
+    }
+    updateGuitarSuite(data.progression, initialKey);
   }
 
   // Update Guitar Learning Suite (SVG chord boxes, Capo recommendation, Voicing, Secondary Dominant)
@@ -669,11 +728,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 2. Determine song original key
-    let songKey = overrideKey || (playKeySelect ? playKeySelect.value : "C");
-    if (!overrideKey && currentSearchResults && currentSearchResults.songs && currentSearchResults.songs.length > 0) {
-      const topSong = currentSearchResults.songs[0];
-      if (topSong.key) songKey = topSong.key;
+    // 2. Determine song original key: explicit override -> selector value -> top song key -> "C"
+    let songKey = "C";
+    if (overrideKey) {
+      songKey = overrideKey;
+    } else if (playKeySelect && playKeySelect.value) {
+      songKey = playKeySelect.value;
+    } else if (currentSearchResults && currentSearchResults.songs && currentSearchResults.songs.length > 0) {
+      songKey = currentSearchResults.songs[0].key || "C";
     }
     const cleanKey = songKey.replace(/\s*(major|minor|m|maj)\b/i, "").trim() || "C";
 
@@ -1052,7 +1114,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <div><strong>核心 Loop 级数:</strong> <span style="color:var(--primary-accent);font-weight:700;">${data.primary_roman}</span> (${data.primary_progression})</div>
         ${data.progression_name ? `<div style="color:#38bdf8;font-size:12px;">🏷️ 对应进行: ${data.progression_name}</div>` : ""}
         <div><strong>和弦走向:</strong> ${(data.primary_chords || []).join(" - ")}</div>
-        <button id="btn-use-yopu-prog" class="btn btn-secondary" style="margin-top:8px;padding:4px 8px;font-size:11px;">在曲库中检索此进行 ➔</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <button id="btn-use-yopu-prog" class="btn btn-secondary" style="padding:4px 8px;font-size:11px;">在曲库中检索此进行 ➔</button>
+          <button id="btn-practice-yopu-guitar" class="btn btn-primary" style="padding:4px 8px;font-size:11px;">在吉他套件中练习 🎸</button>
+        </div>
       `;
 
       document.getElementById("btn-use-yopu-prog")?.addEventListener("click", () => {
@@ -1060,6 +1125,19 @@ document.addEventListener("DOMContentLoaded", () => {
         activeDegrees = parseInputToDegrees(data.primary_progression);
         renderBuilderDisplay();
         executeSearch();
+      });
+
+      document.getElementById("btn-practice-yopu-guitar")?.addEventListener("click", () => {
+        const cleanKey = (data.key || "C").replace(/\s*(major|minor|m|maj)\b/i, "").trim() || "C";
+        if (playKeySelect && optionExists(playKeySelect, cleanKey)) {
+          playKeySelect.value = cleanKey;
+        }
+        inputProg.value = data.primary_progression;
+        activeDegrees = parseInputToDegrees(data.primary_progression);
+        renderBuilderDisplay();
+        updateGuitarSuite(data.primary_progression, cleanKey);
+        guitarSuiteCard?.scrollIntoView({ behavior: "smooth", block: "start" });
+        showToast(`已将《${data.title}》载入吉他指法套件！`);
       });
 
     } catch (e) {

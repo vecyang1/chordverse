@@ -2,6 +2,24 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.7.0] - 2026-09-20
+
+### Added
+- **Full 14-Key Diatonic & 7th Chords Harmonic Engine (`src/static/guitar_suite.js`, `functions/api/_yopu_decoder.js`)**:
+  - Expanded `DIATONIC_TRIADS` and `SEVENTH_CHORDS_MAP` across all 14 musical keys (C, G, D, A, E, B, F#, Gb, F, Bb, Eb, Ab, Db, C#). Fixed D major 3rd degree from triad `F#m` to seventh `F#m7`.
+  - Added 25+ comprehensive chord voicings to `GUITAR_CHORD_LIBRARY`: `C#7`, `C#m7`, `F#m7`, `G#7`, `G#m7`, `Emaj7`, `Ebmaj7`, `Cm7`, `D#m`, `D#7`, `D#m7`, `D#dim`, `C#dim`, `G#dim`, `Adim`, `Ddim`, `Cdim`, `Gdim`, `Fdim`, `Fm7`, `F#`, `F#maj7`, `Bmaj7`, `Db`, `Dbmaj7`, `Bbm`, `Bbm7`, `Abmaj7`, `Ab7`, complete with physical frets, finger assignments, and barre boundaries.
+  - Synchronized `GUITAR_CHORD_LIBRARY` to Cloudflare Edge function `functions/api/_yopu_decoder.js`.
+  - Dynamic Secondary Dominant Resolution ($III^7 \to vi$): Automatically generates key-specific secondary dominant chord pairs and music theory explanations across all keys (e.g. in A major: $C\#7 \to F\#m$ with leading tone $E\#$; in D major: $F\#7 \to Bm$; in G major: $B7 \to Em$; in E major: $G\#7 \to C\#m$; in C major: $E7 \to Am$).
+- **Interactive Song-to-Fretboard Live Binding (`src/static/app.js`, `src/static/styles.css`)**:
+  - Table Row Click Interaction: Clicking any song row in search results immediately highlights the row (`.selected-song-row`), syncs the song's original key into `#play-key-select`, syncs progression into `activeDegrees` & step builder, recalculates Capo recommendations, updates interactive SVG chord diagrams, and displays feedback via toast notification.
+  - Fixed ghost logic in `updateGuitarSuite` key resolution: prioritizes active UI key selector over stale top search result.
+  - One-Click Guitar Practice from Yopu: Added "在吉他套件中练习 🎸" button to Yopu sheet import result to instantly load imported progressions and keys into the visualizer.
+  - Added modern glassmorphism `.chordverse-toast` notification and interactive table row hover styles.
+
+### Verified
+- Automated Tests: 173/173 tests passing (50/50 Node.js edge tests, 97/97 Python test suite, 26/26 yopu-cli unit tests).
+- Production Chrome E2E: Real headless Chrome verification against live production (`https://chord.worldinspirelab.com`) validating 《青花瓷》 A-major click sync, Capo 2 recommendation, 7th chords toggle producing `["Dmaj7","E7","C#7","F#m7","Bm7","E7","Amaj7"]`, and complete SVG chord diagram rendering.
+
 ## [1.6.0] - 2026-09-20
 
 ### Added

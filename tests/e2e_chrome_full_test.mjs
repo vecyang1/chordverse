@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { chromium } from '/Users/vecsatfoxmailcom/Documents/A-coding/world-inspire-page-kit/node_modules/playwright/index.mjs';
 import path from 'path';
 
 const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'https://chord.worldinspirelab.com/';

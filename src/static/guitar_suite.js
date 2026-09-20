@@ -84,16 +84,25 @@ export const GUITAR_CHORD_LIBRARY = {
   "C#dim":  { frets: [-1, 4, 5, 3, 5, -1], fingers: [0, 2, 3, 1, 4, 0], baseFret: 3 },
   "Db":     { frets: [-1, 4, 6, 6, 6, 4], fingers: [0, 1, 2, 3, 4, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
   "Dbmaj7": { frets: [-1, 4, 6, 5, 6, 4], fingers: [0, 1, 3, 2, 4, 1], baseFret: 4, barre: { fret: 4, fromString: 5, toString: 1 } },
+  "D#":     { frets: [-1, 6, 8, 8, 8, 6], fingers: [0, 1, 2, 3, 4, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 } },
   "D#m":    { frets: [-1, 6, 8, 8, 7, 6], fingers: [0, 1, 3, 4, 2, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 } },
   "D#7":    { frets: [-1, 6, 8, 6, 8, 6], fingers: [0, 1, 3, 1, 4, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 }, isSecondaryDominant: true, target: "G#m" },
   "D#m7":   { frets: [-1, 6, 8, 6, 7, 6], fingers: [0, 1, 3, 1, 2, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 } },
   "D#dim":  { frets: [-1, -1, 1, 2, 1, 2], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
+  "Ebm":    { frets: [-1, 6, 8, 8, 7, 6], fingers: [0, 1, 3, 4, 2, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 } },
+  "Ebm7":   { frets: [-1, 6, 8, 6, 7, 6], fingers: [0, 1, 3, 1, 2, 1], baseFret: 6, barre: { fret: 6, fromString: 5, toString: 1 } },
+  "A#m":    { frets: [-1, 1, 3, 3, 2, 1], fingers: [0, 1, 3, 4, 2, 1], baseFret: 1, barre: { fret: 1, fromString: 5, toString: 1 } },
+  "A#m7":   { frets: [-1, 1, 3, 1, 2, 1], fingers: [0, 1, 3, 1, 2, 1], baseFret: 1, barre: { fret: 1, fromString: 5, toString: 1 } },
+  "Cb":     { frets: [-1, 2, 4, 4, 4, 2], fingers: [0, 1, 2, 3, 4, 1], baseFret: 2, barre: { fret: 2, fromString: 5, toString: 1 } },
+  "Abm":    { frets: [4, 6, 6, 4, 4, 4], fingers: [1, 3, 4, 1, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
+  "Abm7":   { frets: [4, 6, 4, 4, 4, 4], fingers: [1, 3, 1, 1, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
   "G#":     { frets: [4, 6, 6, 5, 4, 4], fingers: [1, 3, 4, 2, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
   "G#7":    { frets: [4, 6, 4, 5, 4, 4], fingers: [1, 3, 1, 2, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 }, isSecondaryDominant: true, target: "C#m" },
   "G#m":    { frets: [4, 6, 6, 4, 4, 4], fingers: [1, 3, 4, 1, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
   "G#m7":   { frets: [4, 6, 4, 4, 4, 4], fingers: [1, 3, 1, 1, 1, 1], baseFret: 4, barre: { fret: 4, fromString: 6, toString: 1 } },
   "G#dim":  { frets: [-1, -1, 3, 4, 3, 4], fingers: [0, 0, 1, 3, 2, 4], baseFret: 3 },
   "Adim":   { frets: [-1, 0, 1, 2, 1, 2], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
+  "A#dim":  { frets: [-1, 1, 2, 0, 2, 0], fingers: [0, 1, 2, 0, 3, 0], baseFret: 1 },
   "Ddim":   { frets: [-1, -1, 0, 1, 0, 1], fingers: [0, 0, 0, 1, 0, 2], baseFret: 1 },
   "Cdim":   { frets: [-1, -1, 1, 2, 1, 2], fingers: [0, 0, 1, 3, 2, 4], baseFret: 1 },
   "Gdim":   { frets: [-1, -1, 2, 3, 2, 3], fingers: [0, 0, 1, 3, 2, 4], baseFret: 2 },
@@ -400,7 +409,11 @@ export const SEVENTH_CHORDS_MAP = {
 /**
  * Resolve progression chord names with Triad vs 7th Voicings.
  */
-export function getProgressionVoicings(degrees, key = "C", voicing = "triad") {
+export function getProgressionVoicings(degrees, key = "C", voicing = "triad", customChords = null) {
+  if (Array.isArray(customChords) && customChords.length > 0 && voicing === "triad") {
+    return customChords.map(c => String(c).split("/")[0].trim());
+  }
+
   const root = normalizeKeyRoot(key);
   const triadDict = DIATONIC_TRIADS[root] || DIATONIC_TRIADS["C"];
   const seventhDict = SEVENTH_CHORDS_MAP[root] || SEVENTH_CHORDS_MAP["C"];
@@ -408,6 +421,9 @@ export function getProgressionVoicings(degrees, key = "C", voicing = "triad") {
   const degArray = Array.isArray(degrees)
     ? degrees
     : String(degrees).split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+
+  const is6413 = degArray.length === 4 && degArray[0] === 6 && degArray[1] === 4 && degArray[2] === 1 && degArray[3] === 3;
+  const maj3 = { "C": "E", "G": "B", "D": "F#", "A": "C#", "E": "G#", "B": "D#", "F#": "A#", "Gb": "Bb", "F": "A", "Bb": "D", "Eb": "G", "Ab": "C", "Db": "F", "C#": "F" };
 
   return degArray.map((deg, idx) => {
     if (voicing === "seventh") {
@@ -417,6 +433,9 @@ export function getProgressionVoicings(degrees, key = "C", voicing = "triad") {
         return seventhDict["3_sec"] || "E7";
       }
       return seventhDict[deg] || triadDict[deg] || "C";
+    }
+    if (deg === 3 && is6413 && maj3[root]) {
+      return maj3[root];
     }
     return triadDict[deg] || "C";
   });

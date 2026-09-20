@@ -151,7 +151,7 @@ test("normalizeKeyRoot cleans key strings", () => {
   assert.equal(normalizeKeyRoot(""), "C");
 });
 
-test("getProgressionVoicings supports Triad vs 7th Extensions for Royal Road", () => {
+test("getProgressionVoicings supports Triad vs 7th Extensions for Royal Road across multiple keys", () => {
   const royalRoad = [4, 5, 3, 6, 2, 5, 1];
 
   // Triads in C major
@@ -169,22 +169,55 @@ test("getProgressionVoicings supports Triad vs 7th Extensions for Royal Road", (
   // 7th Extensions in G major (3 upgraded to B7 leading to Em)
   const seventhG = getProgressionVoicings(royalRoad, "G", "seventh");
   assert.deepEqual(seventhG, ["Cmaj7", "D7", "B7", "Em7", "Am7", "D7", "Gmaj7"]);
+
+  // Triads in A major (e.g. 青花瓷)
+  const triadsA = getProgressionVoicings(royalRoad, "A", "triad");
+  assert.deepEqual(triadsA, ["D", "E", "C#m", "F#m", "Bm", "E", "A"]);
+
+  // 7th Extensions in A major (3 upgraded to C#7 leading to F#m)
+  const seventhA = getProgressionVoicings(royalRoad, "A", "seventh");
+  assert.deepEqual(seventhA, ["Dmaj7", "E7", "C#7", "F#m7", "Bm7", "E7", "Amaj7"]);
+
+  // 7th Extensions in D major (3 upgraded to F#7 leading to Bm)
+  const seventhD = getProgressionVoicings(royalRoad, "D", "seventh");
+  assert.deepEqual(seventhD, ["Gmaj7", "A7", "F#7", "Bm7", "Em7", "A7", "Dmaj7"]);
+
+  // 7th Extensions in E major (3 upgraded to G#7 leading to C#m)
+  const seventhE = getProgressionVoicings(royalRoad, "E", "seventh");
+  assert.deepEqual(seventhE, ["Amaj7", "B7", "G#7", "C#m7", "F#m7", "B7", "Emaj7"]);
 });
 
-test("detectSecondaryDominant flags E7 -> Am (III7 -> vi) half-step leading tone", () => {
-  // Royal Road progression contains 3 -> 6
-  const secDomRoyal = detectSecondaryDominant("4,5,3,6,2,5,1");
-  assert.equal(secDomRoyal.isSecondaryDominant, true);
-  assert.ok(secDomRoyal.explanation.includes("E7 (III7) → Am (vi)"));
-  assert.ok(secDomRoyal.explanation.includes("半音导向（G# → A）"));
-  assert.ok(secDomRoyal.explanation.includes("《凄美地》《水星记》《青花瓷》"));
+test("detectSecondaryDominant flags III7 -> vi half-step leading tone across all keys", () => {
+  // Royal Road progression contains 3 -> 6 in C major
+  const secDomC = detectSecondaryDominant("4,5,3,6,2,5,1", [], "C");
+  assert.equal(secDomC.isSecondaryDominant, true);
+  assert.equal(secDomC.chordPair, "E7 → Am");
+  assert.ok(secDomC.explanation.includes("E7 → Am (III7 → vi)"));
+  assert.ok(secDomC.explanation.includes("导音 G#"));
+
+  // Royal Road in A major (青花瓷: C#7 -> F#m)
+  const secDomA = detectSecondaryDominant("4,5,3,6,2,5,1", [], "A");
+  assert.equal(secDomA.isSecondaryDominant, true);
+  assert.equal(secDomA.chordPair, "C#7 → F#m");
+  assert.ok(secDomA.explanation.includes("C#7 → F#m"));
+  assert.ok(secDomA.explanation.includes("导音 E#"));
+
+  // Royal Road in G major (B7 -> Em)
+  const secDomG = detectSecondaryDominant("4,5,3,6,2,5,1", [], "G");
+  assert.equal(secDomG.isSecondaryDominant, true);
+  assert.equal(secDomG.chordPair, "B7 → Em");
+
+  // Royal Road in D major (F#7 -> Bm)
+  const secDomD = detectSecondaryDominant("4,5,3,6,2,5,1", [], "D");
+  assert.equal(secDomD.isSecondaryDominant, true);
+  assert.equal(secDomD.chordPair, "F#7 → Bm");
 
   // Explicit E7 -> Am in chords list
-  const secDomExplicit = detectSecondaryDominant("1,3,6,4", ["C", "E7", "Am", "F"]);
+  const secDomExplicit = detectSecondaryDominant("1,3,6,4", ["C", "E7", "Am", "F"], "C");
   assert.equal(secDomExplicit.isSecondaryDominant, true);
 
   // Non-secondary dominant progression (1,5,6,4)
-  const secDomPopPunk = detectSecondaryDominant("1,5,6,4", ["C", "G", "Am", "F"]);
+  const secDomPopPunk = detectSecondaryDominant("1,5,6,4", ["C", "G", "Am", "F"], "C");
   assert.equal(secDomPopPunk.isSecondaryDominant, false);
 });
 

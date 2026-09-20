@@ -8,8 +8,9 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 from dataclasses import asdict
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
 try:
     from .roman_engine import (
@@ -101,11 +102,16 @@ class UnifiedChordAnalyzer:
         songs: List[SongEntry] = []
         seen_keys = set()
 
+        def _norm_k(s: SongEntry) -> Tuple[str, str]:
+            t = re.sub(r"\s*[\(（].*?[\)）]\s*", "", s.title or "").strip().lower()
+            a = re.sub(r"\s*[\(（].*?[\)）]\s*", "", s.artist or "").strip().lower()
+            return (t, a)
+
         # 1. Fetch Chinese songs
         if language.lower() in ("all", "zh", "chinese", "mandopop"):
             zh_songs = self.chinese_engine.search_songs(comma_str, exact=exact)
             for s in zh_songs:
-                k = (s.title.lower(), s.artist.lower(), s.section.lower())
+                k = _norm_k(s)
                 if k not in seen_keys:
                     seen_keys.add(k)
                     songs.append(s)
@@ -114,7 +120,7 @@ class UnifiedChordAnalyzer:
         if language.lower() in ("all", "en", "western", "english"):
             west_curated = self._get_offline_western_songs(comma_str, exact=exact)
             for s in west_curated:
-                k = (s.title.lower(), s.artist.lower(), s.section.lower())
+                k = _norm_k(s)
                 if k not in seen_keys:
                     seen_keys.add(k)
                     songs.append(s)
@@ -122,10 +128,22 @@ class UnifiedChordAnalyzer:
             # 3. Fetch Hooktheory 75,000+ API / Index
             en_songs = self.hooktheory.search_songs(comma_str, max_pages=max_pages)
             for s in en_songs:
-                k = (s.title.lower(), s.artist.lower(), s.section.lower())
+                k = _norm_k(s)
                 if k not in seen_keys:
                     seen_keys.add(k)
                     songs.append(s)
+
+        # Ensure iconic Royal Road hits rank top
+        if comma_str == "4,5,3,6,2,5,1":
+            iconic_order = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"]
+            def _rr_sort(s: SongEntry):
+                t = s.title or ""
+                for idx, name in enumerate(iconic_order):
+                    if name in t:
+                        return (0, idx)
+                kind_order = 0 if getattr(s, "match_kind", "loop") != "sequence" else 1
+                return (1, kind_order)
+            songs.sort(key=_rr_sort)
 
         # Apply artist filter if specified
         if artist_filter:
@@ -136,6 +154,7 @@ class UnifiedChordAnalyzer:
         if key_filter:
             kf_low = key_filter.lower()
             songs = [s for s in songs if kf_low in s.key.lower()]
+
 
         # Stats breakdown
         zh_count = sum(1 for s in songs if s.language == "zh")

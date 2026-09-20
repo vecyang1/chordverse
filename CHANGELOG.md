@@ -2,6 +2,65 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.6.0] - 2026-09-20
+
+### Added
+- **Guitar Learning Suite (`src/static/guitar_suite.js`, `src/static/app.js`, `src/static/styles.css`)**:
+  - Interactive SVG Fretboard Visualizer: Dynamic chord box diagrams rendering 6-string fretboards, open/muted string indicators (○/✕), nut/fret numbers, finger placement circles, and barre highlights across 43+ standard guitar chords.
+  - Voicing Color Toggle: Instant switching between beginner-friendly standard triads (e.g. `F - G - Em - Am - Dm - G - C`) and modern Mandopop/J-Pop 7th jazz/pop extensions (e.g. `Fmaj7 - G7 - E7 - Am7 - Dm7 - G7 - Cmaj7`).
+  - Secondary Dominant ($E^7 \to Am$) Music Theory Card: Real-time detection and educational callout explaining the half-step leading tone pull ($G\# \to A$) that creates irresistible emotional momentum in iconic Royal Road hits.
+  - Modulo-12 Capo Calculator: Transposition assistant calculating optimal capo placements ($Capo \le 5$) with beginner-friendly open C and G shapes for all 12 musical keys.
+- **Acoustic Guitar Strumming Synthesizer (`src/static/audio_synth.js`)**:
+  - Web Audio acoustic guitar simulation with 6-string physical tuning (E2-A2-D3-G3-B3-E4), staggered ~20ms micro-arpeggio string timing, crisp 6ms plectrum attack, and dynamic wood resonance lowpass filtering.
+- **Milestone Harmonization & Production Readiness**:
+  - Consolidated M1 (Yopu toolchain egress fallback, structured score decoding, dummy song elimination, 404/400 error handling).
+  - Consolidated M2 (Zero-hallucination Hooktheory sequence validation, cache sanitization, POP909 sequence match chord transposition, bilingual deduplication, Royal Road iconic ranking).
+  - Production deployment pipeline to Cloudflare Pages (`chord.worldinspirelab.com`) with automated cache-busting version sync.
+
+## [1.5.0] - 2026-09-20
+
+### Fixed
+- **Hooktheory Meilisearch Zero-Hallucination (`src/hooktheory_client.py`)**:
+  - Eliminated Meilisearch bag-of-words hallucination bug where unauthenticated keyword queries (e.g. `"IV V iii vi ii V I"`) matched Roman numerals in unrelated titles (e.g. *George IV*, *Feldschlacht IV*, *D-I-V-O-R-C-E*).
+  - Added `extract_hit_degrees` to parse `SInD` and `chordRelBare` scale degree sequences.
+  - Gated candidate songs with `matches_progression_sequence(hit_degrees, target_degrees)` before attribution or caching.
+  - Purged 17 contaminated keys from `data/hooktheory_cache.json` (such as Tammy Wynette's *D-I-V-O-R-C-E* erroneously stamped as Royal Road).
+- **POP909 Sequence Match Highlighting & Dynamic Chords (`functions/api/search.js`, `src/pop909_engine.py`, `src/static/app.js`)**:
+  - Resolved label ghosting where POP909 sequence matches defaulted to primary loop labels and 4 chords (e.g. 周杰伦 *《最长的电影》* returning `6,2,5,1` or 林俊杰 *《修炼爱情》* returning `4,5,3,6` for a `4,5,3,6,2,5,1` query).
+  - Implemented `scaleDegreesToChords(degrees, key)` to synthesize the authentic matching chords in the song's key (e.g. 7 chords in E major: `A, B, G#m, C#m, F#m, B, E`).
+  - Labeled section accurately as `匹配乐段 (Royal Road 4-5-3-6-2-5-1)` while preserving `primary_loop_progression` and `primary_loop_chords`.
+- **Royal Road Ground Truth Harmonization & Deduplication (`src/chinese_corpus.py`)**:
+  - Corrected *凄美地* (`zh_065`) in E major from contradictory `1,5,6,4` to Royal Road `4,5,3,6,2,5,1` (`["A", "B", "G#m", "C#m", "F#m", "B", "E"]`).
+  - Implemented bilingual title/artist normalization (`normalizeTitle`, `normalizeArtist`) to deduplicate songs across translated English subtitles (e.g. *乌梅子酱* "Plum Sauce" vs "Plum Jam").
+  - Ensured iconic Royal Road hits (*水星记*, *凄美地*, *漠河舞厅*, *乌梅子酱*, *青花瓷*) rank at the top of results.
+
+### Added
+- `tests/test_hooktheory_client.py`: Unit test suite verifying Meilisearch rejection of hallucinated songs, genuine sequence acceptance, and zero-hallucination cache protection.
+- Extended `tests/functions/search.test.mjs`: Tests verifying dynamic chord transposition across keys, POP909 sequence match chord synthesis, and bilingual title deduplication.
+- Web bundle resync: Updated derived n-gram model and static JSON datasets via `scripts/export_web_bundle.py`.
+
+## [1.4.0] - 2026-09-20
+
+
+### Fixed
+- **Yopu Egress Resolution & Automated Fallback (`yopu-cli`)**: `resolve_egress` now treats `~/.config/yopu/egress` as authoritative without bleeding into `~/.config/yopu-pdf/egress`. Defaulted network egress to `direct`. Added automatic graceful fallback to direct connection with 15s timeout whenever configured proxy/SSH egress fails.
+- **Chord Sheet Import Ingestion (`src/yopu_importer.py`)**: `parse_and_clean_score()` no longer discards `sheet_data["chords"]`. Structured chord arrays are now used directly to determine key center, Roman numerals, and detected harmonic loops. Fixed fallback regex to word boundary `\b([A-G]...)\b` to prevent chord truncation on space-delimited text.
+- **Zero-Hallucination Error Handling (`src/yopu_importer.py` & `src/cli.py`)**: Completely eliminated silent dummy song generation (`Song #...`, `华语歌手`, `1,5,6,4`, `C-G-Am-F`). Network fetch failures and invalid/nonexistent score IDs now cleanly raise `RuntimeError` / `ConnectionError` with exit code 1. Empty and whitespace-only inputs are strictly validated and rejected. Sheets with no chords never hallucinate fallback progressions or pollute the corpus.
+- **Cloudflare Edge Yopu Import Function (`functions/api/import-yopu.js`)**: Replaced fragile HTML regex scraping with canonical protocol decoder. Fetches view page for dynamic `data-model` session token, queries `/z/<token>` via `encodeZ`, and decompresses binary payload via pure JS Brotli custom dictionary decompressor (`_ar_decompressor.js` / `_yopu_decoder.js`). Now returns HTTP 404 `{ error: "曲谱不存在或无法获取", code: 404 }` on missing scores, fetch failures, or 404 titles rather than misleading HTTP 200 responses.
+- **Guitar Fingerings & Edge Endpoints**: Added standard guitar chord fingering lookup (`guitar_fingerings`) for all extracted chords. Implemented both `onRequestPost` (JSON body) and `onRequestGet` (URL query parameter). Eliminated false "未内嵌和弦" errors for valid scores.
+
+### Added
+- `functions/api/_ar_decompressor.js`: Pure JavaScript Brotli dictionary decompressor with universal `globalThis` support for Cloudflare Pages Functions.
+- `functions/api/_yopu_decoder.js`: Shared decoder library implementing `encodeZ`, `decodeDataModel`, `decodeSheetPayload`, `decodeSearchResponse`, and `getGuitarFingering`.
+- `tests/fixtures/qingtian_sheet_payload.bin`: Captured binary test fixture from live Yopu score (`3PbjG3gP`).
+- Unit and regression tests: 39 passing tests in `tests/functions/` (including negative tests for 404s, network errors, and whitespace inputs), 90 passing tests in Python suite (including clean rejection and error raising on empty inputs and fetch failures), and 26 passing tests in `yopu-cli`.
+
+## [2026-09-12] - 2026-09-12
+
+
+### Fixes
+- Untrack private context files and upload artifacts, update gitignore (`4aea91a`)
+
 ## [1.3.0] - 2026-09-04
 
 ### Fixed

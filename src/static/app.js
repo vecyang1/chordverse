@@ -1,3 +1,11 @@
+import {
+  GUITAR_CHORD_LIBRARY,
+  renderGuitarChordSVG,
+  calculateCapo,
+  getProgressionVoicings,
+  detectSecondaryDominant
+} from "./guitar_suite.js";
+
 // Escape untrusted text (upstream titles, error strings) before HTML insertion.
 function escapeHtml(value) {
   return String(value ?? "")
@@ -36,6 +44,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const leaderboardChips = document.getElementById("leaderboard-chips");
   const leaderboardMeta = document.getElementById("leaderboard-meta");
 
+  // Guitar Suite Elements
+  const guitarSuiteCard = document.getElementById("guitar-suite-card");
+  const chordBoxesContainer = document.getElementById("chord-boxes-container");
+  const voicingToggle = document.getElementById("voicing-toggle");
+  const instrumentToggle = document.getElementById("instrument-toggle");
+  const capoText = document.getElementById("capo-text");
+  const capoShapeSelect = document.getElementById("capo-shape-select");
+  const theoryTipCard = document.getElementById("theory-tip-card");
+  const theoryTipBody = document.getElementById("theory-tip-body");
+
   // Custom Analyzer Elements
   const customChordsInput = document.getElementById("custom-chords-input");
   const customKeySelect = document.getElementById("custom-key-select");
@@ -46,6 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let activeDegrees = [1, 5, 6, 4];
   let currentSearchResults = null;
   let isLoopPlaying = false;
+  let currentVoicing = "triad";       // "triad" or "seventh"
+  let currentCapoShape = "original";  // "original", "C", "G"
   // Only the most recent executeSearch() may render: a slower earlier response
   // (e.g. the 1,000-row "all" listing) must not overwrite a newer answer.
   let searchSeq = 0;
@@ -99,6 +119,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getActiveChordsInKey(key) {
+    if (currentVoicing === "seventh" && typeof getProgressionVoicings === "function") {
+      return getProgressionVoicings(activeDegrees, key, "seventh");
+    }
     return activeDegrees.map(deg => degreeToChord(deg, key));
   }
 
@@ -108,6 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
     activeChipsContainer.innerHTML = "";
     if (activeDegrees.length === 0) {
       activeChipsContainer.innerHTML = `<span style="color: var(--text-muted); font-size: 13px;">点击下方和弦按钮构建进行...</span>`;
+      updateGuitarSuite("", playKeySelect ? playKeySelect.value : "C");
       return;
     }
 
@@ -143,6 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       activeChipsContainer.appendChild(chip);
     });
+
+    updateGuitarSuite(activeDegrees.join(","), currentKey);
   }
 
   // Subsequence matching for degree arrays
@@ -310,10 +336,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!wanted.includes(" ")) return candidates.some(k => k.split(" ")[0] === wanted);
     return false;
   }
-  function sortByEvidenceClient(songs) {
-    const rank = s => [s.match_kind === "loop" ? 0 : 1, CURATED_SOURCES.has(s.source) ? 0 : 1, -(s.match_occurrences || 0)];
+  const ICONIC_ROYAL_ROAD = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"];
+  function sortByEvidenceClient(songs, queryProg = "") {
+    const rank = s => {
+      let iconicOrder = 99;
+      if (queryProg === "4,5,3,6,2,5,1" || queryProg === "4536251") {
+        const rawTitle = s.title || "";
+        const idx = ICONIC_ROYAL_ROAD.findIndex(t => rawTitle.includes(t));
+        if (idx !== -1) iconicOrder = idx;
+      }
+      return [
+        iconicOrder,
+        s.match_kind === "loop" ? 0 : 1,
+        CURATED_SOURCES.has(s.source) ? 0 : 1,
+        -(s.match_occurrences || 0)
+      ];
+    };
     return songs.map((song, index) => ({ song, index, r: rank(song) }))
-      .sort((a, b) => a.r[0] - b.r[0] || a.r[1] - b.r[1] || a.r[2] - b.r[2] || a.index - b.index)
+      .sort((a, b) => a.r[0] - b.r[0] || a.r[1] - b.r[1] || a.r[2] - b.r[2] || a.r[3] - b.r[3] || a.index - b.index)
       .map(e => e.song);
   }
 
@@ -463,14 +503,30 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (!match) continue;
 
-      const k = `${s.title}|${s.artist}|${s.section || ''}`.toLowerCase();
+      const normTitle = (s.title || "").replace(/\s*[\(（].*?[\)）]\s*/g, "").trim().toLowerCase();
+      const normArtist = (s.artist || "").replace(/\s*[\(（].*?[\)）]\s*/g, "").trim().toLowerCase();
+      const k = (!textKeyword && clean) ? `${normTitle}|${normArtist}` : `${s.title}|${s.artist}|${s.section || ''}`.toLowerCase();
       if (seen.has(k)) continue;
       seen.add(k);
+
       const { degree_sequence: _seq, ...row } = s;
+      if (match.kind === "sequence") {
+        const matchingChords = targetDegs.map(d => degreeToChord(d, s.analysis_key || s.key));
+        const romanStr = targetDegs.map(d => romanMap[d] || d).join("-");
+        const secLabel = clean === "4,5,3,6,2,5,1"
+          ? "匹配乐段 (Royal Road 4-5-3-6-2-5-1)"
+          : `匹配乐段 (${clean})`;
+        row.progression = clean;
+        row.roman = romanStr;
+        row.chords = matchingChords;
+        row.section = secLabel;
+        row.primary_loop_progression = s.progression;
+        row.primary_loop_chords = s.chords;
+      }
       matches.push({ ...row, match_kind: match.kind, match_occurrences: match.occurrences });
     }
 
-    const ordered = targetDegs.length > 0 ? sortByEvidenceClient(matches) : matches;
+    const ordered = targetDegs.length > 0 ? sortByEvidenceClient(matches, clean) : matches;
     const degs = targetDegs.length > 0 ? targetDegs : (ordered[0]?.degrees || [1, 5, 6, 4]);
     const refC = degs.map(d => degreeToChord(d, "C"));
     const refG = degs.map(d => degreeToChord(d, "G"));
@@ -528,6 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </td>
         </tr>
       `;
+      updateGuitarSuite(data.progression, playKeySelect ? playKeySelect.value : "C");
       return;
     }
 
@@ -583,6 +640,116 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       songsTbody.appendChild(tr);
+    });
+
+    // Update Guitar Learning Suite with current progression & key
+    updateGuitarSuite(data.progression, playKeySelect ? playKeySelect.value : "C");
+  }
+
+  // Update Guitar Learning Suite (SVG chord boxes, Capo recommendation, Voicing, Secondary Dominant)
+  function updateGuitarSuite(overrideProg = null, overrideKey = null) {
+    if (!guitarSuiteCard || !chordBoxesContainer) return;
+
+    // 1. Determine active progression string
+    let progStr = "";
+    if (overrideProg) {
+      progStr = String(overrideProg);
+    } else if (currentSearchResults && currentSearchResults.progression) {
+      progStr = String(currentSearchResults.progression);
+    } else if (activeDegrees && activeDegrees.length > 0) {
+      progStr = activeDegrees.join(",");
+    } else {
+      progStr = "1,5,6,4";
+    }
+
+    const degs = progStr.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+    if (degs.length === 0) {
+      chordBoxesContainer.innerHTML = `<div class="prog-empty-hint">暂无和弦进行数据</div>`;
+      if (theoryTipCard) theoryTipCard.style.display = "none";
+      return;
+    }
+
+    // 2. Determine song original key
+    let songKey = overrideKey || (playKeySelect ? playKeySelect.value : "C");
+    if (!overrideKey && currentSearchResults && currentSearchResults.songs && currentSearchResults.songs.length > 0) {
+      const topSong = currentSearchResults.songs[0];
+      if (topSong.key) songKey = topSong.key;
+    }
+    const cleanKey = songKey.replace(/\s*(major|minor|m|maj)\b/i, "").trim() || "C";
+
+    // 3. Capo Calculation and display
+    const capoInfo = calculateCapo(cleanKey);
+
+    if (capoText) {
+      if (currentCapoShape === "C") {
+        const cCapo = capoInfo.cShapeCapo !== undefined ? capoInfo.cShapeCapo : capoInfo.capo;
+        if (cCapo === 0) {
+          capoText.innerHTML = `原曲 ${cleanKey} 调 → 使用 <strong>C 调指法 (不夹变调夹)</strong>`;
+        } else {
+          capoText.innerHTML = `原曲 ${cleanKey} 调 → 使用 <strong>C 调指法 (Capo ${cCapo} 品)</strong>`;
+        }
+      } else if (currentCapoShape === "G") {
+        const gCapo = capoInfo.gShapeCapo !== undefined ? capoInfo.gShapeCapo : capoInfo.capo;
+        if (gCapo === 0) {
+          capoText.innerHTML = `原曲 ${cleanKey} 调 → 使用 <strong>G 调指法 (不夹变调夹)</strong>`;
+        } else {
+          capoText.innerHTML = `原曲 ${cleanKey} 调 → 使用 <strong>G 调指法 (Capo ${gCapo} 品)</strong>`;
+        }
+      } else {
+        capoText.innerHTML = capoInfo.text;
+      }
+    }
+
+    // 4. Effective Key for Fingering Shapes
+    let effectiveKey = cleanKey;
+    if (currentCapoShape === "C") {
+      effectiveKey = "C";
+    } else if (currentCapoShape === "G") {
+      effectiveKey = "G";
+    }
+
+    // 5. Calculate Chord Names (Triad vs 7th)
+    const chordNames = getProgressionVoicings(degs, effectiveKey, currentVoicing);
+
+    // 6. Secondary Dominant Detection (E7 -> Am / III7 -> vi)
+    const secDom = detectSecondaryDominant(progStr, chordNames, effectiveKey);
+
+    if (theoryTipCard) {
+      if (secDom.isSecondaryDominant) {
+        theoryTipCard.style.display = "block";
+        if (theoryTipBody) theoryTipBody.textContent = secDom.explanation;
+      } else {
+        theoryTipCard.style.display = "none";
+      }
+    }
+
+    // 7. Render Interactive SVG Chord Boxes
+    chordBoxesContainer.innerHTML = "";
+    chordNames.forEach((chord, idx) => {
+      const card = document.createElement("div");
+      card.className = "chord-box-card";
+      card.dataset.chord = chord;
+      card.setAttribute("title", `点击试听 ${chord} 吉他扫弦`);
+
+      const romanLabel = romanMap[degs[idx]] || degs[idx];
+      const orderLabel = `${idx + 1}/${chordNames.length} · ${romanLabel}`;
+      const svgString = renderGuitarChordSVG(chord);
+
+      card.innerHTML = `
+        <div class="chord-box-order">${escapeHtml(orderLabel)}</div>
+        ${svgString}
+        <div class="chord-box-action-hint">点击扫弦 ♫</div>
+      `;
+
+      card.addEventListener("click", () => {
+        if (window.chordSynth) {
+          window.chordSynth.strumGuitarChord(chord, 1.4, true);
+        }
+        card.classList.add("active-strum");
+        setTimeout(() => card.classList.remove("active-strum"), 400);
+      });
+
+      chordBoxesContainer.appendChild(card);
     });
   }
 
@@ -1083,6 +1250,38 @@ document.addEventListener("DOMContentLoaded", () => {
     a.click();
     URL.revokeObjectURL(url);
   });
+
+  // Guitar Suite Controls Event Listeners
+  if (voicingToggle) {
+    voicingToggle.querySelectorAll(".seg-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        voicingToggle.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentVoicing = btn.dataset.voicing || "triad";
+        updateGuitarSuite();
+      });
+    });
+  }
+
+  if (instrumentToggle) {
+    instrumentToggle.querySelectorAll(".seg-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        instrumentToggle.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const inst = btn.dataset.inst || "guitar";
+        if (window.chordSynth) {
+          window.chordSynth.setInstrument(inst);
+        }
+      });
+    });
+  }
+
+  if (capoShapeSelect) {
+    capoShapeSelect.addEventListener("change", (e) => {
+      currentCapoShape = e.target.value;
+      updateGuitarSuite();
+    });
+  }
 
   // Initial Boot: a URL that carries ?q= is the source of truth.
   const hadUrlQuery = readUrlState();

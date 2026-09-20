@@ -113,33 +113,40 @@ class YopuImporter:
 
     def extract_score_id(self, input_str: str) -> str:
         """Extract Yopu score ID from URL or raw ID."""
-        match = re.search(r"yopu\.co/(?:view|sheet)/([a-zA-Z0-9_-]+)", input_str)
+        if not input_str or not str(input_str).strip():
+            return ""
+        clean = str(input_str).strip()
+        match = re.search(r"yopu\.co/(?:view|sheet)/([a-zA-Z0-9_-]+)", clean)
         if match:
             return match.group(1)
-        clean = input_str.strip().split("/")[-1].split("?")[0]
-        return clean
+        return clean.split("/")[-1].split("?")[0].strip()
 
     def fetch_score_data(self, score_id_or_url: str) -> Dict[str, Any]:
         """
         Fetches score data from Yopu.co using canonical yopu client or fallback HTML.
+        Raises ConnectionError or ValueError on failure. Never returns dummy data.
         """
         score_id = self.extract_score_id(score_id_or_url)
+        if not score_id:
+            raise ValueError("Score ID or URL is required.")
         url = f"https://yopu.co/view/{score_id}"
         
+        last_error = None
         if yopu_fetch_score_data is not None:
             try:
                 sheet_data = yopu_fetch_score_data(score_id)
-                return {
-                    "id": score_id,
-                    "title": sheet_data.get("title", "Untitled"),
-                    "artist": sheet_data.get("artist", ""),
-                    "url": url,
-                    "html": "",
-                    "article": sheet_data.get("lyrics", ""),
-                    "sheet_data": sheet_data,
-                }
-            except Exception:
-                pass
+                if sheet_data:
+                    return {
+                        "id": score_id,
+                        "title": sheet_data.get("title", "Untitled"),
+                        "artist": sheet_data.get("artist", ""),
+                        "url": url,
+                        "html": "",
+                        "article": sheet_data.get("lyrics", ""),
+                        "sheet_data": sheet_data,
+                    }
+            except Exception as e:
+                last_error = e
 
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -152,18 +159,26 @@ class YopuImporter:
             with urllib.request.urlopen(req, timeout=12) as resp:
                 html = resp.read().decode("utf-8", errors="replace")
         except Exception as e:
-            # Fallback mock/offline handler for testing if network restricted
-            raise ConnectionError(f"Failed to connect to Yopu ({url}): {e}")
+            msg = f"Failed to connect to Yopu ({url}): {e}"
+            if last_error:
+                msg += f" (yopu-client: {last_error})"
+            raise ConnectionError(msg) from e
 
         # Extract title and artist
         title_m = re.search(r"<title>(.*?)</title>", html, re.DOTALL | re.IGNORECASE)
-        raw_title = title_m.group(1) if title_m else "Untitled"
+        raw_title = title_m.group(1) if title_m else ""
+        if not raw_title or raw_title.strip() in ("404 Not Found", "页面未找到", "404"):
+            raise ValueError(f"Score '{score_id}' not found on Yopu.co (HTTP 404 or empty title).")
+
         clean_title = re.sub(r"\s*(?:吉他和弦谱|吉他谱|和弦谱|尤克里里谱|尤克里里和弦谱|钢琴谱|弹唱谱)\s*$", "", raw_title).strip()
         parts = clean_title.split("-", 1)
         if len(parts) == 2:
             title, artist = parts[0].strip(), parts[1].strip()
         else:
             title, artist = clean_title, ""
+
+        if not title or title in ("404 Not Found", "页面未找到"):
+            raise ValueError(f"Score '{score_id}' not found or has invalid title.")
 
         # Extract article lyrics text
         art_m = re.search(r"<article>(.*?)</article>", html, re.DOTALL | re.IGNORECASE)
@@ -343,66 +358,135 @@ class YopuImporter:
     ) -> ImportedSong:
         """
         Parse a Yopu URL, ID, or raw chord sheet into a cleaned, structured ImportedSong.
+        Fails cleanly with ValueError/RuntimeError on empty input, invalid IDs, or fetch errors.
+        Never fabricates dummy songs.
         """
-        if score_input.startswith("http") or len(score_input) < 15 and " " not in score_input:
+        if not score_input or not str(score_input).strip():
+            raise ValueError("Score ID, URL, or chord text cannot be empty.")
+        clean_input = str(score_input).strip()
+
+        is_url = (
+            clean_input.startswith("http://")
+            or clean_input.startswith("https://")
+            or "yopu.co/" in clean_input
+        )
+        is_score_id = (
+            not is_url
+            and "\n" not in clean_input
+            and " " not in clean_input
+            and not clean_input.startswith("local://")
+            and bool(re.match(r"^[a-zA-Z0-9_-]{4,64}$", clean_input))
+        )
+
+        if is_url or is_score_id:
             try:
-                data = self.fetch_score_data(score_input)
-                title = custom_title or data["title"]
-                artist = custom_artist or data["artist"]
-                score_id = data["id"]
-                url = data["url"]
-                article_text = data["article"]
-            except Exception:
-                # If network fetch fails, parse as ID or title
-                score_id = self.extract_score_id(score_input)
-                title = custom_title or f"Song #{score_id}"
-                artist = custom_artist or "华语歌手"
-                url = f"https://yopu.co/view/{score_id}"
-                article_text = ""
+                data = self.fetch_score_data(clean_input)
+            except Exception as e:
+                raise RuntimeError(f"Failed to fetch Yopu score '{clean_input}': {e}") from e
+
+            title = custom_title or data.get("title") or "Untitled"
+            artist = custom_artist or data.get("artist") or "Unknown Artist"
+            score_id = data.get("id") or self.extract_score_id(clean_input)
+            url = data.get("url") or f"https://yopu.co/view/{score_id}"
+            article_text = data.get("article") or ""
+            sheet_data = data.get("sheet_data") or {}
         else:
-            score_id = "custom_" + str(abs(hash(score_input)) % 100000)
+            score_id = "custom_" + str(abs(hash(clean_input)) % 100000)
             title = custom_title or "Custom Song"
             artist = custom_artist or "Unknown Artist"
             url = "local://chord_sheet"
-            article_text = score_input
+            article_text = clean_input
+            sheet_data = {}
 
-        # Detect chords in text
-        chord_regex = r"([A-G][b#]?(?:m|maj|min|dim|aug|sus[24]?|add[29]?|7|9|11|13|maj7|m7|m7b5|6)?(?:/[A-G][b#]?)?)"
-        chords_found = re.findall(chord_regex, article_text)
+        # 1. First priority for chords: structured sheet_data["chords"]
+        chords_found = []
+        if sheet_data.get("chords"):
+            chords_found = [str(c).strip("[]") for c in sheet_data["chords"] if str(c).strip("[]")]
+
+        # 2. Fallback: Detect chords in text/article
+        if not chords_found:
+            chord_regex_word = r"\b([A-G][b#]?(?:m|maj|min|dim|aug|sus[24]?|add[29]?|7|9|11|13|maj7|m7|m7b5|6)?(?:/[A-G][#b]?)?)\b"
+            for tok in re.findall(chord_regex_word, article_text):
+                # Filter out standalone English 'A' or 'I' unless chords list is active
+                if tok not in ("A", "I") or len(chords_found) > 0:
+                    chords_found.append(tok)
 
         # Detect Key and Capo
         capo = custom_capo
-        capo_m = re.search(r"(?:变调夹|Capo)[:：\s]*(\d+)", article_text, re.IGNORECASE)
-        if capo_m and custom_capo == 0:
-            capo = int(capo_m.group(1))
+        if custom_capo == 0:
+            if "capo" in sheet_data:
+                capo = int(sheet_data.get("capo") or 0)
+            else:
+                capo_m = re.search(r"(?:变调夹|Capo)[:：\s]*(\d+)", article_text, re.IGNORECASE)
+                if capo_m:
+                    capo = int(capo_m.group(1))
 
-        detected_key = custom_key or "C"
-        key_m = re.search(r"(?:原调|选调|Key)[:：\s]*([A-G][b#]?m?)", article_text, re.IGNORECASE)
-        if key_m and not custom_key:
-            detected_key = key_m.group(1).replace("1=", "").strip()
+        detected_key = custom_key
+        if not detected_key:
+            if sheet_data.get("key"):
+                detected_key = str(sheet_data["key"]).strip()
+            else:
+                key_m = re.search(r"(?:原调|选调|Key)[:：\s]*([A-G][b#]?m?)", article_text, re.IGNORECASE)
+                if key_m:
+                    detected_key = key_m.group(1).replace("1=", "").strip()
+                elif chords_found:
+                    root_cand = chords_found[0].split("/")[0]
+                    detected_key = root_cand.rstrip("m").rstrip("maj7").rstrip("7") or "C"
+                else:
+                    detected_key = "C"
 
         # Handle degree notations if in article (e.g. 6m 4 5 6m)
-        degree_regex = r"([1-7]m?|[IViv]+)"
+        degree_regex = r" ([1-7]m?|[IViv]+) "
         degree_tokens = re.findall(degree_regex, article_text)
         
-        primary_progression = "1,5,6,4"
+        primary_progression = ""
         if chords_found:
             loops = self.detect_harmonic_loops(chords_found, key_root=detected_key.split()[0])
             if loops:
                 primary_progression = loops[0][0]
+            else:
+                degs = progression_to_scale_degrees(chords_found, key_root=detected_key.split()[0])
+                clean_degs = [str(d) for d in degs if d > 0]
+                if len(clean_degs) >= 4:
+                    primary_progression = ",".join(clean_degs[:4])
+                elif clean_degs:
+                    primary_progression = ",".join(clean_degs)
         elif degree_tokens:
             deg_clean = [t.replace("m", "") for t in degree_tokens if t[0].isdigit()]
             if len(deg_clean) >= 4:
                 primary_progression = ",".join(deg_clean[:4])
+            elif deg_clean:
+                primary_progression = ",".join(deg_clean)
 
         # Apply Capo Transposition if Capo is specified
         concert_key = detected_key
         if capo > 0:
             concert_key = transpose_note_name(detected_key.split()[0], capo) + " major"
 
-        comma_str, roman_str, degrees = normalize_progression_input(primary_progression)
-        prog_name = get_progression_name(comma_str)
-        concrete_chords = scale_degrees_to_chords(degrees, detected_key.split()[0], "major")
+        if primary_progression:
+            comma_str, roman_str, degrees = normalize_progression_input(primary_progression)
+            prog_name = get_progression_name(comma_str)
+            concrete_chords = scale_degrees_to_chords(degrees, detected_key.split()[0], "major")
+
+            # Map rich authentic chords from chords_found when available
+            if chords_found:
+                key_root = detected_key.split()[0]
+                rich_chords = []
+                for deg in degrees:
+                    found_match = None
+                    for c in chords_found:
+                        c_deg = progression_to_scale_degrees([c], key_root=key_root)
+                        if c_deg and c_deg[0] == deg:
+                            found_match = c
+                            break
+                    rich_chords.append(found_match if found_match else scale_degrees_to_chords([deg], key_root)[0])
+                concrete_chords = rich_chords
+        else:
+            comma_str = ""
+            roman_str = ""
+            degrees = []
+            prog_name = None
+            concrete_chords = []
 
         # Sample lyrics snippet
         clean_lines = [l.strip() for l in article_text.splitlines() if l.strip() and not l.startswith("★")]

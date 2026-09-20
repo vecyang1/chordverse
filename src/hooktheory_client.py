@@ -16,9 +16,9 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
 try:
-    from .roman_engine import normalize_progression_input, ROMAN_MAJOR
+    from .roman_engine import normalize_progression_input, ROMAN_MAJOR, matches_progression_sequence
 except ImportError:
-    from roman_engine import normalize_progression_input, ROMAN_MAJOR
+    from roman_engine import normalize_progression_input, ROMAN_MAJOR, matches_progression_sequence
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -38,9 +38,41 @@ class SongEntry:
     url: Optional[str] = None
     language: str = "en"
     source: str = "hooktheory"
+    chords: Optional[List[str]] = None
+    match_kind: Optional[str] = None
+    match_occurrences: Optional[int] = None
+    primary_loop_progression: Optional[str] = None
+    primary_loop_chords: Optional[List[str]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+
+def extract_hit_degrees(hit: Dict[str, Any]) -> List[int]:
+    """Extract scale degree root sequence from Hooktheory Meilisearch hit."""
+    sind = hit.get("SInD", "")
+    if sind:
+        tokens = [t.strip() for piece in sind.split("qq") for t in piece.split() if t.strip()]
+        degs = []
+        for t in tokens:
+            m = re.match(r"^[b#]?([1-7])", t)
+            if m:
+                degs.append(int(m.group(1)))
+        if degs:
+            return degs
+    rel = hit.get("chordRelBare", "") or hit.get("chordRel", "")
+    if rel:
+        tokens = [t.strip() for piece in rel.split("qq") for t in piece.split() if t.strip()]
+        roman_map = {"i": 1, "ii": 2, "iii": 3, "iv": 4, "v": 5, "vi": 6, "vii": 7}
+        degs = []
+        for t in tokens:
+            clean = re.sub(r"\(.*?\)", "", t).split("slash")[0].split("/")[0].lower()
+            clean = re.sub(r"[b#]", "", clean)
+            if clean in roman_map:
+                degs.append(roman_map[clean])
+        if degs:
+            return degs
+    return []
 
 
 class HooktheoryClient:
@@ -121,7 +153,7 @@ class HooktheoryClient:
         
         # If API returns empty or no token, use web search index / chord-search fallback
         if not all_songs:
-            all_songs = self._fetch_via_search(comma_str, roman_str, max_pages)
+            all_songs = self._fetch_via_search(comma_str, roman_str, max_pages, target_degrees=degrees)
 
         # Save to cache if found
         if all_songs and self.cache_enabled:
@@ -168,9 +200,20 @@ class HooktheoryClient:
                 break
         return results
 
-    def _fetch_via_search(self, comma_str: str, roman_str: str, max_pages: int) -> List[SongEntry]:
-        """Fetch songs using Hooktheory's search index (no auth required)."""
+    def _fetch_via_search(
+        self,
+        comma_str: str,
+        roman_str: str,
+        max_pages: int,
+        target_degrees: Optional[List[int]] = None
+    ) -> List[SongEntry]:
+        """Fetch songs using Hooktheory's search index (no auth required) with zero-hallucination validation."""
+        if target_degrees is None:
+            _, _, target_degrees = normalize_progression_input(comma_str)
+
         results: List[SongEntry] = []
+        seen_ids = set()
+
         # Query search index with Roman chord string e.g. "I V vi IV"
         search_token = "YHXUiQCa6024e2a88cb48f226a94d16db0c20d993e0a424cfde7834b697445bdf280ce88"
         url = "https://search.hooktheory.com/indexes/theorytabs/search"
@@ -181,43 +224,66 @@ class HooktheoryClient:
             "Origin": "https://www.hooktheory.com",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
         }
-        
+
+        query_terms = [roman_str.replace("-", " ")]
+        if comma_str == "1,5,6,3,4,1,2,5":
+            query_terms.append("Canon in D")
+
         limit_per_page = 20
-        for page in range(1, max_pages + 1):
-            offset = (page - 1) * limit_per_page
-            # Query by progression Roman numerals e.g. "I V vi IV" or scale degrees "1 5 6 4"
-            payload = json.dumps({
-                "q": roman_str.replace("-", " "),
-                "limit": limit_per_page,
-                "offset": offset
-            }).encode("utf-8")
-            
-            try:
-                self._rate_limit()
-                req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    data = json.loads(resp.read().decode("utf-8"))
-                    hits = data.get("hits", [])
-                    if not hits:
-                        break
-                    for hit in hits:
-                        s = SongEntry(
-                            id=str(hit.get("id", "")),
-                            title=hit.get("song", "Unknown"),
-                            artist=hit.get("artist", "Unknown"),
-                            section=hit.get("section", "Section"),
-                            key=hit.get("key", "C major"),
-                            progression=comma_str,
-                            roman_progression=roman_str,
-                            ytid=hit.get("ytid"),
-                            url=f"https://www.hooktheory.com/theorytab/view/{hit.get('artist', '').lower().replace(' ', '-')}/{hit.get('song', '').lower().replace(' ', '-')}",
-                            language="en",
-                            source="hooktheory"
-                        )
-                        results.append(s)
-            except Exception:
+        for q_term in query_terms:
+            for page in range(1, max_pages + 1):
+                offset = (page - 1) * limit_per_page
+                payload = json.dumps({
+                    "q": q_term,
+                    "limit": limit_per_page,
+                    "offset": offset
+                }).encode("utf-8")
+
+                try:
+                    self._rate_limit()
+                    req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+                    with urllib.request.urlopen(req, timeout=10) as resp:
+                        data = json.loads(resp.read().decode("utf-8"))
+                        hits = data.get("hits", [])
+                        if not hits:
+                            break
+                        for hit in hits:
+                            hit_id = str(hit.get("id", ""))
+                            if hit_id in seen_ids:
+                                continue
+
+                            # Zero-hallucination validation: candidate MUST contain target degrees
+                            hit_degrees = extract_hit_degrees(hit)
+                            if not matches_progression_sequence(hit_degrees, target_degrees):
+                                continue
+
+                            seen_ids.add(hit_id)
+                            chords_raw = hit.get("chordAbsBare") or hit.get("chordAbs", "")
+                            chords_list = [c.strip() for c in chords_raw.split("qq") if c.strip()]
+                            matching_chords = chords_list[:len(target_degrees)] if chords_list else None
+
+                            s = SongEntry(
+                                id=hit_id,
+                                title=hit.get("song", "Unknown"),
+                                artist=hit.get("artist", "Unknown"),
+                                section=hit.get("section", "Section"),
+                                key=hit.get("key", "C major"),
+                                progression=comma_str,
+                                roman_progression=roman_str,
+                                ytid=hit.get("ytid"),
+                                url=f"https://www.hooktheory.com/theorytab/view/{hit.get('artist', '').lower().replace(' ', '-')}/{hit.get('song', '').lower().replace(' ', '-')}",
+                                language="en",
+                                source="hooktheory",
+                                chords=matching_chords,
+                                match_kind="sequence"
+                            )
+                            results.append(s)
+                except Exception:
+                    break
+            if results:
                 break
         return results
+
 
     def get_next_chord_probabilities(self, progression: str) -> List[Dict[str, Any]]:
         """

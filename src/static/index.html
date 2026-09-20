@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChordVerse | 零幻觉和弦进行搜索与乐理分析引擎 (1-5-6-4 & Extensible)</title>
-  <link rel="stylesheet" href="/styles.css?v=1.3.0">
+  <link rel="stylesheet" href="/styles.css?v=1.6.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -279,6 +279,67 @@
           </div>
         </div>
 
+        <!-- Guitar Learning Suite -->
+        <div class="guitar-suite-card" id="guitar-suite-card">
+          <div class="guitar-suite-header">
+            <div class="suite-title-group">
+              <span class="suite-icon">🎸</span>
+              <h3>吉他学习与和弦把位 (Guitar Learning Suite)</h3>
+              <span class="badge badge-guitar">新手友好指法</span>
+            </div>
+            <div class="suite-controls">
+              <!-- Voicing Toggle -->
+              <div class="control-group">
+                <label>和弦色彩:</label>
+                <div class="segmented-control" id="voicing-toggle">
+                  <button type="button" class="seg-btn active" data-voicing="triad">流行基础三和弦</button>
+                  <button type="button" class="seg-btn" data-voicing="seventh">华语/J-Pop 七和弦扩展</button>
+                </div>
+              </div>
+              <!-- Instrument Audio Toggle -->
+              <div class="control-group">
+                <label>试听音色:</label>
+                <div class="segmented-control" id="instrument-toggle">
+                  <button type="button" class="seg-btn active" data-inst="guitar">🎸 吉他扫弦</button>
+                  <button type="button" class="seg-btn" data-inst="piano">🎹 键盘钢琴</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Capo Assistant Strip -->
+          <div class="capo-bar" id="capo-bar">
+            <div class="capo-info">
+              <span class="capo-badge">🪕 变调夹推荐</span>
+              <span id="capo-text">原曲调性把位 (无需变调夹)</span>
+            </div>
+            <div class="capo-selector-wrap">
+              <label for="capo-shape-select">演奏把位形状:</label>
+              <select id="capo-shape-select">
+                <option value="original" selected>原曲调性把位</option>
+                <option value="C">C 调指法 (变调夹)</option>
+                <option value="G">G 调指法 (变调夹)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Secondary Dominant Callout Card -->
+          <div class="theory-tip-card" id="theory-tip-card" style="display: none;">
+            <div class="tip-header">
+              <span class="tip-badge">💡 乐理精讲</span>
+              <span class="tip-title">副属和弦 E7 (III7) → Am (vi) 的神级推动力</span>
+            </div>
+            <p class="tip-body" id="theory-tip-body">
+              💡 乐理精讲：副属和弦 E7 (III7) → Am (vi) 的神级推动力。在 C 大调中，三级自然小三和弦为 Em (E-G-B)。升级为副属七和弦 E7 (E-G#-B-D) 引入了调外半音变化音 G#，与六级 Am 根音 A 构成极其强烈的半音导向（G# → A），同时 E7 与 Am 构成局部的属到主解决（V7/vi → vi），赋予流行大金曲（如《凄美地》《水星记》《青花瓷》）无可替代的叙事张力与情感爆发！
+            </p>
+          </div>
+
+          <!-- Interactive SVG Chord Boxes Horizontal Carousel / Grid -->
+          <div class="chord-boxes-scroll" id="chord-boxes-container">
+            <!-- SVG chord diagrams rendered here dynamically -->
+          </div>
+        </div>
+
         <!-- Songs List / Grid -->
         <div class="songs-table-wrapper">
           <table class="songs-table">
@@ -311,7 +372,8 @@
     </footer>
   </div>
 
-  <script src="/audio_synth.js?v=1.3.0"></script>
-  <script src="/app.js?v=1.3.0"></script>
+  <script type="module" src="/guitar_suite.js?v=1.6.0"></script>
+  <script src="/audio_synth.js?v=1.6.0"></script>
+  <script type="module" src="/app.js?v=1.6.0"></script>
 </body>
 </html>

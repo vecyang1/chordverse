@@ -197,6 +197,10 @@ class YopuImporter:
         """
         Search Yopu.co for lead sheets matching a song title, artist, or query keyword.
         """
+        raw_q = str(query or "").strip()
+        cleaned_q = re.sub(r"[\(（\[【][^\)）\]】]*[\)）\]】]", " ", raw_q)
+        cleaned_q = re.sub(r"\s+", " ", cleaned_q).strip()
+        query = cleaned_q if cleaned_q else re.sub(r"[\(（\)）\[\]【】]", " ", raw_q).strip()
         if search_yopu_scores is not None:
             try:
                 live = search_yopu_scores(query=query, page=page, instrument=instrument)
@@ -205,7 +209,7 @@ class YopuImporter:
                 pass
 
         params = {
-            "q": query.strip(),
+            "q": query,
             "page": page,
             "instrument": instrument
         }

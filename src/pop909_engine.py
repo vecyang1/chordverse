@@ -215,7 +215,7 @@ class ChinesePopEngine:
                     results.append(song)
 
         if comma_str == "4,5,3,6,2,5,1":
-            iconic_order = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"]
+            iconic_order = ["水星记", "漠河舞厅", "乌梅子酱", "青花瓷"]
             def sort_key(s: SongEntry):
                 t = s.title or ""
                 for idx, name in enumerate(iconic_order):

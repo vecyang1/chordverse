@@ -247,9 +247,41 @@ export const KEY_TO_SEMITONE = {
   "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11
 };
 
+export const MINOR_TO_RELATIVE_MAJOR = {
+  "Am": "C", "A minor": "C", "Amin": "C",
+  "Em": "G", "E minor": "G", "Emin": "G",
+  "Bm": "D", "B minor": "D", "Bmin": "D",
+  "F#m": "A", "F# minor": "A", "F#min": "A",
+  "C#m": "E", "C# minor": "E", "C#min": "E",
+  "G#m": "B", "G# minor": "B", "G#min": "B",
+  "Dm": "F", "D minor": "F", "Dmin": "F",
+  "Gm": "Bb", "G minor": "Bb", "Gmin": "Bb",
+  "Cm": "Eb", "C minor": "Eb", "Cmin": "Eb",
+  "Fm": "Ab", "F minor": "Ab", "Fmin": "Ab",
+  "Bbm": "Db", "Bb minor": "Db", "Bbmin": "Db",
+  "Ebm": "Gb", "Eb minor": "Gb", "Ebmin": "Gb"
+};
+
 export function normalizeKeyRoot(keyStr) {
   if (!keyStr) return "C";
-  const clean = keyStr.replace(/\s*(major|minor|m|maj)\b/i, "").trim();
+  let str = String(keyStr).trim();
+  if (str.includes("/")) {
+    const parts = str.split("/").map((p) => p.trim());
+    const majorPart = parts.find((p) => /major/i.test(p));
+    if (majorPart) {
+      str = majorPart;
+    } else {
+      const nonMinorPart = parts.find((p) => !/minor\b|min\b/i.test(p));
+      str = nonMinorPart || parts[0];
+    }
+  }
+
+  const clean = str.replace(/\s*(major|minor|m|maj)\b/i, "").trim();
+  const m = clean.match(/^[A-G][#b]?/i);
+  if (m) {
+    const root = m[0][0].toUpperCase() + (m[0][1] ? m[0][1].toLowerCase() : "");
+    if (KEY_TO_SEMITONE[root] !== undefined) return root;
+  }
   return clean || "C";
 }
 

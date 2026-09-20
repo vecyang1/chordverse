@@ -222,82 +222,79 @@
   },
   {
     "id": "zh_new_01",
-    "title": "水星记 (Mercury Records)",
+    "title": "水星记 (Mercury)",
     "artist": "郭顶 (Guo Ding)",
-    "key": "C major",
+    "key": "F major",
     "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "F",
-      "G",
-      "Em",
+      "Bb",
+      "C",
       "Am",
       "Dm",
-      "G",
-      "C"
+      "Gm",
+      "C",
+      "F"
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "现代华语神级王道进行 (4-5-3-6-2-5-1)：F - G - Em - Am - Dm - G - C",
+    "description": "现代华语神级王道进行 (4-5-3-6-2-5-1)：Bb - C - Am - Dm - Gm - C - F",
     "notes": "还要多远才能进入你的心 还要多久才能和你接近"
   },
   {
     "id": "zh_new_02",
     "title": "凄美地 (Beauty In The Breakdown)",
     "artist": "郭顶 (Guo Ding)",
-    "key": "C major",
+    "key": "G# minor / B major",
     "section": "Chorus (副歌)",
-    "progression": "4,5,3,6,2,5,1",
+    "progression": "6,4,1,3",
     "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
+      "G#m",
+      "E",
+      "B",
+      "D#"
     ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "独立摇滚王道进行神作：F - G - Em - Am - Dm - G - C",
-    "notes": "如此凄美地 曾经拥有你"
+    "roman": "vi-IV-I-III",
+    "description": "B大调/G#小调 6-4-1-3 凄美张力进行：G#m - E - B - D#",
+    "notes": "如此不可思议 如此不可自拔 如此凄美地"
   },
   {
     "id": "zh_new_03",
     "title": "漠河舞厅 (Mohe Ballroom)",
     "artist": "柳爽 (Liu Shuang)",
-    "key": "C major",
+    "key": "G major",
     "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "F",
-      "G",
+      "C",
+      "D",
+      "Bm",
       "Em",
       "Am",
-      "Dm",
-      "G",
-      "C"
+      "D",
+      "G"
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "爆款民谣叙事王道进行：F - G - Em - Am - Dm - G - C",
+    "description": "G大调爆款民谣叙事王道进行：C - D - Bm - Em - Am - D - G",
     "notes": "如果时间能够倒流 我会在漠河舞厅等候"
   },
   {
     "id": "zh_new_04",
     "title": "乌梅子酱 (Plum Sauce)",
     "artist": "李荣浩 (Ronghao Li)",
-    "key": "C major",
+    "key": "Db major",
     "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
+      "Gb",
+      "Ab",
+      "Fm",
+      "Bbm",
+      "Ebm",
+      "Ab",
+      "Db"
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "全民刷屏小甜歌王道进行：F - G - Em - Am - Dm - G - C",
+    "description": "Db大调全民刷屏小甜歌王道进行：Gb - Ab - Fm - Bbm - Ebm - Ab - Db",
     "notes": "你浅浅的微笑就像 乌梅子酱"
   },
   {
@@ -338,108 +335,108 @@
     "id": "zh_new_07",
     "title": "嘉宾 (Guest)",
     "artist": "张远 (Bird Zhang)",
-    "key": "C major",
+    "key": "F# major",
     "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
+      "B",
+      "C#",
+      "A#m",
+      "D#m",
+      "G#m",
+      "C#",
+      "F#"
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "经典失恋婚礼大合唱王道进行：F - G - Em - Am - Dm - G - C",
+    "description": "F#大调经典失恋婚礼大合唱王道进行：B - C# - A#m - D#m - G#m - C# - F#",
     "notes": "感谢你特别邀请 可惜我只是个嘉宾"
   },
   {
     "id": "zh_new_08",
     "title": "若月亮没来 (If The Moon Doesn't Come)",
     "artist": "王宇宙 / 乔浚丞",
-    "key": "C major",
+    "key": "Ab major",
     "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
+      "Db",
+      "Eb",
+      "Cm",
+      "Fm",
+      "Bbm",
+      "Eb",
+      "Ab"
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "2024-2026 爆款治愈系王道金曲：F - G - Em - Am - Dm - G - C",
+    "description": "Ab大调爆款治愈系王道金曲：Db - Eb - Cm - Fm - Bbm - Eb - Ab",
     "notes": "若月亮没来 路灯也可照亮窗台"
   },
   {
     "id": "zh_new_09",
     "title": "离别开出花 (Flowers Bloom on Farewell)",
     "artist": "南方凯",
-    "key": "C major",
+    "key": "Db major",
     "section": "Chorus (副歌)",
     "progression": "1,5,6,4",
     "chords": [
-      "C",
-      "G",
-      "Am",
-      "F"
+      "Db",
+      "Ab",
+      "Bbm",
+      "Gb"
     ],
     "roman": "I-V-vi-IV",
-    "description": "2023-2025 全民励志热单 1564：C - G - Am - F",
+    "description": "Db大调全民励志热单 1564：Db - Ab - Bbm - Gb",
     "notes": "要相信离别也能开出花 只要你勇敢走向它"
   },
   {
     "id": "zh_new_10",
     "title": "奢香夫人 (Lady Shexiang)",
     "artist": "凤凰传奇 (Phoenix Legend)",
-    "key": "A minor / C major",
+    "key": "F# minor / A major",
     "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
     "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
+      "F#m",
+      "D",
+      "A",
+      "E"
     ],
     "roman": "vi-IV-I-V",
-    "description": "民族流行神曲副歌 6415：Am - F - C - G",
+    "description": "A大调/F#小调 民族流行神曲副歌 6415：F#m - D - A - E",
     "notes": "乌蒙山连着山外山 月光洒在响水滩"
   },
   {
     "id": "zh_new_11",
     "title": "诀爱 (Parting Love)",
     "artist": "詹雯婷 (Faye)",
-    "key": "A minor / C major",
+    "key": "G# minor / B major",
     "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
     "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
+      "G#m",
+      "E",
+      "B",
+      "F#"
     ],
     "roman": "vi-IV-I-V",
-    "description": "仙侠爆款《苍兰诀》主题曲高燃副歌：Am - F - C - G",
+    "description": "B大调/G#小调 仙侠爆款《苍兰诀》主题曲高燃副歌：G#m - E - B - F#",
     "notes": "等天崩地裂的那一瞬间 我要在你身边"
   },
   {
     "id": "zh_new_12",
     "title": "最伟大的作品 (Greatest Works of Art)",
     "artist": "周杰伦 (Jay Chou)",
-    "key": "A minor / C major",
+    "key": "G minor / Bb major",
     "section": "Verse & Chorus",
     "progression": "6,4,1,5",
     "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
+      "Gm",
+      "Eb",
+      "Bb",
+      "F"
     ],
     "roman": "vi-IV-I-V",
-    "description": "暗黑古典融合流行 6415 循环：Am - F - C - G",
+    "description": "Bb大调/G小调 暗黑古典融合流行 6415 循环：Gm - Eb - Bb - F",
     "notes": "哥穿着复古西装 拿着油画笔"
   },
   {
@@ -767,20 +764,20 @@
   },
   {
     "id": "zh_020",
-    "title": "演员 (Actor)",
-    "artist": "薛之谦 (Joker Xue)",
-    "key": "B major",
+    "title": "再见 (Goodbye)",
+    "artist": "张震岳 (A-Yue)",
+    "key": "G major",
     "section": "Chorus (副歌)",
     "progression": "1,5,6,4",
     "chords": [
-      "B",
-      "F#",
-      "G#m",
-      "E"
+      "G",
+      "D",
+      "Em",
+      "C"
     ],
     "roman": "I-V-vi-IV",
-    "description": "B大调 1564 流行副歌：B - F# - G#m - E",
-    "notes": "简单点 说话的方式简单点"
+    "description": "G大调经典 1564 毕业摇滚金曲：G - D - Em - C",
+    "notes": "我不能答应你 我是否会再回来 不回头 不回头地走下去"
   },
   {
     "id": "zh_021",
@@ -854,17 +851,17 @@
     "id": "zh_027",
     "title": "夜曲 (Nocturne)",
     "artist": "周杰伦 (Jay Chou)",
-    "key": "Bb minor",
+    "key": "Bb minor / Db major",
     "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
     "chords": [
-      "Gm",
-      "Eb",
-      "Bb",
-      "F"
+      "Bbm",
+      "Gb",
+      "Db",
+      "Ab"
     ],
     "roman": "vi-IV-I-V",
-    "description": "流行暗黑 6415 进行：Gm - Eb - Bb - F",
+    "description": "流行暗黑 6415 进行 (原调 Bbm / 关系大调 Db)：Bbm - Gb - Db - Ab（吉他可夹 3 品弹 Gm-Eb-Bb-F）",
     "notes": "为你弹奏萧邦的夜曲 纪念我死去的爱情"
   },
   {
@@ -886,20 +883,20 @@
   },
   {
     "id": "zh_029",
-    "title": "泡沫 (Bubble)",
-    "artist": "邓紫棋 (G.E.M.)",
-    "key": "C major",
+    "title": "夜空中最亮的星 (The Brightest Star in the Night Sky)",
+    "artist": "逃跑计划 (Escape Plan)",
+    "key": "B major",
     "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
     "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
+      "G#m",
+      "E",
+      "B",
+      "F#"
     ],
     "roman": "vi-IV-I-V",
-    "description": "C大调 6415 情感撕裂副歌：Am - F - C - G",
-    "notes": "全都是泡沫 这一刹的花火"
+    "description": "B大调 6415 流行摇滚传唱金曲：G#m - E - B - F#",
+    "notes": "我祈祷拥有一颗透明的心 和会流泪的眼睛"
   },
   {
     "id": "zh_030",
@@ -920,20 +917,20 @@
   },
   {
     "id": "zh_031",
-    "title": "年少有为 (If I Were Young)",
-    "artist": "李荣浩 (Ronghao Li)",
-    "key": "Db major",
+    "title": "出现又离开 (Appear and Leave)",
+    "artist": "梁博 (Liang Bo)",
+    "key": "D major",
     "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
     "chords": [
-      "Bbm",
-      "Gb",
-      "Db",
-      "Ab"
+      "Bm",
+      "G",
+      "D",
+      "A"
     ],
     "roman": "vi-IV-I-V",
-    "description": "Db大调 6415 沧桑回忆进行：Bbm - Gb - Db - Ab",
-    "notes": "假如我年少有为不自卑 懂得什么是珍贵"
+    "description": "D大调 6415 灵魂叙事摇滚：Bm - G - D - A",
+    "notes": "为何总是这样 在意料之中 出现又离开"
   },
   {
     "id": "zh_032",
@@ -988,20 +985,20 @@
   },
   {
     "id": "zh_035",
-    "title": "消愁 (Sorrow Elimination)",
+    "title": "消愁 (Drown Sorrows)",
     "artist": "毛不易 (Mao Buyi)",
-    "key": "C major",
+    "key": "Ab major",
     "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
     "chords": [
-      "Am",
-      "F",
-      "C",
-      "G"
+      "Fm",
+      "Db",
+      "Ab",
+      "Eb"
     ],
     "roman": "vi-IV-I-V",
-    "description": "C大调 6415 叙事抒情进阶：Am - F - C - G",
-    "notes": "一杯敬朝阳 一杯敬月光"
+    "description": "Ab大调 (Capo 1 夹 1 品演奏 G 调) 6415 叙事民谣：Fm - Db - Ab - Eb",
+    "notes": "一杯敬朝阳 一杯敬月光 唤醒我的向往 温柔了寒窗"
   },
   {
     "id": "zh_036",
@@ -1352,20 +1349,20 @@
   },
   {
     "id": "zh_053",
-    "title": "平凡之路 (Ordinary Path)",
-    "artist": "朴树 (Pu Shu)",
-    "key": "D major",
-    "section": "Chorus (副歌)",
+    "title": "晴天 (Sunny Day)",
+    "artist": "周杰伦 (Jay Chou)",
+    "key": "G major",
+    "section": "Verse & Chorus",
     "progression": "6,4,1,5",
     "chords": [
-      "Bm",
+      "Em",
+      "C",
       "G",
-      "D",
-      "A"
+      "D"
     ],
     "roman": "vi-IV-I-V",
-    "description": "D大调 6415 流行民谣经典：Bm - G - D - A",
-    "notes": "我曾经跨过山和大海 也穿过人山人海"
+    "description": "G大调经典 6415 怀旧民谣摇滚：Em - C - G - D",
+    "notes": "故事的小黄花 从出生那年就飘着 童年的荡秋千 随记忆一直晃到现在"
   },
   {
     "id": "zh_054",
@@ -1459,20 +1456,20 @@
     "id": "zh_059",
     "title": "年少有为 (If I Were Young)",
     "artist": "李荣浩 (Li Ronghao)",
-    "key": "Eb major",
+    "key": "Db major",
     "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
     "chords": [
+      "Gb",
       "Ab",
-      "Bb",
-      "Gm",
-      "Cm",
       "Fm",
-      "Bb",
-      "Eb"
+      "Bbm",
+      "Ebm",
+      "Ab",
+      "Db"
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "Eb大调王道进行：Ab - Bb - Gm - Cm - Fm - Bb - Eb",
+    "description": "Db大调王道进行：Gb - Ab - Fm - Bbm - Ebm - Ab - Db",
     "notes": "假如我年少有为不自卑 懂得什么是珍贵"
   },
   {
@@ -1496,34 +1493,34 @@
     "id": "zh_061",
     "title": "演员 (Actor)",
     "artist": "薛之谦 (Joker Xue)",
-    "key": "C major",
-    "section": "Chorus (副歌)",
+    "key": "B major",
+    "section": "Verse (主歌)",
     "progression": "1,6,4,5",
     "chords": [
-      "C",
-      "Am",
-      "F",
-      "G"
+      "B",
+      "G#m",
+      "E",
+      "F#"
     ],
     "roman": "I-vi-IV-V",
-    "description": "C大调 1645 Doo-Wop 怀旧进行：C - Am - F - G",
+    "description": "B大调 1645 主歌复古律动：B - G#m - E - F#",
     "notes": "简单点 说话的方式简单点 递进的情绪请省略"
   },
   {
     "id": "zh_062",
     "title": "消愁 (Drown Sorrows)",
     "artist": "毛不易 (Mao Buyi)",
-    "key": "C major",
+    "key": "G major",
     "section": "Chorus (副歌)",
     "progression": "6,4,1,5",
     "chords": [
-      "Am",
-      "F",
+      "Em",
       "C",
-      "G"
+      "G",
+      "D"
     ],
     "roman": "vi-IV-I-V",
-    "description": "C大调 6415 治愈民谣副歌：Am - F - C - G",
+    "description": "G大调 (原曲降A调 Capo 1) 6415 民谣副歌：Em - C - G - D",
     "notes": "一杯敬朝阳 一杯敬月光 唤醒我的向往 温柔了寒窗"
   },
   {
@@ -1545,7 +1542,7 @@
   },
   {
     "id": "zh_064",
-    "title": "水星记 (Mercury Records)",
+    "title": "水星记 (Mercury)",
     "artist": "郭顶 (Guo Ding)",
     "key": "F major",
     "section": "Chorus (副歌)",
@@ -1567,20 +1564,17 @@
     "id": "zh_065",
     "title": "凄美地 (The Beautiful Land)",
     "artist": "郭顶 (Guo Ding)",
-    "key": "E major",
+    "key": "G# minor / B major",
     "section": "Chorus (副歌)",
-    "progression": "4,5,3,6,2,5,1",
+    "progression": "6,4,1,3",
     "chords": [
-      "A",
-      "B",
       "G#m",
-      "C#m",
-      "F#m",
+      "E",
       "B",
-      "E"
+      "D#"
     ],
-    "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "E大调王道进行神作：A - B - G#m - C#m - F#m - B - E",
+    "roman": "vi-IV-I-III",
+    "description": "B大调/G#小调 6-4-1-3 凄美张力进行：G#m - E - B - D#",
     "notes": "如此不可思议 如此不可自拔 如此凄美地"
   },
   {
@@ -1624,20 +1618,20 @@
     "id": "zh_068",
     "title": "乌梅子酱 (Plum Jam)",
     "artist": "李荣浩 (Li Ronghao)",
-    "key": "C major",
+    "key": "Db major",
     "section": "Chorus (副歌)",
     "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "F",
-      "G",
-      "Em",
-      "Am",
-      "Dm",
-      "G",
-      "C"
+      "Gb",
+      "Ab",
+      "Fm",
+      "Bbm",
+      "Ebm",
+      "Ab",
+      "Db"
     ],
     "roman": "IV-V-iii-vi-ii-V-I",
-    "description": "C大调王道进行甜歌：F - G - Em - Am - Dm - G - C",
+    "description": "Db大调王道进行甜歌：Gb - Ab - Fm - Bbm - Ebm - Ab - Db",
     "notes": "你浅浅的微笑就像 乌梅子酱"
   },
   {

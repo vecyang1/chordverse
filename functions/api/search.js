@@ -310,7 +310,9 @@ export async function onRequestGet(context) {
 
     let match = null;
     if (textKeyword) {
-      if (sTitle.includes(textKeyword) || sArtist.includes(textKeyword)) match = { kind: "text", occurrences: 0 };
+      const tokens = textKeyword.split(/\s+/).filter(Boolean);
+      const haystack = `${sTitle} ${sArtist}`;
+      if (tokens.every((tok) => haystack.includes(tok))) match = { kind: "text", occurrences: 0 };
     } else if (targetDegrees.length > 0) {
       match = matchSong(s, targetDegrees);
     } else {

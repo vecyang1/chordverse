@@ -670,26 +670,32 @@
     "key": "C major",
     "original_key": "C",
     "capo": 0,
-    "primary_progression": "1,5,6,4",
-    "primary_roman": "I-V-vi-IV",
+    "primary_progression": "4,5,3,6,2,5,1",
+    "primary_roman": "IV-V-iii-vi-ii-V-I",
     "primary_degrees": [
-      1,
+      4,
       5,
+      3,
       6,
-      4
+      2,
+      5,
+      1
     ],
-    "progression_name": "Pop-Punk / 4-Chord Progression (Axis of Awesome / 流行四和弦)",
+    "progression_name": "Royal Road Progression (王道进行 / 4536251)",
     "primary_chords": [
-      "C",
+      "F",
       "G",
+      "Em",
       "Am",
-      "F"
+      "Dm",
+      "G",
+      "C"
     ],
     "section_breakdowns": {
-      "Chorus": "1,5,6,4"
+      "Chorus": "4,5,3,6,2,5,1"
     },
     "source_url": null,
-    "raw_lyrics_sample": "分手应该体面 谁都不要说抱歉"
+    "raw_lyrics_sample": "分手应该体面 谁都不要说抱歉 何来亏欠 我敢给就敢心碎"
   },
   {
     "id": "modern_023",

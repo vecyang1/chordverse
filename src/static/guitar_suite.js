@@ -346,7 +346,7 @@ export const DIATONIC_TRIADS = {
   "D":  { 1: "D",  2: "Em",  3: "F#m",  4: "G",  5: "A",  6: "Bm",  7: "C#dim" },
   "A":  { 1: "A",  2: "Bm",  3: "C#m",  4: "D",  5: "E",  6: "F#m", 7: "G#dim" },
   "E":  { 1: "E",  2: "F#m", 3: "G#m",  4: "A",  5: "B",  6: "C#m", 7: "D#dim" },
-  "B":  { 1: "B",  2: "C#m", 3: "D#m",  4: "E",  5: "F#", 6: "G#m", 7: "Adim" },
+  "B":  { 1: "B",  2: "C#m", 3: "D#m",  4: "E",  5: "F#", 6: "G#m", 7: "A#dim" },
   "F#": { 1: "F#", 2: "G#m", 3: "Bbm",  4: "B",  5: "C#", 6: "D#m", 7: "Fdim" },
   "Gb": { 1: "Gb", 2: "Abm", 3: "Bbm",  4: "B",  5: "Db", 6: "Ebm", 7: "Fdim" },
   "F":  { 1: "F",  2: "Gm",  3: "Am",   4: "Bb", 5: "C",  6: "Dm",  7: "Edim" },
@@ -378,7 +378,7 @@ export const SEVENTH_CHORDS_MAP = {
     1: "Emaj7", 2: "F#m7", 3: "G#m7", "3_sec": "G#7", 4: "Amaj7", 5: "B7", 6: "C#m7", 7: "D#dim"
   },
   "B": {
-    1: "Bmaj7", 2: "C#m7", 3: "D#m7", "3_sec": "D#7", 4: "Emaj7", 5: "F#7", 6: "G#m7", 7: "Adim"
+    1: "Bmaj7", 2: "C#m7", 3: "D#m7", "3_sec": "D#7", 4: "Emaj7", 5: "F#7", 6: "G#m7", 7: "A#dim"
   },
   "F#": {
     1: "F#maj7", 2: "G#m7", 3: "Bbm7", "3_sec": "Bb7", 4: "Bmaj7", 5: "C#7", 6: "D#m7", 7: "Fdim"

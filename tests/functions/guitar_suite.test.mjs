@@ -265,3 +265,28 @@ test("physical acoustic guitar string tuning frequencies and micro-arpeggio timi
   const microArpeggioDelay = 0.020; // 20ms
   assert.ok(microArpeggioDelay >= 0.018 && microArpeggioDelay <= 0.022, "Timing must be within 18ms-22ms range");
 });
+
+test("DIATONIC_TRIADS and SEVENTH_CHORDS_MAP support all 14 keys with correct degree 7 A#dim for B major", () => {
+  const all14Keys = ["C", "G", "D", "A", "E", "B", "F#", "Gb", "F", "Bb", "Eb", "Ab", "Db", "C#"];
+  for (const k of all14Keys) {
+    assert.ok(DIATONIC_TRIADS[k], `DIATONIC_TRIADS must define key ${k}`);
+    assert.ok(SEVENTH_CHORDS_MAP[k], `SEVENTH_CHORDS_MAP must define key ${k}`);
+    for (let d = 1; d <= 7; d++) {
+      assert.ok(DIATONIC_TRIADS[k][d], `DIATONIC_TRIADS[${k}][${d}] must be defined`);
+      assert.ok(SEVENTH_CHORDS_MAP[k][d], `SEVENTH_CHORDS_MAP[${k}][${d}] must be defined`);
+    }
+  }
+
+  // Key of B: degree 7 is A#dim, NOT Adim
+  assert.equal(DIATONIC_TRIADS["B"][7], "A#dim");
+  assert.equal(SEVENTH_CHORDS_MAP["B"][7], "A#dim");
+
+  // getProgressionVoicings with customChords from authentic song row (e.g. 凄美地 in B)
+  const qmdChords = ["B", "F#", "G#m", "E"];
+  const voicedCustom = getProgressionVoicings([1, 5, 6, 4], "B", "triad", qmdChords);
+  assert.deepEqual(voicedCustom, ["B", "F#", "G#m", "E"]);
+
+  // 6,4,1,3 in B (G#m, E, B, D#) uses major III D# instead of D#m
+  const voiced6413inB = getProgressionVoicings([6, 4, 1, 3], "B", "triad");
+  assert.deepEqual(voiced6413inB, ["G#m", "E", "B", "D#"]);
+});

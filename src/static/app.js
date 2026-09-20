@@ -1,5 +1,6 @@
 import {
   GUITAR_CHORD_LIBRARY,
+  DIATONIC_TRIADS,
   renderGuitarChordSVG,
   calculateCapo,
   normalizeKeyRoot,
@@ -112,18 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
     7: "vii°"
   };
 
-  const keyScaleChords = {
-    "C":  { 1: "C", 2: "Dm", 3: "Em", 4: "F", 5: "G", 6: "Am", 7: "Bdim" },
-    "G":  { 1: "G", 2: "Am", 3: "Bm", 4: "C", 5: "D", 6: "Em", 7: "F#dim" },
-    "D":  { 1: "D", 2: "Em", 3: "F#m", 4: "G", 5: "A", 6: "Bm", 7: "C#dim" },
-    "A":  { 1: "A", 2: "Bm", 3: "C#m", 4: "D", 5: "E", 6: "F#m", 7: "G#dim" },
-    "E":  { 1: "E", 2: "F#m", 3: "G#m", 4: "A", 5: "B", 6: "C#m", 7: "D#dim" },
-    "F":  { 1: "F", 2: "Gm", 3: "Am", 4: "Bb", 5: "C", 6: "Dm", 7: "Edim" },
-    "Bb": { 1: "Bb", 2: "Cm", 3: "Dm", 4: "Eb", 5: "F", 6: "Gm", 7: "Adim" },
-    "Eb": { 1: "Eb", 2: "Fm", 3: "Gm", 4: "Ab", 5: "Bb", 6: "Cm", 7: "Ddim" },
-    "Ab": { 1: "Ab", 2: "Bbm", 3: "Cm", 4: "Db", 5: "Eb", 6: "Fm", 7: "Gdim" },
-    "Db": { 1: "Db", 2: "Ebm", 3: "Fm", 4: "Gb", 5: "Ab", 6: "Bbm", 7: "Cdim" }
-  };
+  const keyScaleChords = DIATONIC_TRIADS;
+  let selectedSongChords = null;
 
   const namedProgressionsTaxonomy = {
     "1,5,6,4": "Pop-Punk / 4-Chord Progression (Axis of Awesome / 流行四和弦)",
@@ -141,15 +132,17 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function degreeToChord(degree, key = "C") {
-    const scale = keyScaleChords[key] || keyScaleChords["C"];
+    const root = typeof normalizeKeyRoot === "function" ? normalizeKeyRoot(key) : key;
+    const scale = keyScaleChords[root] || keyScaleChords["C"];
     return scale[degree] || "C";
   }
 
   function getActiveChordsInKey(key) {
-    if (currentVoicing === "seventh" && typeof getProgressionVoicings === "function") {
-      return getProgressionVoicings(activeDegrees, key, "seventh");
+    if (typeof getProgressionVoicings === "function") {
+      return getProgressionVoicings(activeDegrees, key, currentVoicing, selectedSongChords);
     }
-    return activeDegrees.map(deg => degreeToChord(deg, key));
+    const root = typeof normalizeKeyRoot === "function" ? normalizeKeyRoot(key) : key;
+    return activeDegrees.map(deg => degreeToChord(deg, root));
   }
 
   // Render Step Builder Chips
@@ -181,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       chip.querySelector(".chip-remove").addEventListener("click", (e) => {
         e.stopPropagation();
+        selectedSongChords = null;
         activeDegrees.splice(idx, 1);
         renderBuilderDisplay();
         executeSearch();
@@ -269,6 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   playKeySelect.addEventListener("change", () => {
+    selectedSongChords = null;
     renderBuilderDisplay();
     if (isLoopPlaying) {
       const key = playKeySelect.value || "C";
@@ -543,7 +538,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let match = null;
       if (textKeyword) {
-        if (sTitle.includes(textKeyword) || sArtist.includes(textKeyword)) match = { kind: "text", occurrences: 0 };
+        const tokens = textKeyword.split(/\s+/).filter(Boolean);
+        const haystack = `${sTitle} ${sArtist}`;
+        if (tokens.every(tok => haystack.includes(tok))) match = { kind: "text", occurrences: 0 };
       } else if (targetDegs.length > 0) {
         match = matchSongClient(s, targetDegs);
       } else {
@@ -717,7 +714,9 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
 
-        updateGuitarSuite(effectiveSongProg || activeDegrees.join(","), cleanKey);
+        selectedSongChords = (Array.isArray(song.chords) && song.chords.length > 0) ? song.chords : null;
+
+        updateGuitarSuite(effectiveSongProg || activeDegrees.join(","), cleanKey, selectedSongChords);
         showToast(`已载入《${song.title}》原调 (${cleanKey} 调) 吉他指法与 Capo 方案`);
       });
 
@@ -725,17 +724,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Update Guitar Learning Suite with current progression & authentic top song key
-    const initialKey = songs[0]?.key 
-      ? normalizeKeyRoot(songs[0].key || songs[0].analysis_key) 
+    const topSong = songs[0];
+    const initialKey = topSong?.key 
+      ? normalizeKeyRoot(topSong.key || topSong.analysis_key) 
       : (playKeySelect ? playKeySelect.value : "C");
     if (playKeySelect && optionExists(playKeySelect, initialKey)) {
       playKeySelect.value = initialKey;
     }
-    updateGuitarSuite(data.progression, initialKey);
+    selectedSongChords = (topSong && Array.isArray(topSong.chords) && topSong.chords.length > 0) ? topSong.chords : null;
+    updateGuitarSuite(data.progression, initialKey, selectedSongChords);
   }
 
   // Update Guitar Learning Suite (SVG chord boxes, Capo recommendation, Voicing, Secondary Dominant)
-  function updateGuitarSuite(overrideProg = null, overrideKey = null) {
+  function updateGuitarSuite(overrideProg = null, overrideKey = null, overrideChords = null) {
     if (!guitarSuiteCard || !chordBoxesContainer) return;
 
     // 1. Determine active progression string
@@ -800,7 +801,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 5. Calculate Chord Names (Triad vs 7th)
-    const chordNames = getProgressionVoicings(degs, effectiveKey, currentVoicing);
+    const customForVoicing = (effectiveKey === cleanKey) ? (overrideChords || selectedSongChords) : null;
+    const chordNames = getProgressionVoicings(degs, effectiveKey, currentVoicing, customForVoicing);
 
     // 6. Secondary Dominant Detection (E7 -> Am / III7 -> vi)
     const secDom = detectSecondaryDominant(progStr, chordNames, effectiveKey);
@@ -929,6 +931,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       row.addEventListener("click", () => {
+        selectedSongChords = null;
         activeDegrees.push(deg);
         inputProg.value = activeDegrees.join(",");
         renderBuilderDisplay();
@@ -1183,6 +1186,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       const deg = Number(btn.getAttribute("data-degree"));
       if (!deg || isNaN(deg)) return;
+      selectedSongChords = null;
       activeDegrees.push(deg);
       
       const key = playKeySelect.value || "C";
@@ -1196,6 +1200,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnBackspace.addEventListener("click", () => {
     if (activeDegrees.length > 0) {
+      selectedSongChords = null;
       activeDegrees.pop();
       renderBuilderDisplay();
       executeSearch();
@@ -1203,6 +1208,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnClear.addEventListener("click", () => {
+    selectedSongChords = null;
     activeDegrees = [];
     renderBuilderDisplay();
     executeSearch();
@@ -1210,6 +1216,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   presetChips.forEach(chip => {
     chip.addEventListener("click", () => {
+      selectedSongChords = null;
       presetChips.forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       const prog = chip.getAttribute("data-prog");
@@ -1233,6 +1240,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (val && !isDegreeQueryText(val)) return;
     const degs = parseInputToDegrees(val);
     if (degs.join(",") === activeDegrees.join(",") && val === activeDegrees.join(",")) return;
+    selectedSongChords = null;
     activeDegrees = degs;
     renderBuilderDisplay();
     executeSearch();

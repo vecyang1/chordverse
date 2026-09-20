@@ -173,6 +173,18 @@ test("a text query with lang=zh searches titles and artists without calling Hook
   assert.equal(body.songs[0].match_kind, "text");
 });
 
+test("a multi-token text query matches across title and artist combined", async () => {
+  serveCorpora();
+  const { body } = await call("progression=%E9%9D%92%E8%8A%B1%E7%93%B7%20%E5%91%A8%E6%9D%B0%E4%BC%A6&lang=zh");
+  assert.equal(body.songs.length, 1);
+  assert.equal(body.songs[0].id, "zh_2");
+  assert.equal(body.songs[0].title, "青花瓷");
+
+  const rev = await call("progression=%E6%9F%B3%E7%88%BD%20%E6%BC%A0%E6%B2%B3%E8%88%9E%E5%8E%85&lang=zh");
+  assert.equal(rev.body.songs.length, 1);
+  assert.equal(rev.body.songs[0].id, "modern_1");
+});
+
 test("scaleDegreesToChords accurately transposes degrees to chords in major keys", () => {
   // Royal Road 4,5,3,6,2,5,1 in C major
   assert.deepEqual(scaleDegreesToChords([4, 5, 3, 6, 2, 5, 1], "C major"), ["F", "G", "Em", "Am", "Dm", "G", "C"]);

@@ -290,6 +290,86 @@ console.log(`🌐 [Ego-Browser] Launching Chrome acceptance runner on ${TARGET_B
   await page.waitForTimeout(300);
 
   // =========================================================================
+  // SCENARIO 5: Multi-Token Search, B Major Key & 1564 Authenticity Check
+  // =========================================================================
+  console.log(`\n=================================================================`);
+  console.log(`🚀 SCENARIO 5: 多关键词检索、B大调联动与 1-5-6-4 曲库准确性`);
+  console.log(`=================================================================`);
+
+  // 1. Test multi-token query "郭顶 水星记"
+  console.log(`   触发多关键词搜索: "郭顶 水星记"...`);
+  await inputProg.fill('郭顶 水星记');
+  await Promise.all([
+    waitForSearch(u => u.includes('lang=zh') || u.includes('%E9%83%AD%E9%A1%B6')),
+    page.locator('#btn-search').click()
+  ]);
+  await waitForTableSettled();
+
+  const mercuryRow = page.locator('#songs-tbody tr', { hasText: '水星记' }).first();
+  if (await mercuryRow.count() === 0) {
+    throw new Error(`多关键词搜索 "郭顶 水星记" 未能命中《水星记》！`);
+  }
+  console.log(`   ✅ 多词组合检索成功命中《水星记》！`);
+
+  // 2. Test Key of B major (凄美地 in B major)
+  console.log(`   触发《凄美地》检索并校验 B 大调和弦指法...`);
+  await inputProg.fill('凄美地');
+  await Promise.all([
+    waitForSearch(u => u.includes('lang=zh') || u.includes('%E5%87%84%E7%BE%8E%E5%9C%B0')),
+    page.locator('#btn-search').click()
+  ]);
+  await waitForTableSettled();
+
+  const qmdRow = page.locator('#songs-tbody tr', { hasText: '凄美地' }).first();
+  if (await qmdRow.count() === 0) {
+    throw new Error(`曲库中未检索到《凄美地》！`);
+  }
+  await qmdRow.click();
+  await page.waitForTimeout(400);
+
+  const keyForQmd = await page.$eval('#play-key-select', el => el.value);
+  console.log(`   点击《凄美地》后调性下拉选择器同步为: ${keyForQmd}`);
+  if (keyForQmd !== 'B') {
+    throw new Error(`《凄美地》原调联动异常，期望为 'B'，实际为 '${keyForQmd}'`);
+  }
+
+  const chordsForQmd = await page.$$eval('#chord-boxes-container .chord-box-card', els => els.map(e => e.dataset.chord));
+  console.log(`   《凄美地》吉他盒图渲染和弦: ${JSON.stringify(chordsForQmd)}`);
+  if (!chordsForQmd.includes('B') || !chordsForQmd.includes('F#') || !chordsForQmd.includes('G#m') || !chordsForQmd.includes('E')) {
+    throw new Error(`《凄美地》B 大调和弦盒图未正确渲染 B, F#, G#m, E: 实际为 ${JSON.stringify(chordsForQmd)}`);
+  }
+  console.log(`   ✅ B 大调 14 调完整体系生效，《凄美地》准确渲染 B、F#、G#m、E 吉他盒图，绝无回退 C 大调！`);
+
+  // 3. Test 1-5-6-4 progression search accuracy (no Canon 15634125 or Royal Road)
+  console.log(`   触发 1,5,6,4 流行进行检索，校验和弦绝无张冠李戴...`);
+  await inputProg.fill('1,5,6,4');
+  await Promise.all([
+    waitForSearch(u => u.includes('progression=1,5,6,4')),
+    page.locator('#btn-search').click()
+  ]);
+  await waitForTableSettled();
+
+  const top1564Songs = await page.$$eval('#songs-tbody tr', rows => rows.slice(0, 10).map(r => ({
+    title: r.querySelector('.song-title')?.textContent?.trim() || '',
+    artist: r.querySelector('.song-artist')?.textContent?.trim() || '',
+    prog: r.querySelector('.song-progression')?.textContent?.trim() || ''
+  })));
+
+  console.log(`   1,5,6,4 命中曲目样检:`);
+  top1564Songs.forEach((s, i) => console.log(`     ${i + 1}. 《${s.title}》 - ${s.artist}`));
+
+  // Ensure classic Canon songs are NOT present in 1,5,6,4 results
+  const canonFalsePositives = ['修炼爱情', '小情歌', '童话', '情非得已', '告白气球', '稻香'];
+  for (const s of top1564Songs) {
+    for (const cfp of canonFalsePositives) {
+      if (s.title.includes(cfp)) {
+        throw new Error(`和弦假阳性检测失败！卡农神曲《${s.title}》错误出现在 1,5,6,4 结果中！`);
+      }
+    }
+  }
+  console.log(`   ✅ 1,5,6,4 和弦准确性校验通过: 卡农歌曲绝不假冒 1,5,6,4！`);
+
+  // =========================================================================
   // SCREENSHOT & VERIFICATION COMPLETION
   // =========================================================================
   console.log(`\n=================================================================`);

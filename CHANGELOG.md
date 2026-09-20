@@ -2,6 +2,27 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.9.0] - 2026-09-21
+
+### Added & Fixed
+- **Full 14-Key Scale & Diatonic Triad Completion (`src/static/app.js`, `src/static/guitar_suite.js`)**:
+  - Replaced hardcoded 10-key table in `app.js` with `DIATONIC_TRIADS`, bringing full 14-key diatonic scale support (including `B`, `F#`, `Gb`, `C#`) to degree-to-chord resolution and builder displays.
+  - Corrected degree 7 of Key of B in `DIATONIC_TRIADS` and `SEVENTH_CHORDS_MAP` from `Adim` to `A#dim`, matching theoretical diatonic scale degree ($A\#\text{dim}$) and `GUITAR_CHORD_LIBRARY`.
+  - Added missing guitar chord voicings: `D#` (fret 6), `Ebm`, `Ebm7`, `A#m`, `A#m7`, `Cb`, `Abm`, `Abm7`, `A#dim`.
+- **Authentic Chord Ground-Truth & Zero-Hallucination Corpus Cleanup (`src/chinese_corpus.py`, `data/chinese_modern_corpus.json`)**:
+  - Fixed misclassified songs: Replaced falsely forced 1-5-6-4 songs with authentic 1-5-6-4 classics (许巍《曾经的你》, 朴树《生如夏花》, 周杰伦《手写的从前》, 汪峰《再见青春》, 李荣浩《李白》, 告五人《给你一瓶魔法药水》, 赵雷《成都》, 宋冬野《董小姐》, 陈粒《奇妙能力歌》, 毛不易《像我这样的人》).
+  - Moved 8-chord Canon songs falsely listed under 1564/6415 to Section 6 (Pachelbel Canon): 汪峰《当我想你的时候》, 林俊杰《修炼爱情》, 苏打绿《小情歌》, 光良《童话》, 庾澄庆《情非得已》, 孙燕姿《遇见》, 王菲《红豆》, 周杰伦《告白气球》, 周杰伦《稻香》, 周杰伦《龙卷风》, 王力宏《你不知道的事》, 五月天《后来的我们》.
+  - Corrected 于文文《体面》(`modern_022`) from legacy false 1564 to authentic Royal Road 4-5-3-6-2-5-1 (`F, G, Em, Am, Dm, G, C`).
+  - Added authentic 6-4-1-5 hits: 林俊杰《江南》(`Gm, Eb, Bb, F`), 队长《哪里都是你》(`Am, F, C, G`).
+- **Live Song Row Chord Audio Loop & Multi-Token Search (`src/static/app.js`, `functions/api/search.js`)**:
+  - Bound `selectedSongChords` to song row clicks and top results so clicking a song row passes authentic song chords to guitar diagrams and audio progression playback.
+  - Upgraded multi-token search in edge API and client fallback: queries like `水星记 郭顶` or `周杰伦 晴天` split tokens across title and artist, eliminating 0-result text search failures.
+  - Rebuilt offline n-gram prediction models and synchronized web bundles.
+
+### Verified
+- Automated Tests: 152/152 tests passing (55/55 Node.js edge tests, 97/97 Python test suite).
+- Ego-Browser E2E Acceptance: Executed real headless browser verification against production and local suites, verifying clean Yopu URLs, B major chord rendering for 《凄美地》, multi-token queries, and 1564 zero false positives.
+
 ## [1.8.0] - 2026-09-21
 
 ### Fixed

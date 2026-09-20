@@ -31,6 +31,7 @@ console.log(`🌐 Launching Chrome to execute multi-progression interactive E2E 
 (async () => {
   const browser = await chromium.launch({
     headless: true,
+    channel: 'chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 

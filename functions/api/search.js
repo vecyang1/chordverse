@@ -14,8 +14,40 @@
 
 export const MIN_SEQUENCE_OCCURRENCES = 2;
 
-const ROMAN_MAP = { 1: "I", 2: "ii", 3: "iii", 4: "IV", 5: "V", 6: "vi", 7: "vii°" };
-const CURATED_SOURCES = new Set(["chinese_curated", "chinese_modern", "western_hooktheory"]);
+export const ROMAN_MAP = { 1: "I", 2: "ii", 3: "iii", 4: "IV", 5: "V", 6: "vi", 7: "vii°" };
+export const CURATED_SOURCES = new Set(["chinese_curated", "chinese_modern", "western_hooktheory"]);
+export const ICONIC_ROYAL_ROAD = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"];
+
+export const KEY_CHORDS = {
+  "C":  { 1: "C", 2: "Dm", 3: "Em", 4: "F", 5: "G", 6: "Am", 7: "Bdim" },
+  "G":  { 1: "G", 2: "Am", 3: "Bm", 4: "C", 5: "D", 6: "Em", 7: "F#dim" },
+  "D":  { 1: "D", 2: "Em", 3: "F#m", 4: "G", 5: "A", 6: "Bm", 7: "C#dim" },
+  "A":  { 1: "A", 2: "Bm", 3: "C#m", 4: "D", 5: "E", 6: "F#m", 7: "G#dim" },
+  "E":  { 1: "E", 2: "F#m", 3: "G#m", 4: "A", 5: "B", 6: "C#m", 7: "D#dim" },
+  "B":  { 1: "B", 2: "C#m", 3: "D#m", 4: "E", 5: "F#", 6: "G#m", 7: "A#dim" },
+  "F#": { 1: "F#", 2: "G#m", 3: "A#m", 4: "B", 5: "C#", 6: "D#m", 7: "E#dim" },
+  "Gb": { 1: "Gb", 2: "Abm", 3: "Bbm", 4: "Cb", 5: "Db", 6: "Ebm", 7: "Fdim" },
+  "F":  { 1: "F", 2: "Gm", 3: "Am", 4: "Bb", 5: "C", 6: "Dm", 7: "Edim" },
+  "Bb": { 1: "Bb", 2: "Cm", 3: "Dm", 4: "Eb", 5: "F", 6: "Gm", 7: "Adim" },
+  "Eb": { 1: "Eb", 2: "Fm", 3: "Gm", 4: "Ab", 5: "Bb", 6: "Cm", 7: "Ddim" },
+  "Ab": { 1: "Ab", 2: "Bbm", 3: "Cm", 4: "Db", 5: "Eb", 6: "Fm", 7: "Gdim" },
+  "Db": { 1: "Db", 2: "Ebm", 3: "Fm", 4: "Gb", 5: "Ab", 6: "Bbm", 7: "Cdim" },
+  "C#": { 1: "C#", 2: "D#m", 3: "E#m", 4: "F#", 5: "G#", 6: "A#m", 7: "B#dim" }
+};
+
+export function scaleDegreesToChords(degrees, keyStr) {
+  const root = String(keyStr || "C").trim().split(/[\s/]+/)[0];
+  const scale = KEY_CHORDS[root] || KEY_CHORDS["C"];
+  return degrees.map((d) => scale[d] || "C");
+}
+
+export function normalizeTitle(title) {
+  return String(title || "").replace(/\s*[\(（].*?[\)）]\s*/g, "").trim().toLowerCase();
+}
+
+export function normalizeArtist(artist) {
+  return String(artist || "").replace(/\s*[\(（].*?[\)）]\s*/g, "").trim().toLowerCase();
+}
 
 export function parseDegrees(value) {
   return String(value || "")
@@ -83,16 +115,22 @@ export function keyMatches(song, filter) {
   return false;
 }
 
-function evidenceRank(song) {
+function evidenceRank(song, queryProg = "") {
+  let iconicOrder = 99;
+  if (queryProg === "4,5,3,6,2,5,1" || queryProg === "4536251") {
+    const rawTitle = song.title || "";
+    const idx = ICONIC_ROYAL_ROAD.findIndex((t) => rawTitle.includes(t));
+    if (idx !== -1) iconicOrder = idx;
+  }
   const curated = CURATED_SOURCES.has(song.source) ? 0 : 1;
   const kind = song.match_kind === "loop" ? 0 : 1;
-  return [kind, curated, -(song.match_occurrences || 0)];
+  return [iconicOrder, kind, curated, -(song.match_occurrences || 0)];
 }
 
-export function sortByEvidence(songs) {
+export function sortByEvidence(songs, queryProg = "") {
   return songs
-    .map((song, index) => ({ song, index, rank: evidenceRank(song) }))
-    .sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] || a.rank[2] - b.rank[2] || a.index - b.index)
+    .map((song, index) => ({ song, index, rank: evidenceRank(song, queryProg) }))
+    .sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] || a.rank[2] - b.rank[2] || a.rank[3] - b.rank[3] || a.index - b.index)
     .map((entry) => entry.song);
 }
 
@@ -233,15 +271,46 @@ export async function onRequestGet(context) {
     }
     if (!match) continue;
 
-    const uniqKey = `${s.title}|${s.artist}|${s.section || ""}`.toLowerCase();
+    const normTitle = normalizeTitle(s.title);
+    const normArtist = normalizeArtist(s.artist);
+    // Deduplicate translated titles (e.g. Plum Sauce vs Plum Jam) for progression searches
+    const uniqKey = isDegreeQuery && cleanProg
+      ? `${normTitle}|${normArtist}`
+      : `${s.title}|${s.artist}|${s.section || ""}`.toLowerCase();
     if (seen.has(uniqKey)) continue;
     seen.add(uniqKey);
+
     // The whole-song sequence is evidence, not a row the client renders.
     const { degree_sequence: _seq, ...publicRow } = s;
-    matchedSongs.push({ ...publicRow, match_kind: match.kind, match_occurrences: match.occurrences });
+
+    if (match.kind === "sequence") {
+      const matchingChords = scaleDegreesToChords(targetDegrees, s.analysis_key || s.key);
+      const romanStr = targetDegrees.map((d) => ROMAN_MAP[d] || d).join("-");
+      const sectionName = cleanProg === "4,5,3,6,2,5,1"
+        ? "匹配乐段 (Royal Road 4-5-3-6-2-5-1)"
+        : (taxonomy[cleanProg] ? `匹配乐段 (${taxonomy[cleanProg].split(/[\s/]+/)[0]} ${cleanProg})` : `匹配乐段 (${cleanProg})`);
+
+      matchedSongs.push({
+        ...publicRow,
+        progression: cleanProg,
+        roman: romanStr,
+        chords: matchingChords,
+        section: sectionName,
+        primary_loop_progression: s.progression,
+        primary_loop_chords: s.chords,
+        match_kind: match.kind,
+        match_occurrences: match.occurrences
+      });
+    } else {
+      matchedSongs.push({
+        ...publicRow,
+        match_kind: match.kind,
+        match_occurrences: match.occurrences
+      });
+    }
   }
 
-  const ordered = targetDegrees.length > 0 ? sortByEvidence(matchedSongs) : matchedSongs;
+  const ordered = targetDegrees.length > 0 ? sortByEvidence(matchedSongs, cleanProg) : matchedSongs;
 
   const degs = targetDegrees.length > 0 ? targetDegrees : (ordered[0]?.degrees || [1, 5, 6, 4]);
   const progName = taxonomy[cleanProg]

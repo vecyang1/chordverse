@@ -92,6 +92,65 @@ class TestYopuImporter(unittest.TestCase):
         titles = [r["title"] for r in res["results"]]
         self.assertTrue(any("再见青春" in t for t in titles))
 
+    def test_parse_and_clean_score_with_sheet_data_chords(self):
+        from unittest.mock import patch
+        mock_sheet = {
+            "id": "mock123",
+            "title": "晴天",
+            "artist": "周杰伦",
+            "url": "https://yopu.co/view/mock123",
+            "html": "",
+            "article": "故事的小黄花 从出生那年就飘着",
+            "sheet_data": {
+                "id": "mock123",
+                "title": "晴天",
+                "artist": "周杰伦",
+                "key": "G",
+                "capo": 0,
+                "chords": ["Em", "Cadd9", "G", "D/F#", "Cmaj7", "Dsus4", "D", "B7", "G/D", "Am7"],
+                "lyrics": "故事的小黄花 从出生那年就飘着"
+            }
+        }
+        with patch.object(self.importer, "fetch_score_data", return_value=mock_sheet):
+            song = self.importer.parse_and_clean_score("mock123")
+            self.assertEqual(song.title, "晴天")
+            self.assertEqual(song.artist, "周杰伦")
+            self.assertEqual(song.key, "G major")
+            self.assertEqual(song.capo, 0)
+            self.assertIn("6", song.primary_progression)
+            self.assertIn("Em", song.primary_chords)
+            self.assertIn("Cadd9", song.primary_chords)
+
+    def test_parse_and_clean_score_rejects_empty_input(self):
+        with self.assertRaises(ValueError):
+            self.importer.parse_and_clean_score("")
+        with self.assertRaises(ValueError):
+            self.importer.parse_and_clean_score("   ")
+
+    def test_parse_and_clean_score_raises_on_fetch_failure(self):
+        from unittest.mock import patch
+        with patch.object(self.importer, "fetch_score_data", side_effect=ConnectionError("HTTP 404 Not Found")):
+            with self.assertRaises(RuntimeError) as ctx:
+                self.importer.parse_and_clean_score("invalid_score_id_9999")
+            self.assertIn("Failed to fetch Yopu score", str(ctx.exception))
+
+    def test_fetch_score_data_rejects_empty_id(self):
+        with self.assertRaises(ValueError):
+            self.importer.fetch_score_data("")
+
+    def test_parse_and_clean_score_no_dummy_progression_when_no_chords(self):
+        # Raw lyrics with no chords must NOT fabricate 1,5,6,4 or C-G-Am-F
+        song = self.importer.parse_and_clean_score(
+            score_input="纯歌词文本没有任何和弦标记的一首歌\n第二行歌词\n第三行歌词",
+            custom_title="无和弦歌曲",
+            custom_artist="独立音乐人"
+        )
+        self.assertEqual(song.title, "无和弦歌曲")
+        self.assertEqual(song.primary_progression, "")
+        self.assertEqual(song.primary_chords, [])
+        self.assertIsNone(song.progression_name)
+
 
 if __name__ == "__main__":
     unittest.main()
+

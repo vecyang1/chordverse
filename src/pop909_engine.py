@@ -15,6 +15,7 @@ try:
     from .roman_engine import (
         normalize_progression_input,
         progression_to_scale_degrees,
+        scale_degrees_to_chords,
         matches_progression_sequence,
         match_loop_or_sequence,
         parse_degree_sequence,
@@ -27,6 +28,7 @@ except ImportError:
     from roman_engine import (
         normalize_progression_input,
         progression_to_scale_degrees,
+        scale_degrees_to_chords,
         matches_progression_sequence,
         match_loop_or_sequence,
         parse_degree_sequence,
@@ -85,6 +87,11 @@ class ChinesePopEngine:
         seen_ids = set()
 
         # 1. Search in Curated Corpus (Highest Accuracy)
+        def normalize_text_key(s: str) -> str:
+            return re.sub(r"\s*[\(（].*?[\)）]\s*", "", s).strip().lower()
+
+        seen_keys = set()
+
         for item in self.corpus:
             item_prog = item.get("progression", "")
             item_comma, item_roman, item_degrees = normalize_progression_input(item_prog)
@@ -104,20 +111,29 @@ class ChinesePopEngine:
                     if matches_progression_sequence(calc_degrees, target_degrees, exact=exact):
                         matched = True
 
-            if matched and item["id"] not in seen_ids:
+            title = item.get("title", "Unknown")
+            artist = item.get("artist", "Unknown")
+            norm_key = (normalize_text_key(title), normalize_text_key(artist))
+
+            if matched and item["id"] not in seen_ids and norm_key not in seen_keys:
                 seen_ids.add(item["id"])
+                seen_keys.add(norm_key)
+                song_key = item.get("key", "C major")
+                chords = item.get("chords") or scale_degrees_to_chords(target_degrees, song_key)
                 song = SongEntry(
                     id=item["id"],
-                    title=item["title"],
-                    artist=item["artist"],
+                    title=title,
+                    artist=artist,
                     section=item.get("section", "Chorus"),
-                    key=item.get("key", "C major"),
+                    key=song_key,
                     progression=comma_str,
                     roman_progression=roman_str,
                     ytid=None,
                     url=None,
                     language="zh",
-                    source="chinese_corpus"
+                    source="chinese_corpus",
+                    chords=chords,
+                    match_kind="loop"
                 )
                 results.append(song)
 
@@ -136,40 +152,78 @@ class ChinesePopEngine:
                     p_degrees, target_degrees, parse_degree_sequence(p_item.get("degree_sequence", ""))
                 )
             if matched_kind:
+                p_title = p_item.get("title", f"POP909 #{p_id}")
+                p_artist = p_item.get("artist", "华语流行")
+                norm_key = (normalize_text_key(p_title), normalize_text_key(p_artist))
+                if norm_key in seen_keys:
+                    continue
                 seen_ids.add(p_id)
+                seen_keys.add(norm_key)
+
+                song_key = p_item.get("analysis_key") or p_item.get("key", "C major")
+                if matched_kind == "sequence":
+                    section = "匹配乐段 (Royal Road 4-5-3-6-2-5-1)" if comma_str == "4,5,3,6,2,5,1" else f"匹配乐段 (全曲复现 {roman_str})"
+                    matching_chords = scale_degrees_to_chords(target_degrees, song_key)
+                else:
+                    section = p_item.get("section", "Section")
+                    matching_chords = p_item.get("chords") or scale_degrees_to_chords(target_degrees, song_key)
+
                 song = SongEntry(
                     id=p_id,
-                    title=p_item.get("title", f"POP909 #{p_id}"),
-                    artist=p_item.get("artist", "华语流行"),
-                    section=p_item.get("section", "Section"),
+                    title=p_title,
+                    artist=p_artist,
+                    section=section,
                     key=p_item.get("key", "C major"),
                     progression=comma_str,
                     roman_progression=roman_str,
                     language="zh",
-                    source="pop909"
+                    source="pop909",
+                    chords=matching_chords,
+                    match_kind=matched_kind,
+                    primary_loop_progression=p_item.get("progression"),
+                    primary_loop_chords=p_item.get("chords")
                 )
                 results.append(song)
 
         # 3. Search in Modern Harvested Corpus
         for m_item in self._modern_data:
             m_id = m_item.get("id", "")
-            if m_id in seen_ids:
-                continue
+            m_title = m_item.get("title", f"Modern #{m_id}")
+            m_artist = m_item.get("artist", "华语新歌")
+            norm_key = (normalize_text_key(m_title), normalize_text_key(m_artist))
+
             m_degrees = m_item.get("primary_degrees", []) or m_item.get("degrees", [])
             if matches_progression_sequence(m_degrees, target_degrees, exact=exact):
-                seen_ids.add(m_id)
-                song = SongEntry(
-                    id=m_id,
-                    title=m_item.get("title", f"Modern #{m_id}"),
-                    artist=m_item.get("artist", "华语新歌"),
-                    section="Chorus",
-                    key=m_item.get("key", "C major"),
-                    progression=comma_str,
-                    roman_progression=roman_str,
-                    language="zh",
-                    source="modern_harvest"
-                )
-                results.append(song)
+                if m_id not in seen_ids and norm_key not in seen_keys:
+                    seen_ids.add(m_id)
+                    seen_keys.add(norm_key)
+                    song_key = m_item.get("key", "C major")
+                    chords = m_item.get("primary_chords") or m_item.get("chords") or scale_degrees_to_chords(target_degrees, song_key)
+                    song = SongEntry(
+                        id=m_id,
+                        title=m_title,
+                        artist=m_artist,
+                        section="Chorus",
+                        key=song_key,
+                        progression=comma_str,
+                        roman_progression=roman_str,
+                        language="zh",
+                        source="modern_harvest",
+                        chords=chords,
+                        match_kind="loop"
+                    )
+                    results.append(song)
+
+        if comma_str == "4,5,3,6,2,5,1":
+            iconic_order = ["水星记", "凄美地", "漠河舞厅", "乌梅子酱", "青花瓷"]
+            def sort_key(s: SongEntry):
+                t = s.title or ""
+                for idx, name in enumerate(iconic_order):
+                    if name in t:
+                        return (0, idx)
+                kind_order = 0 if getattr(s, "match_kind", "loop") != "sequence" else 1
+                return (1, kind_order)
+            results.sort(key=sort_key)
 
         return results
 

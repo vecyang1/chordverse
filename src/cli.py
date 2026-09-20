@@ -188,11 +188,16 @@ def cmd_web(args, analyzer: UnifiedChordAnalyzer):
 def cmd_import_yopu(args):
     from yopu_importer import YopuImporter
     importer = YopuImporter()
-    
-    print(f"\n📥 \033[1;36mFetching & Analyzing Score:\033[0m {args.score} ...")
+
+    score = (args.score or "").strip()
+    if not score:
+        print("❌ Error: Score ID, URL, or chord text cannot be empty.", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"\n📥 \033[1;36mFetching & Analyzing Score:\033[0m {score} ...")
     try:
         song = importer.parse_and_clean_score(
-            score_input=args.score,
+            score_input=score,
             custom_title=args.title,
             custom_artist=args.artist,
             custom_key=args.key,
@@ -209,18 +214,27 @@ def cmd_import_yopu(args):
     print("\n" + "=" * 60)
     print(f"🎵 \033[1;32m{song.title}\033[0m - \033[1;33m{song.artist}\033[0m")
     print(f"🔑 Key: \033[1m{song.key}\033[0m (Original/Concert: \033[1m{song.original_key}\033[0m, Capo: {song.capo})")
-    print(f"🎼 Primary Progression: \033[1;36m{song.primary_roman}\033[0m ({song.primary_progression})")
+    if song.primary_roman:
+        print(f"🎼 Primary Progression: \033[1;36m{song.primary_roman}\033[0m ({song.primary_progression})")
+    else:
+        print("🎼 Primary Progression: （未检测到有效和弦走向）")
     if song.progression_name:
         print(f"🏷️  Progression Name: \033[1;35m{song.progression_name}\033[0m")
-    print(f"🎹 Chords: {' - '.join(song.primary_chords)}")
+    if song.primary_chords:
+        print(f"🎹 Chords: {' - '.join(song.primary_chords)}")
+    else:
+        print("🎹 Chords: （未内嵌公开和弦）")
     print(f"🔗 Source: {song.source_url}")
     if song.raw_lyrics_sample:
         print(f"📝 Lyrics Snippet: {song.raw_lyrics_sample}...")
     print("=" * 60)
 
     if args.add:
-        importer.save_to_modern_corpus(song)
-        print(f"✅ Successfully added '{song.title}' to data/chinese_modern_corpus.json!\n")
+        if not song.primary_chords:
+            print("⚠️ 该曲谱未包含有效和弦走向，跳过加入语料库。\n")
+        else:
+            importer.save_to_modern_corpus(song)
+            print(f"✅ Successfully added '{song.title}' to data/chinese_modern_corpus.json!\n")
     else:
         print("💡 Tip: Use '--add' to permanently save this song to ChordVerse's Chinese modern corpus.\n")
 
@@ -229,7 +243,10 @@ def cmd_yopu_search(args):
     from yopu_importer import YopuImporter
     importer = YopuImporter()
 
-    query = args.query.strip()
+    query = (args.query or "").strip()
+    if not query:
+        print("❌ Error: Search query cannot be empty.", file=sys.stderr)
+        sys.exit(1)
     print(f"\n🔍 \033[1;36mSearching Yopu.co for:\033[0m '{query}' ...")
     try:
         data = importer.search_yopu(query)

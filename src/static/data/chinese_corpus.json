@@ -1569,16 +1569,19 @@
     "artist": "郭顶 (Guo Ding)",
     "key": "E major",
     "section": "Chorus (副歌)",
-    "progression": "1,5,6,4",
+    "progression": "4,5,3,6,2,5,1",
     "chords": [
-      "E",
+      "A",
       "B",
+      "G#m",
       "C#m",
-      "A"
+      "F#m",
+      "B",
+      "E"
     ],
-    "roman": "I-V-vi-IV",
-    "description": "E大调 1564 迷幻独立摇滚：E - B - C#m - A",
-    "notes": "如此不可思议 如此不可自拔"
+    "roman": "IV-V-iii-vi-ii-V-I",
+    "description": "E大调王道进行神作：A - B - G#m - C#m - F#m - B - E",
+    "notes": "如此不可思议 如此不可自拔 如此凄美地"
   },
   {
     "id": "zh_066",

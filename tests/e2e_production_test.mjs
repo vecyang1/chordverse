@@ -8,6 +8,7 @@ console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_U
 (async () => {
   const browser = await chromium.launch({
     headless: true,
+    channel: 'chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 

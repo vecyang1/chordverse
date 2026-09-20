@@ -17,6 +17,9 @@ import {
   parseDegreeSequence,
   sortByEvidence,
   keyMatches,
+  scaleDegreesToChords,
+  normalizeTitle,
+  normalizeArtist,
   MIN_SEQUENCE_OCCURRENCES
 } from "../../functions/api/search.js";
 
@@ -169,3 +172,66 @@ test("a text query with lang=zh searches titles and artists without calling Hook
   assert.deepEqual(body.songs.map((s) => s.id).sort(), ["pop909_a", "zh_2"]);
   assert.equal(body.songs[0].match_kind, "text");
 });
+
+test("scaleDegreesToChords accurately transposes degrees to chords in major keys", () => {
+  // Royal Road 4,5,3,6,2,5,1 in C major
+  assert.deepEqual(scaleDegreesToChords([4, 5, 3, 6, 2, 5, 1], "C major"), ["F", "G", "Em", "Am", "Dm", "G", "C"]);
+  // Royal Road in G major
+  assert.deepEqual(scaleDegreesToChords([4, 5, 3, 6, 2, 5, 1], "G major"), ["C", "D", "Bm", "Em", "Am", "D", "G"]);
+  // Royal Road in E major
+  assert.deepEqual(scaleDegreesToChords([4, 5, 3, 6, 2, 5, 1], "E major"), ["A", "B", "G#m", "C#m", "F#m", "B", "E"]);
+  // Canon in D major
+  assert.deepEqual(scaleDegreesToChords([1, 5, 6, 3, 4, 1, 2, 5], "D major"), ["D", "A", "Bm", "F#m", "G", "D", "Em", "A"]);
+});
+
+test("POP909 sequence match synthesizes matching chords and highlights section", async () => {
+  serveCorpora();
+  const { body } = await call("progression=1,5,6,3,4,1,2,5&lang=zh");
+  const canon = body.songs.find((s) => s.id === "pop909_b");
+  assert.ok(canon);
+  assert.equal(canon.match_kind, "sequence");
+  assert.equal(canon.progression, "1,5,6,3,4,1,2,5");
+  assert.equal(canon.roman, "I-V-vi-iii-IV-I-ii-V");
+  assert.deepEqual(canon.chords, ["D", "A", "Bm", "F#m", "G", "D", "Em", "A"]);
+  assert.match(canon.section, /匹配乐段/);
+  assert.equal(canon.primary_loop_progression, "1,4,5,1");
+  assert.deepEqual(canon.primary_loop_chords, ["D", "G", "A", "D"]);
+});
+
+test("bilingual title deduplication collapses translated subtitles", () => {
+  assert.equal(normalizeTitle("乌梅子酱 (Plum Sauce)"), "乌梅子酱");
+  assert.equal(normalizeTitle("乌梅子酱 (Plum Jam)"), "乌梅子酱");
+  assert.equal(normalizeTitle("凄美地 (Beauty In The Breakdown)"), "凄美地");
+  assert.equal(normalizeTitle("凄美地 （The Beautiful Land）"), "凄美地");
+  assert.equal(normalizeArtist("李荣浩 (Li Ronghao)"), "李荣浩");
+  assert.equal(normalizeArtist("李荣浩 (Ronghao Li)"), "李荣浩");
+});
+
+test("Royal Road search deduplicates identical songs with differing English translations", async () => {
+  const customCurated = [
+    { id: "c_1", title: "乌梅子酱 (Plum Sauce)", artist: "李荣浩 (Ronghao Li)", key: "C major", section: "Chorus", progression: "4,5,3,6,2,5,1", roman: "IV-V-iii-vi-ii-V-I", chords: ["F","G","Em","Am","Dm","G","C"] },
+    { id: "c_2", title: "乌梅子酱 (Plum Jam)", artist: "李荣浩 (Li Ronghao)", key: "C major", section: "Chorus", progression: "4,5,3,6,2,5,1", roman: "IV-V-iii-vi-ii-V-I", chords: ["F","G","Em","Am","Dm","G","C"] },
+    { id: "c_3", title: "青花瓷", artist: "周杰伦", key: "A major", section: "Chorus", progression: "4,5,3,6,2,5,1", roman: "IV-V-iii-vi-ii-V-I", chords: ["D","E","C#m","F#m","Bm","E","A"] },
+    { id: "c_4", title: "水星记", artist: "郭顶", key: "C major", section: "Chorus", progression: "4,5,3,6,2,5,1", roman: "IV-V-iii-vi-ii-V-I", chords: ["F","G","Em","Am","Dm","G","C"] }
+  ];
+
+  globalThis.fetch = async (url) => {
+    if (url.includes("chinese_corpus.json")) return { ok: true, json: async () => customCurated };
+    if (url.includes("pop909_indexed_chords.json")) return { ok: true, json: async () => [] };
+    if (url.includes("chinese_modern_corpus.json")) return { ok: true, json: async () => [] };
+    if (url.includes("western_corpus.json")) return { ok: true, json: async () => [] };
+    if (url.includes("named_progressions.json")) return { ok: true, json: async () => TAXONOMY };
+    throw new Error(`unexpected fetch: ${url}`);
+  };
+
+  const req = new Request(`${ORIGIN}/api/search?progression=4,5,3,6,2,5,1&lang=zh`);
+  const resp = await onRequestGet({ request: req });
+  const body = await resp.json();
+
+  const titles = body.songs.map((s) => s.title);
+  assert.equal(body.songs.length, 3, "Plum Sauce and Plum Jam must deduplicate to 1 entry");
+  assert.equal(titles[0], "水星记", "水星记 ranks before other songs");
+  assert.equal(titles[1], "乌梅子酱 (Plum Sauce)");
+  assert.equal(titles[2], "青花瓷");
+});
+

@@ -61,10 +61,9 @@ jobs:
 
       - name: Publish to Cloudflare Pages
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: chordverse
-          directory: src/static
+          command: pages deploy src/static --project-name=chordverse
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}

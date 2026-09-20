@@ -14,6 +14,8 @@ All notable changes to the Chord Progression Analyzer (ChordVerse) will be docum
   - Moved 8-chord Canon songs falsely listed under 1564/6415 to Section 6 (Pachelbel Canon): 汪峰《当我想你的时候》, 林俊杰《修炼爱情》, 苏打绿《小情歌》, 光良《童话》, 庾澄庆《情非得已》, 孙燕姿《遇见》, 王菲《红豆》, 周杰伦《告白气球》, 周杰伦《稻香》, 周杰伦《龙卷风》, 王力宏《你不知道的事》, 五月天《后来的我们》.
   - Corrected 于文文《体面》(`modern_022`) from legacy false 1564 to authentic Royal Road 4-5-3-6-2-5-1 (`F, G, Em, Am, Dm, G, C`).
   - Added authentic 6-4-1-5 hits: 林俊杰《江南》(`Gm, Eb, Bb, F`), 队长《哪里都是你》(`Am, F, C, G`).
+- **CI/CD Deployment Modernization (`.github/workflows/deploy.yml`)**:
+  - Migrated deploy step from retired `cloudflare/pages-action@v1` (repository removed by Cloudflare) to `cloudflare/wrangler-action@v4` with `command: pages deploy src/static --project-name=chordverse`, resolving CI action resolution 404 failures.
 - **Live Song Row Chord Audio Loop & Multi-Token Search (`src/static/app.js`, `functions/api/search.js`)**:
   - Bound `selectedSongChords` to song row clicks and top results so clicking a song row passes authentic song chords to guitar diagrams and audio progression playback.
   - Upgraded multi-token search in edge API and client fallback: queries like `水星记 郭顶` or `周杰伦 晴天` split tokens across title and artist, eliminating 0-result text search failures.

@@ -300,7 +300,7 @@ console.log(`🌐 [Ego-Browser] Launching Chrome acceptance runner on ${TARGET_B
   console.log(`   触发多关键词搜索: "郭顶 水星记"...`);
   await inputProg.fill('郭顶 水星记');
   await Promise.all([
-    waitForSearch(u => u.includes('lang=zh') || u.includes('%E9%83%AD%E9%A1%B6')),
+    waitForSearch(u => u.includes('郭顶') || u.includes('水星记')),
     page.locator('#btn-search').click()
   ]);
   await waitForTableSettled();
@@ -315,7 +315,7 @@ console.log(`🌐 [Ego-Browser] Launching Chrome acceptance runner on ${TARGET_B
   console.log(`   触发《凄美地》检索并校验 B 大调和弦指法...`);
   await inputProg.fill('凄美地');
   await Promise.all([
-    waitForSearch(u => u.includes('lang=zh') || u.includes('%E5%87%84%E7%BE%8E%E5%9C%B0')),
+    waitForSearch(u => u.includes('凄美地')),
     page.locator('#btn-search').click()
   ]);
   await waitForTableSettled();
@@ -333,12 +333,22 @@ console.log(`🌐 [Ego-Browser] Launching Chrome acceptance runner on ${TARGET_B
     throw new Error(`《凄美地》原调联动异常，期望为 'B'，实际为 '${keyForQmd}'`);
   }
 
-  const chordsForQmd = await page.$$eval('#chord-boxes-container .chord-box-card', els => els.map(e => e.dataset.chord));
-  console.log(`   《凄美地》吉他盒图渲染和弦: ${JSON.stringify(chordsForQmd)}`);
-  if (!chordsForQmd.includes('B') || !chordsForQmd.includes('F#') || !chordsForQmd.includes('G#m') || !chordsForQmd.includes('E')) {
-    throw new Error(`《凄美地》B 大调和弦盒图未正确渲染 B, F#, G#m, E: 实际为 ${JSON.stringify(chordsForQmd)}`);
+  // Verify 7th mode chords for 6,4,1,3 in B
+  const chords7thQmd = await page.$$eval('#chord-boxes-container .chord-box-card', els => els.map(e => e.dataset.chord));
+  console.log(`   《凄美地》七和弦扩展盒图: ${JSON.stringify(chords7thQmd)}`);
+  if (!chords7thQmd.includes('Bmaj7') || !chords7thQmd.includes('G#m7') || !chords7thQmd.includes('Emaj7') || !chords7thQmd.includes('D#7')) {
+    throw new Error(`《凄美地》七和弦盒图未正确渲染 Bmaj7, G#m7, Emaj7, D#7: 实际为 ${JSON.stringify(chords7thQmd)}`);
   }
-  console.log(`   ✅ B 大调 14 调完整体系生效，《凄美地》准确渲染 B、F#、G#m、E 吉他盒图，绝无回退 C 大调！`);
+
+  // Switch to triad mode and verify triad chords for 6,4,1,3 in B (G#m - E - B - D#)
+  await page.click('#voicing-toggle .seg-btn[data-voicing="triad"]');
+  await page.waitForTimeout(300);
+  const chordsTriadQmd = await page.$$eval('#chord-boxes-container .chord-box-card', els => els.map(e => e.dataset.chord));
+  console.log(`   《凄美地》基础三和弦盒图: ${JSON.stringify(chordsTriadQmd)}`);
+  if (!chordsTriadQmd.includes('B') || !chordsTriadQmd.includes('G#m') || !chordsTriadQmd.includes('E') || !chordsTriadQmd.includes('D#')) {
+    throw new Error(`《凄美地》B 大调三和弦盒图未正确渲染 B, G#m, E, D#: 实际为 ${JSON.stringify(chordsTriadQmd)}`);
+  }
+  console.log(`   ✅ B 大调 14 调完整体系生效，《凄美地》准确渲染 B、G#m、E、D# 吉他盒图，绝无回退 C 大调！`);
 
   // 3. Test 1-5-6-4 progression search accuracy (no Canon 15634125 or Royal Road)
   console.log(`   触发 1,5,6,4 流行进行检索，校验和弦绝无张冠李戴...`);

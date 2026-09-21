@@ -43,6 +43,14 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 POP909_INDEX_FILE = DATA_DIR / "pop909_indexed_chords.json"
 MODERN_CORPUS_FILE = DATA_DIR / "chinese_modern_corpus.json"
 
+try:
+    from .yopu_importer import clean_yopu_query
+except ImportError:
+    try:
+        from yopu_importer import clean_yopu_query
+    except ImportError:
+        clean_yopu_query = lambda q: str(q or "").strip()
+
 
 class ChinesePopEngine:
     def __init__(self):
@@ -94,88 +102,97 @@ class ChinesePopEngine:
         seen_keys = set()
 
         if is_text:
-            tokens = str(progression).strip().lower().split()
-            for item in self.corpus:
-                haystack = f"{item.get('title', '')} {item.get('artist', '')}".lower()
-                if all(tok in haystack for tok in tokens):
-                    song_id = item.get("id", str(len(seen_ids) + 1))
-                    norm_key = (normalize_text_key(item.get("title", "")), normalize_text_key(item.get("artist", "")))
-                    if norm_key not in seen_keys:
-                        seen_ids.add(song_id)
-                        seen_keys.add(norm_key)
-                        prog = item.get("primary_progression") or item.get("progression", "")
-                        roman = item.get("primary_roman") or item.get("roman", "")
-                        chords = item.get("primary_chords") or item.get("chords", [])
-                        results.append(SongEntry(
-                            id=song_id,
-                            title=item.get("title", "Unknown"),
-                            artist=item.get("artist", "Unknown"),
-                            section=item.get("section", "Chorus"),
-                            key=item.get("key", "C major"),
-                            progression=prog,
-                            roman_progression=roman,
-                            language="zh",
-                            source="chinese_curated",
-                            chords=chords,
-                            match_kind="loop",
-                            url=item.get("source_url"),
-                            primary_loop_progression=prog,
-                            primary_loop_chords=chords
-                        ))
-            for m_item in self._modern_data:
-                haystack = f"{m_item.get('title', '')} {m_item.get('artist', '')}".lower()
-                if all(tok in haystack for tok in tokens):
-                    m_id = m_item.get("id", "")
-                    norm_key = (normalize_text_key(m_item.get("title", "")), normalize_text_key(m_item.get("artist", "")))
-                    if norm_key not in seen_keys:
-                        seen_ids.add(m_id)
-                        seen_keys.add(norm_key)
-                        m_prog = m_item.get("primary_progression") or m_item.get("progression", "")
-                        m_roman = m_item.get("primary_roman") or m_item.get("roman", "")
-                        m_chords = m_item.get("primary_chords") or m_item.get("chords") or []
-                        results.append(SongEntry(
-                            id=m_id,
-                            title=m_item.get("title", f"Modern #{m_id}"),
-                            artist=m_item.get("artist", "华语新歌"),
-                            section=m_item.get("section", "Chorus"),
-                            key=m_item.get("key", "C major"),
-                            progression=m_prog,
-                            roman_progression=m_roman,
-                            language="zh",
-                            source="modern_harvest",
-                            chords=m_chords,
-                            match_kind="loop",
-                            url=m_item.get("source_url"),
-                            primary_loop_progression=m_prog,
-                            primary_loop_chords=m_chords
-                        ))
-            for p_item in self._pop909_data:
-                haystack = f"{p_item.get('title', '')} {p_item.get('artist', '')}".lower()
-                if all(tok in haystack for tok in tokens):
-                    p_id = p_item.get("id", "")
-                    norm_key = (normalize_text_key(p_item.get("title", "")), normalize_text_key(p_item.get("artist", "")))
-                    if norm_key not in seen_keys:
-                        seen_ids.add(p_id)
-                        seen_keys.add(norm_key)
-                        p_prog = p_item.get("progression", "")
-                        p_roman = p_item.get("roman", "")
-                        p_chords = p_item.get("chords") or []
-                        results.append(SongEntry(
-                            id=p_id,
-                            title=p_item.get("title", f"POP909 #{p_id}"),
-                            artist=p_item.get("artist", "华语流行"),
-                            section=p_item.get("section", "Chorus"),
-                            key=p_item.get("key", "C major"),
-                            progression=p_prog,
-                            roman_progression=p_roman,
-                            language="zh",
-                            source="pop909",
-                            chords=p_chords,
-                            match_kind="loop",
-                            url=None,
-                            primary_loop_progression=p_prog,
-                            primary_loop_chords=p_chords
-                        ))
+            clean_q = clean_yopu_query(str(progression))
+            tokens = clean_q.lower().split()
+            if not tokens:
+                tokens = str(progression).strip().lower().split()
+
+            def _scan_corpus(req_tokens: List[str]):
+                for item in self.corpus:
+                    haystack = f"{item.get('title', '')} {item.get('artist', '')}".lower()
+                    if all(tok in haystack for tok in req_tokens):
+                        song_id = item.get("id", str(len(seen_ids) + 1))
+                        norm_key = (normalize_text_key(item.get("title", "")), normalize_text_key(item.get("artist", "")))
+                        if norm_key not in seen_keys:
+                            seen_ids.add(song_id)
+                            seen_keys.add(norm_key)
+                            prog = item.get("primary_progression") or item.get("progression", "")
+                            roman = item.get("primary_roman") or item.get("roman", "")
+                            chords = item.get("primary_chords") or item.get("chords", [])
+                            results.append(SongEntry(
+                                id=song_id,
+                                title=item.get("title", "Unknown"),
+                                artist=item.get("artist", "Unknown"),
+                                section=item.get("section", "Chorus"),
+                                key=item.get("key", "C major"),
+                                progression=prog,
+                                roman_progression=roman,
+                                language="zh",
+                                source="chinese_curated",
+                                chords=chords,
+                                match_kind="loop",
+                                url=item.get("source_url"),
+                                primary_loop_progression=prog,
+                                primary_loop_chords=chords
+                            ))
+                for m_item in self._modern_data:
+                    haystack = f"{m_item.get('title', '')} {m_item.get('artist', '')}".lower()
+                    if all(tok in haystack for tok in req_tokens):
+                        m_id = m_item.get("id", "")
+                        norm_key = (normalize_text_key(m_item.get("title", "")), normalize_text_key(m_item.get("artist", "")))
+                        if norm_key not in seen_keys:
+                            seen_ids.add(m_id)
+                            seen_keys.add(norm_key)
+                            m_prog = m_item.get("primary_progression") or m_item.get("progression", "")
+                            m_roman = m_item.get("primary_roman") or m_item.get("roman", "")
+                            m_chords = m_item.get("primary_chords") or m_item.get("chords") or []
+                            results.append(SongEntry(
+                                id=m_id,
+                                title=m_item.get("title", f"Modern #{m_id}"),
+                                artist=m_item.get("artist", "华语新歌"),
+                                section=m_item.get("section", "Chorus"),
+                                key=m_item.get("key", "C major"),
+                                progression=m_prog,
+                                roman_progression=m_roman,
+                                language="zh",
+                                source="modern_harvest",
+                                chords=m_chords,
+                                match_kind="loop",
+                                url=m_item.get("source_url"),
+                                primary_loop_progression=m_prog,
+                                primary_loop_chords=m_chords
+                            ))
+                for p_item in self._pop909_data:
+                    haystack = f"{p_item.get('title', '')} {p_item.get('artist', '')}".lower()
+                    if all(tok in haystack for tok in req_tokens):
+                        p_id = p_item.get("id", "")
+                        norm_key = (normalize_text_key(p_item.get("title", "")), normalize_text_key(p_item.get("artist", "")))
+                        if norm_key not in seen_keys:
+                            seen_ids.add(p_id)
+                            seen_keys.add(norm_key)
+                            p_prog = p_item.get("progression", "")
+                            p_roman = p_item.get("roman", "")
+                            p_chords = p_item.get("chords") or []
+                            results.append(SongEntry(
+                                id=p_id,
+                                title=p_item.get("title", f"POP909 #{p_id}"),
+                                artist=p_item.get("artist", "华语流行"),
+                                section=p_item.get("section", "Chorus"),
+                                key=p_item.get("key", "C major"),
+                                progression=p_prog,
+                                roman_progression=p_roman,
+                                language="zh",
+                                source="pop909",
+                                chords=p_chords,
+                                match_kind="loop",
+                                url=None,
+                                primary_loop_progression=p_prog,
+                                primary_loop_chords=p_chords
+                            ))
+
+            _scan_corpus(tokens)
+            if not results and len(tokens) > 1:
+                _scan_corpus([tokens[0]])
             return results
 
         for item in self.corpus:

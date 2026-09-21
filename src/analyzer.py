@@ -88,6 +88,15 @@ class UnifiedChordAnalyzer:
         """
         comma_str, roman_str, degrees = normalize_progression_input(progression)
         if not degrees:
+            zh_songs = self.chinese_engine.search_songs(progression)
+            if zh_songs:
+                return {
+                    "progression": progression,
+                    "roman": "",
+                    "total_count": len(zh_songs),
+                    "counts_by_language": {"chinese": len(zh_songs), "western": 0},
+                    "songs": [s.to_dict() for s in zh_songs]
+                }
             return {
                 "progression": progression,
                 "error": f"Invalid progression format: '{progression}'. Use e.g. '1,5,6,4', '1564', or 'I-V-vi-IV'.",

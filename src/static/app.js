@@ -8,11 +8,13 @@ import {
   detectSecondaryDominant
 } from "./guitar_suite.js";
 
-// Clean parenthesized subtitles from Yopu search queries and links
+// Clean parenthesized subtitles and noise from Yopu search queries and links
 function cleanYopuQuery(str) {
   const raw = String(str || "").trim();
-  const stripped = raw
+  let stripped = raw
     .replace(/[\(（\[【][^\)）\]】]*[\)）\]】]/g, " ")
+    .replace(/(?:^|\s+)[-–—]\s*(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
+    .replace(/(?:^|\s+)(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
   return stripped || raw.replace(/[\(（\)）\[\]【】]/g, " ").trim();
@@ -646,14 +648,18 @@ document.addEventListener("DOMContentLoaded", () => {
       let listenLink = "-";
       const isFakeYopuSlug = song.source_url && /yopu\.co\/view\/[a-z_]+$/i.test(song.source_url) && !/yopu\.co\/view\/[0-9a-f]{24}$/i.test(song.source_url) && !/yopu\.co\/view\/[A-Za-z0-9]{8}$/i.test(song.source_url);
       if (song.source_url && /^https?:\/\//i.test(song.source_url) && !isFakeYopuSlug && !song.source_url.startsWith("local://")) {
-        listenLink = `<a href="${escapeHtml(song.source_url)}" target="_blank" rel="noopener">曲谱/来源 ↗</a>`;
+        listenLink = `<a href="${escapeHtml(song.source_url)}" target="_blank" rel="noopener" class="listen-pill source-pill" title="查看原始曲谱来源">曲谱/来源 ↗</a>`;
       } else if (song.youtube_id) {
-        listenLink = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener">试听 ↗</a>`;
+        listenLink = `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener" class="listen-pill yt-pill" title="在 YouTube 试听原曲">试听 ↗</a>`;
       } else if (isZh) {
         const cleanTitle = cleanYopuQuery(song.title);
-        const cleanArtist = cleanYopuQuery(song.artist);
+        let cleanArtist = cleanYopuQuery(song.artist);
+        if (/^(华语群星|华语流行|华语新歌|群星|未知歌手|佚名|pop909.*)$/i.test(cleanArtist)) {
+          cleanArtist = "";
+        }
         const queryTerm = `${cleanTitle} ${cleanArtist}`.trim() || cleanTitle || song.title || "";
-        listenLink = `<a href="https://yopu.co/search?q=${encodeURIComponent(queryTerm)}" target="_blank" rel="noopener">有谱么 ↗</a>`;
+        const encodedQ = encodeURIComponent(queryTerm);
+        listenLink = `<a href="https://yopu.co/search?q=${encodedQ}#q=${encodedQ}" target="_blank" rel="noopener" class="listen-pill yopu-pill" title="在有谱么搜索《${escapeHtml(queryTerm)}》吉他谱">有谱么 ↗</a>`;
       }
 
       const songProg = song.progression || activeDegrees.join(",");
@@ -741,12 +747,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 1. Determine active progression string
     let progStr = "";
-    if (overrideProg) {
+    if (overrideProg && isDegreeQueryText(String(overrideProg))) {
       progStr = String(overrideProg);
-    } else if (currentSearchResults && currentSearchResults.progression) {
-      progStr = String(currentSearchResults.progression);
     } else if (activeDegrees && activeDegrees.length > 0) {
       progStr = activeDegrees.join(",");
+    } else if (currentSearchResults && currentSearchResults.progression && isDegreeQueryText(currentSearchResults.progression)) {
+      progStr = String(currentSearchResults.progression);
     } else {
       progStr = "1,5,6,4";
     }

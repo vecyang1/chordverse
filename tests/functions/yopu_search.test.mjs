@@ -217,6 +217,9 @@ test("cleanYopuQuery strips bilingual and subtitle brackets from search queries"
   assert.equal(cleanYopuQuery("水星记（Mercury Records） 郭顶（Guo Ding）"), "水星记 郭顶");
   assert.equal(cleanYopuQuery("漠河舞厅 (Mohe Ballroom)"), "漠河舞厅");
   assert.equal(cleanYopuQuery("乌梅子酱 (Plum Sauce) 李荣浩 (Ronghao Li)"), "乌梅子酱 李荣浩");
+  assert.equal(cleanYopuQuery("怒放的生命 华语"), "怒放的生命");
+  assert.equal(cleanYopuQuery("怒放的生命 - 华语流行"), "怒放的生命");
+  assert.equal(cleanYopuQuery("晴天 华语新歌"), "晴天");
   assert.equal(cleanYopuQuery("孤勇者"), "孤勇者");
   assert.equal(cleanYopuQuery(""), "");
   assert.equal(cleanYopuQuery(null), "");

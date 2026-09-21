@@ -52,11 +52,13 @@ function zMod(t, n) {
   return r < 0 ? r + n : r;
 }
 
-/** Sanitize query by stripping English/Chinese parenthesized subtitles */
+/** Sanitize query by stripping English/Chinese parenthesized subtitles and noise words */
 export function cleanYopuQuery(query) {
   const raw = String(query || "").trim();
-  const stripped = raw
+  let stripped = raw
     .replace(/[\(（\[【][^\)）\]】]*[\)）\]】]/g, " ")
+    .replace(/(?:^|\s+)[-–—]\s*(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
+    .replace(/(?:^|\s+)(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
   return stripped || raw.replace(/[\(（\)）\[\]【】]/g, " ").trim();
@@ -265,7 +267,21 @@ export async function onRequestGet(context) {
   let upstreamError;
   for (let attempt = 0; attempt <= TRANSIENT_RETRIES; attempt++) {
     try {
-      const { results, total } = await fetchYopuLive(q, page, instrument);
+      let { results, total } = await fetchYopuLive(q, page, instrument);
+      if ((!results || results.length === 0) && q.includes(" ")) {
+        const titleOnly = q.split(/\s+/)[0];
+        if (titleOnly && titleOnly !== q) {
+          try {
+            const fallbackLive = await fetchYopuLive(titleOnly, page, instrument);
+            if (fallbackLive && fallbackLive.results && fallbackLive.results.length > 0) {
+              results = fallbackLive.results;
+              total = fallbackLive.total;
+            }
+          } catch (_titleErr) {
+            // retain original empty results
+          }
+        }
+      }
       return jsonResponse(
         { ...base, source: SOURCE_LIVE, total, total_count: total, results },
         { "Cache-Control": "public, max-age=1800" }

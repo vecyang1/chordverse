@@ -13,9 +13,11 @@ function cleanYopuQuery(str) {
   const raw = String(str || "").trim();
   let stripped = raw
     .replace(/[\(（\[【][^\)）\]】]*[\)）\]】]/g, " ")
-    .replace(/(?:^|\s+)[-–—]\s*(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
-    .replace(/(?:^|\s+)(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
+    .replace(/\/[\s]*[a-zA-Z\s0-9\-_]+$/g, "")
+    .replace(/(?:^|[\s\-–—_/]+)(?:华语|国语|粤语|台语|闽南语|欧美|日韩|POP909)(?:版|流行|新歌|经典|金曲)?(?=[\s\-–—_/]+|$)/gi, " ")
+    .replace(/(?:^|[\s\-–—_/]+)(?:流行|新歌|经典|现场版|原版|伴奏|Live)(?=[\s\-–—_/]+|$)/gi, " ")
     .replace(/\s+/g, " ")
+    .replace(/^[\s\-–—_/]+|[\s\-–—_/]+$/g, "")
     .trim();
   return stripped || raw.replace(/[\(（\)）\[\]【】]/g, " ").trim();
 }
@@ -642,8 +644,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const isZh = song.language === "zh" || song.source?.startsWith("chinese") || song.source?.startsWith("pop909");
       const langBadge = isZh 
-        ? `<span class="badge badge-zh">华语</span>` 
-        : `<span class="badge badge-en">欧美</span>`;
+        ? `<span class="lang-badge zh" title="华语流行">华语</span>` 
+        : `<span class="lang-badge en" title="欧美流行">欧美</span>`;
 
       let listenLink = "-";
       const isFakeYopuSlug = song.source_url && /yopu\.co\/view\/[a-z_]+$/i.test(song.source_url) && !/yopu\.co\/view\/[0-9a-f]{24}$/i.test(song.source_url) && !/yopu\.co\/view\/[A-Za-z0-9]{8}$/i.test(song.source_url);

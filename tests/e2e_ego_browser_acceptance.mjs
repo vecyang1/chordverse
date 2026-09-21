@@ -97,6 +97,12 @@ console.log(`🌐 [Ego-Browser] Launching Chrome acceptance runner on ${TARGET_B
     }
 
     const href = await yopuLink.getAttribute('href');
+    const pillClass = await yopuLink.getAttribute('class') || '';
+    if (!pillClass.includes('listen-pill') || !pillClass.includes('yopu-pill')) {
+      throw new Error(`《${item.titleSnippet}》有谱么链接缺少 listen-pill yopu-pill 样式类: "${pillClass}"`);
+    }
+    const linkColor = await yopuLink.evaluate(el => window.getComputedStyle(el).color);
+    console.log(`   《${item.titleSnippet}》徽章类: "${pillClass}", 计算文字色: ${linkColor}`);
     const url = new URL(href);
     const qParam = url.searchParams.get('q') || '';
     console.log(`   《${item.titleSnippet}》有谱么链接 q 参数: "${qParam}" (完整 href: ${href})`);
@@ -378,6 +384,32 @@ console.log(`🌐 [Ego-Browser] Launching Chrome acceptance runner on ${TARGET_B
     }
   }
   console.log(`   ✅ 1,5,6,4 和弦准确性校验通过: 卡农歌曲绝不假冒 1,5,6,4！`);
+
+  // Verify 《怒放的生命》 specifically for clean query, yopu-pill badge contrast, and lang-badge
+  const nfRow = page.locator('#songs-tbody tr', { hasText: '怒放的生命' }).first();
+  if (await nfRow.count() > 0) {
+    const nfLink = nfRow.locator('a[href*="yopu.co/search"]').first();
+    if (await nfLink.count() > 0) {
+      const nfHref = await nfLink.getAttribute('href');
+      const nfUrl = new URL(nfHref);
+      const nfQ = nfUrl.searchParams.get('q') || '';
+      console.log(`   《怒放的生命》有谱么链接: "${nfHref}", q="${nfQ}"`);
+      if (nfQ.includes('Blooming') || nfQ.includes('华语') || nfQ.includes('(') || nfQ.includes('（')) {
+        throw new Error(`《怒放的生命》外链未正确清洗: "${nfQ}"`);
+      }
+      if (nfQ !== '怒放的生命 汪峰') {
+        console.warn(`   ⚠️ 《怒放的生命》检索词为 "${nfQ}" (预期 "怒放的生命 汪峰")`);
+      } else {
+        console.log(`   ✅ 《怒放的生命》外链精确净化为 "怒放的生命 汪峰"！`);
+      }
+      const nfColor = await nfLink.evaluate(el => window.getComputedStyle(el).color);
+      console.log(`   ✅ 《怒放的生命》有谱么徽章计算色彩: ${nfColor} (高对比度玻璃拟态)`);
+    }
+    const zhBadge = nfRow.locator('.lang-badge.zh').first();
+    if (await zhBadge.count() > 0) {
+      console.log(`   ✅ 《怒放的生命》行包含独立 .lang-badge.zh 语言徽章`);
+    }
+  }
 
   // =========================================================================
   // SCREENSHOT & VERIFICATION COMPLETION

@@ -52,14 +52,16 @@ function zMod(t, n) {
   return r < 0 ? r + n : r;
 }
 
-/** Sanitize query by stripping English/Chinese parenthesized subtitles and noise words */
+/** Sanitize query by stripping English/Chinese parenthesized subtitles, bilingual slashes, and noise words */
 export function cleanYopuQuery(query) {
   const raw = String(query || "").trim();
   let stripped = raw
     .replace(/[\(（\[【][^\)）\]】]*[\)）\]】]/g, " ")
-    .replace(/(?:^|\s+)[-–—]\s*(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
-    .replace(/(?:^|\s+)(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)/gi, " ")
+    .replace(/\/[\s]*[a-zA-Z\s0-9\-_]+$/g, "")
+    .replace(/(?:^|[\s\-–—_/]+)(?:华语|国语|粤语|台语|闽南语|欧美|日韩|POP909)(?:版|流行|新歌|经典|金曲)?(?=[\s\-–—_/]+|$)/gi, " ")
+    .replace(/(?:^|[\s\-–—_/]+)(?:流行|新歌|经典|现场版|原版|伴奏|Live)(?=[\s\-–—_/]+|$)/gi, " ")
     .replace(/\s+/g, " ")
+    .replace(/^[\s\-–—_/]+|[\s\-–—_/]+$/g, "")
     .trim();
   return stripped || raw.replace(/[\(（\)）\[\]【】]/g, " ").trim();
 }

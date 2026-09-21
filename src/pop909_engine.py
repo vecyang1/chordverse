@@ -149,6 +149,33 @@ class ChinesePopEngine:
                             primary_loop_progression=m_prog,
                             primary_loop_chords=m_chords
                         ))
+            for p_item in self._pop909_data:
+                haystack = f"{p_item.get('title', '')} {p_item.get('artist', '')}".lower()
+                if all(tok in haystack for tok in tokens):
+                    p_id = p_item.get("id", "")
+                    norm_key = (normalize_text_key(p_item.get("title", "")), normalize_text_key(p_item.get("artist", "")))
+                    if norm_key not in seen_keys:
+                        seen_ids.add(p_id)
+                        seen_keys.add(norm_key)
+                        p_prog = p_item.get("progression", "")
+                        p_roman = p_item.get("roman", "")
+                        p_chords = p_item.get("chords") or []
+                        results.append(SongEntry(
+                            id=p_id,
+                            title=p_item.get("title", f"POP909 #{p_id}"),
+                            artist=p_item.get("artist", "华语流行"),
+                            section=p_item.get("section", "Chorus"),
+                            key=p_item.get("key", "C major"),
+                            progression=p_prog,
+                            roman_progression=p_roman,
+                            language="zh",
+                            source="pop909",
+                            chords=p_chords,
+                            match_kind="loop",
+                            url=None,
+                            primary_loop_progression=p_prog,
+                            primary_loop_chords=p_chords
+                        ))
             return results
 
         for item in self.corpus:

@@ -60,15 +60,18 @@ code, pre {
   font-family: 'JetBrains Mono', monospace;
 }
 
-a {
+a,
+a:visited {
   color: var(--primary-accent);
   text-decoration: none;
   transition: var(--transition);
 }
 
-a:hover {
+a:hover,
+a:focus-visible {
   color: #70e2ff;
   text-decoration: underline;
+  outline: none;
 }
 
 .app-container {
@@ -823,22 +826,32 @@ a:hover {
   color: var(--text-secondary);
 }
 
-.lang-badge {
-  display: inline-block;
-  padding: 2px 6px;
+.lang-badge,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
+  line-height: 1.3;
+  margin-left: 6px;
+  vertical-align: middle;
 }
 
-.lang-badge.zh {
-  background: var(--tag-zh-bg);
-  color: var(--tag-zh-text);
+.lang-badge.zh,
+.badge.badge-zh {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
 }
 
-.lang-badge.en {
-  background: var(--tag-en-bg);
-  color: var(--tag-en-text);
+.lang-badge.en,
+.badge.badge-en {
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #c084fc;
 }
 
 /* Provenance Source Badges */
@@ -900,7 +913,8 @@ a:hover {
   white-space: nowrap;
 }
 
-.listen-pill {
+.listen-pill,
+.listen-pill:visited {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -916,55 +930,65 @@ a:hover {
 }
 
 /* Yopu.co Badge: Vibrant Sky/Cyan (#38bdf8, > 8.8:1 contrast against dark slate background) */
-.listen-pill.yopu-pill {
+.listen-pill.yopu-pill,
+.listen-pill.yopu-pill:visited {
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.35);
   color: #38bdf8;
 }
 
-.listen-pill.yopu-pill:hover {
+.listen-pill.yopu-pill:hover,
+.listen-pill.yopu-pill:focus-visible {
   background: rgba(56, 189, 248, 0.25);
   border-color: rgba(56, 189, 248, 0.65);
   color: #e0f2fe;
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
   text-decoration: none;
   transform: translateY(-1px);
+  outline: none;
 }
 
 /* YouTube Badge: High-contrast Coral/Rose (#f87171, > 5.5:1 contrast) */
-.listen-pill.yt-pill {
+.listen-pill.yt-pill,
+.listen-pill.yt-pill:visited {
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.35);
   color: #f87171;
 }
 
-.listen-pill.yt-pill:hover {
+.listen-pill.yt-pill:hover,
+.listen-pill.yt-pill:focus-visible {
   background: rgba(239, 68, 68, 0.25);
   border-color: rgba(239, 68, 68, 0.65);
   color: #fee2e2;
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
   text-decoration: none;
   transform: translateY(-1px);
+  outline: none;
 }
 
 /* Sheet / Source Badge: High-contrast Emerald (#34d399, > 8:1 contrast) */
-.listen-pill.source-pill {
+.listen-pill.source-pill,
+.listen-pill.source-pill:visited {
   background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.35);
   color: #34d399;
 }
 
-.listen-pill.source-pill:hover {
+.listen-pill.source-pill:hover,
+.listen-pill.source-pill:focus-visible {
   background: rgba(16, 185, 129, 0.25);
   border-color: rgba(16, 185, 129, 0.65);
   color: #d1fae5;
   box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
   text-decoration: none;
   transform: translateY(-1px);
+  outline: none;
 }
 
 /* Fallback for generic <a> tags inside .listen-link */
-.listen-link a {
+.listen-link a,
+.listen-link a:visited {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -975,9 +999,11 @@ a:hover {
   transition: all 0.2s ease;
 }
 
-.listen-link a:hover {
+.listen-link a:hover,
+.listen-link a:focus-visible {
   color: #70e2ff;
   text-decoration: underline;
+  outline: none;
 }
 
 /* Loading & Empty States */

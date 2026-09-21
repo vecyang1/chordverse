@@ -199,6 +199,8 @@ class YopuImporter:
         """
         raw_q = str(query or "").strip()
         cleaned_q = re.sub(r"[\(（\[【][^\)）\]】]*[\)）\]】]", " ", raw_q)
+        cleaned_q = re.sub(r"(?:^|\s+)[-–—]\s*(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)", " ", cleaned_q, flags=re.IGNORECASE)
+        cleaned_q = re.sub(r"(?:^|\s+)(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)", " ", cleaned_q, flags=re.IGNORECASE)
         cleaned_q = re.sub(r"\s+", " ", cleaned_q).strip()
         query = cleaned_q if cleaned_q else re.sub(r"[\(（\)）\[\]【】]", " ", raw_q).strip()
         if search_yopu_scores is not None:

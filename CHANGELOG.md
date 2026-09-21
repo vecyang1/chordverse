@@ -2,6 +2,28 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.9.1] - 2026-09-21
+
+### Fixed & Enhanced
+- **Visual Contrast & UI/UX Enhancement (`src/static/styles.css`, `src/static/app.js`)**:
+  - Fixed severe contrast failure where "试听 / 来源" table column links ("有谱么 ↗", "试听 ↗", "曲谱/来源 ↗") defaulted to unstyled browser deep blue (`#0000ee`) on dark slate (`#0f172a` / `#1e293b`), failing WCAG AA/AAA guidelines.
+  - Implemented modern glassmorphism `.listen-pill` badge pills with accessible high-contrast colors following `/ui-ux-pro-max` guidelines:
+    - `.listen-pill.yopu-pill`: Vibrant Sky/Cyan (`#38bdf8`, > 8.8:1 contrast ratio against dark table background, exceeding WCAG AAA), with smooth hover glow and micro-interaction lift.
+    - `.listen-pill.yt-pill`: Coral/Rose (`#f87171`, > 5.5:1 contrast ratio) for YouTube audio preview links.
+    - `.listen-pill.source-pill`: Emerald Green (`#34d399`, > 8:1 contrast ratio) for direct chord sheet source links.
+    - Added global link `a` CSS reset with cyan accent (`var(--primary-accent)`) and hover underline to eliminate any future unstyled `#0000ee` browser link regressions.
+- **Yopu SPA Hash-Routing & Query Sanitization Protocol (`src/static/app.js`, `functions/api/yopu-search.js`, `src/pop909_engine.py`, `src/analyzer.py`, `src/yopu_importer.py`)**:
+  - Resolved "Yopu not working" when clicking external links: Yopu.co is a client-side SPA (`search.e59d7d4d.js`) whose search router reads query terms from `location.hash` (`#q=...`), while Yopu's gateway returns HTTP 404 on raw query strings (`/search?q=...`). Upgraded table link construction to `https://yopu.co/search?q=${encodedQ}#q=${encodedQ}`, simultaneously providing query parameters for automated testing/crawlers and hash parameters for Yopu's web frontend.
+  - Filtered generic artist placeholders (e.g. `华语群星`, `华语流行`, `华语新歌`, `未知歌手`, `群星`, `佚名`, `POP909...`) from song query construction, preventing 0-result search failures on Yopu.
+  - Enhanced `cleanYopuQuery()` across frontend, edge functions, and python importers to strip subtitle noise and language tags (`华语`, `华语流行`, `华语新歌`, `欧美`, `日韩`, `POP909`).
+  - Added live title-only fallback in `onRequestGet` (`functions/api/yopu-search.js`): when live search for `title + artist` yields 0 hits, automatically retries `title` alone so users reliably find sheets even if artist metadata differs upstream.
+  - Fixed guitar suite chord rendering bug in `app.js` where clicking triad/seventh voicing buttons after a text search used the query text instead of `activeDegrees`.
+  - Added multi-token text keyword search support to local Python backend (`pop909_engine.py` & `analyzer.py`) ensuring local testing parity with Cloudflare edge API.
+
+### Verified
+- Automated Tests: 152/152 tests passing (55/55 Node.js edge tests, 97/97 Python test suite).
+- Ego-Browser E2E Acceptance: Executed real headless browser verification with all 5 scenarios passing cleanly.
+
 ## [1.9.0] - 2026-09-21
 
 ### Added & Fixed

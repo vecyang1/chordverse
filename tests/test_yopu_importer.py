@@ -92,6 +92,20 @@ class TestYopuImporter(unittest.TestCase):
         titles = [r["title"] for r in res["results"]]
         self.assertTrue(any("再见青春" in t for t in titles))
 
+    def test_search_yopu_multi_token_and_noise_stripping(self):
+        # Multi-token title + artist must successfully match local corpus without throwing ConnectionError
+        res = self.importer.search_yopu("怒放的生命 汪峰")
+        self.assertIn("results", res)
+        self.assertGreater(len(res["results"]), 0)
+        titles = [r["title"] for r in res["results"]]
+        self.assertTrue(any("怒放的生命" in t for t in titles))
+
+        # Query with noise suffix like 华语流行 or hyphen must be stripped
+        res_noise = self.importer.search_yopu("怒放的生命-华语流行")
+        self.assertIn("results", res_noise)
+        self.assertGreater(len(res_noise["results"]), 0)
+        self.assertTrue(any("怒放的生命" in r["title"] for r in res_noise["results"]))
+
     def test_parse_and_clean_score_with_sheet_data_chords(self):
         from unittest.mock import patch
         mock_sheet = {

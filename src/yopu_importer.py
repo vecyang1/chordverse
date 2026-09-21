@@ -55,7 +55,38 @@ except ImportError:
                 pass
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+STATIC_DATA_DIR = Path(__file__).resolve().parent / "static" / "data"
 MODERN_CORPUS_FILE = DATA_DIR / "chinese_modern_corpus.json"
+CHINESE_CORPUS_FILE = STATIC_DATA_DIR / "chinese_corpus.json" if (STATIC_DATA_DIR / "chinese_corpus.json").exists() else DATA_DIR / "chinese_corpus.json"
+POP909_INDEX_FILE = DATA_DIR / "pop909_indexed_chords.json" if (DATA_DIR / "pop909_indexed_chords.json").exists() else STATIC_DATA_DIR / "pop909_indexed_chords.json"
+
+def clean_yopu_query(query: str) -> str:
+    """Sanitize query by stripping English/Chinese parenthesized subtitles, bilingual slashes, and noise tags."""
+    raw = str(query or "").strip()
+    if not raw:
+        return ""
+    # 1. Strip bracketed content
+    stripped = re.sub(r"[\(（\[【][^\)）\]】]*[\)）\]】]", " ", raw)
+    # 2. Strip bilingual slash translation if trailing part is Latin: "汪峰/Wang Feng" -> "汪峰"
+    stripped = re.sub(r"/[\s]*[a-zA-Z\s0-9\-_]+$", "", stripped)
+    # 3. Strip language and category noise tags with optional delimiters and suffixes
+    stripped = re.sub(
+        r"(?:^|[\s\-–—_/]+)(?:华语|国语|粤语|台语|闽南语|欧美|日韩|POP909)(?:版|流行|新歌|经典|金曲)?(?=[\s\-–—_/]+|$)",
+        " ",
+        stripped,
+        flags=re.IGNORECASE,
+    )
+    # 4. Strip standalone noise suffixes
+    stripped = re.sub(
+        r"(?:^|[\s\-–—_/]+)(?:流行|新歌|经典|现场版|原版|伴奏|Live)(?=[\s\-–—_/]+|$)",
+        " ",
+        stripped,
+        flags=re.IGNORECASE,
+    )
+    # 5. Normalize whitespace and trailing/leading punctuation
+    stripped = re.sub(r"\s+", " ", stripped)
+    stripped = re.sub(r"^[\s\-–—_/]+|[\s\-–—_/]+$", "", stripped).strip()
+    return stripped if stripped else re.sub(r"[\(（\)）\[\]【】]", " ", raw).strip()
 
 SEMITONES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 FLAT_MAP = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#"}
@@ -198,17 +229,36 @@ class YopuImporter:
         Search Yopu.co for lead sheets matching a song title, artist, or query keyword.
         """
         raw_q = str(query or "").strip()
-        cleaned_q = re.sub(r"[\(（\[【][^\)）\]】]*[\)）\]】]", " ", raw_q)
-        cleaned_q = re.sub(r"(?:^|\s+)[-–—]\s*(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)", " ", cleaned_q, flags=re.IGNORECASE)
-        cleaned_q = re.sub(r"(?:^|\s+)(?:华语|华语流行|华语新歌|欧美|日韩|POP909)(?:\s+|$)", " ", cleaned_q, flags=re.IGNORECASE)
-        cleaned_q = re.sub(r"\s+", " ", cleaned_q).strip()
-        query = cleaned_q if cleaned_q else re.sub(r"[\(（\)）\[\]【】]", " ", raw_q).strip()
+        query = clean_yopu_query(raw_q)
+        if not query:
+            return {
+                "query": "",
+                "total_count": 0,
+                "results": [],
+                "source": "yopu_live"
+            }
+
+        upstream_err = None
         if search_yopu_scores is not None:
             try:
                 live = search_yopu_scores(query=query, page=page, instrument=instrument)
-                return {**live, "source": "yopu_live"}
-            except Exception:
-                pass
+                results = live.get("results", [])
+                total = live.get("totalResultNum", len(results))
+                # If multi-token query (e.g. title artist) yields 0 results, fall back to title-only
+                if not results and " " in query:
+                    title_only = query.split()[0]
+                    if title_only and title_only != query:
+                        try:
+                            fb_live = search_yopu_scores(query=title_only, page=page, instrument=instrument)
+                            if fb_live.get("results"):
+                                results = fb_live.get("results", [])
+                                total = fb_live.get("totalResultNum", len(results))
+                        except Exception:
+                            pass
+                if results or total > 0:
+                    return {**live, "results": results, "total_count": total, "source": "yopu_live"}
+            except Exception as e:
+                upstream_err = str(e)
 
         params = {
             "q": query,
@@ -254,48 +304,71 @@ class YopuImporter:
                     "source": "yopu_live"
                 }
         except Exception as e:
+            upstream_err = str(e)
             fallback = self._search_local_corpus(query)
-            if fallback:
-                return {
-                    "query": query,
-                    "total_count": len(fallback),
-                    "results": fallback,
-                    "source": "local_corpus",
-                    "note": "有谱么当前不可达，以下为本地语料库的匹配结果",
-                    "upstream_error": str(e)
-                }
-            raise ConnectionError(f"Failed to search Yopu.co for '{query}': {e}")
+            body = {
+                "query": query,
+                "total_count": len(fallback),
+                "results": fallback,
+                "source": "local_corpus",
+                "note": "有谱么当前不可达，以下为本地语料库的匹配结果",
+                "upstream_error": upstream_err
+            }
+            if not fallback:
+                body["error"] = f"有谱么搜索失败 ({upstream_err})，且本地语料库无匹配"
+            return body
 
     def _search_local_corpus(self, query: str) -> List[Dict[str, Any]]:
-        """Search local modern corpus for matching songs as offline/CI fallback."""
-        if not MODERN_CORPUS_FILE.exists():
+        """Search local corpora for matching songs as offline/CI fallback."""
+        clean_q = clean_yopu_query(query)
+        tokens = clean_q.lower().split()
+        if not tokens:
             return []
-        try:
-            with open(MODERN_CORPUS_FILE, "r", encoding="utf-8") as f:
-                items = json.load(f)
-            q = query.strip().lower()
-            matched = []
-            for item in items:
-                title = str(item.get("title", "")).lower()
-                artist = str(item.get("artist", "")).lower()
-                if q in title or q in artist:
-                    matched.append({
-                        "id": item.get("id", ""),
-                        "title": item.get("title", ""),
-                        "artist": item.get("artist", ""),
-                        "key": item.get("key", "C"),
-                        "capo": item.get("capo", 0),
-                        "author": item.get("artist", ""),
-                        "verified": False,
-                        "progression": item.get("primary_progression") or item.get("progression", ""),
-                        "roman": item.get("primary_roman") or item.get("roman", ""),
-                        "url": item.get("source_url") or "",
-                        "source_url": item.get("source_url") or "",
-                        "source": "local_corpus"
-                    })
-            return matched
-        except Exception:
-            return []
+
+        matched = []
+        seen_ids = set()
+        corpus_files = [
+            (MODERN_CORPUS_FILE, "chinese_modern"),
+            (CHINESE_CORPUS_FILE, "chinese_curated"),
+            (POP909_INDEX_FILE, "pop909")
+        ]
+
+        def _scan(required_tokens: List[str]):
+            for path, corpus_name in corpus_files:
+                if not path.exists():
+                    continue
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        items = json.load(f)
+                    for item in (items if isinstance(items, list) else []):
+                        item_id = item.get("id") or item.get("title", "")
+                        if item_id in seen_ids:
+                            continue
+                        haystack = f"{item.get('title', '')} {item.get('artist', '')}".lower()
+                        if all(t in haystack for t in required_tokens):
+                            seen_ids.add(item_id)
+                            matched.append({
+                                "id": item.get("id", ""),
+                                "title": item.get("title", ""),
+                                "artist": item.get("artist", ""),
+                                "key": item.get("key", "C"),
+                                "capo": item.get("capo", 0),
+                                "author": item.get("artist", ""),
+                                "verified": False,
+                                "progression": item.get("primary_progression") or item.get("progression", ""),
+                                "roman": item.get("primary_roman") or item.get("roman", ""),
+                                "url": item.get("source_url") or "",
+                                "source_url": item.get("source_url") or "",
+                                "corpus": corpus_name,
+                                "source": "local_corpus"
+                            })
+                except Exception:
+                    continue
+
+        _scan(tokens)
+        if not matched and len(tokens) > 1:
+            _scan([tokens[0]])
+        return matched
 
     def import_from_search(self, query: str, pick_index: int = 0, add_to_corpus: bool = True) -> ImportedSong:
         """

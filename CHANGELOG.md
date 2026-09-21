@@ -2,6 +2,23 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [1.9.2] - 2026-09-21
+
+### Fixed & Enhanced
+- **Visual Contrast & Visited Link State Protection (`src/static/styles.css`, `src/static/app.js`)**:
+  - Added explicit `:visited`, `:hover`, and `:focus-visible` styling for `a`, `.listen-link a`, and all `.listen-pill` badges (`.yopu-pill`, `.yt-pill`, `.source-pill`), completely preventing links from reverting to browser default purple (`#551a8b`) or unstyled deep blue (`#0000ee`) after clicks.
+  - Upgraded `.lang-badge` and `.badge` styling (`.lang-badge.zh`, `.badge.badge-zh`, `.lang-badge.en`, `.badge.badge-en`) with glassmorphism borders and 6px margin, cleanly separating language tags from song titles.
+- **Yopu Search URL Auto-Extraction & Delimiter Normalization (`functions/api/yopu-search.js`, `src/yopu_importer.py`, `src/static/app.js`, `functions/api/search.js`, `src/pop909_engine.py`)**:
+  - Implemented automatic query extraction from pasted Yopu search URLs (`https://yopu.co/search?q=...` or `#q=...`) in both JS and Python, decoding encoded terms like `怒放的生命 汪峰`.
+  - Normalized punctuation delimiters (`-`, `–`, `—`, `_`, `/`, `\`, `~`, `·`, `:`, `：`, `|`) into spaces, resolving search failures for queries like `汪峰 - 怒放的生命`, `怒放的生命-汪峰`, `怒放的生命/汪峰`, and `汪峰·怒放的生命`.
+  - Stripped attached and spaced sheet music keywords (`吉他谱`, `弹唱谱`, `六线谱`, `简谱`, `曲谱`, `谱子`, `和弦谱`, `吉他`, `谱`), ensuring user searches like `怒放的生命 吉他谱` and `怒放的生命 谱` match songs directly.
+  - Added auto-routing in 1-Click Yopu Import modal: pasting a search URL or text query into "直接解析" automatically executes search instead of failing with an ID parsing error.
+  - Added 1-click "载入 ➔" button (`.btn-load-local-item`) and accessible "有谱么 ↗" pill for local corpus fallback results in Yopu search modal.
+  - Added multi-token title-only fallback in `functions/api/yopu-search.js` and `pop909_engine.py`.
+- **Production Cloudflare Pages Deployment & Verification**:
+  - Deployed updated web application and edge functions to Cloudflare Pages (`chordverse`).
+  - Verified live deployment with Playwright Ego-browser acceptance runner (all 5 scenarios passed, zero console errors, full-page screenshot verified).
+
 ## [1.9.1] - 2026-09-21
 
 ### Fixed & Enhanced

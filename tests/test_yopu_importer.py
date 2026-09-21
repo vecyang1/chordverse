@@ -106,6 +106,21 @@ class TestYopuImporter(unittest.TestCase):
         self.assertGreater(len(res_noise["results"]), 0)
         self.assertTrue(any("怒放的生命" in r["title"] for r in res_noise["results"]))
 
+        # Query with delimiters like 汪峰 - 怒放的生命 or 怒放的生命-汪峰
+        res_delim1 = self.importer.search_yopu("汪峰 - 怒放的生命")
+        self.assertGreater(len(res_delim1.get("results", [])), 0)
+        res_delim2 = self.importer.search_yopu("怒放的生命-汪峰")
+        self.assertGreater(len(res_delim2.get("results", [])), 0)
+
+        # Query with sheet intent suffix like 吉他谱
+        res_sheet = self.importer.search_yopu("怒放的生命 吉他谱")
+        self.assertGreater(len(res_sheet.get("results", [])), 0)
+
+        # Query with raw Yopu search URL
+        res_url = self.importer.search_yopu("https://yopu.co/search?q=%E6%80%92%E6%94%BE%E7%9A%84%E7%94%9F%E5%91%BD%20%E6%B1%AA%E5%B3%B0")
+        self.assertGreater(len(res_url.get("results", [])), 0)
+
+
     def test_parse_and_clean_score_with_sheet_data_chords(self):
         from unittest.mock import patch
         mock_sheet = {

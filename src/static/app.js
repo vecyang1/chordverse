@@ -1104,8 +1104,12 @@ document.addEventListener("DOMContentLoaded", () => {
         let action;
         if (r.source === "local_corpus") {
           const prog = r.roman ? `${escapeHtml(r.roman)} (${escapeHtml(r.progression || "")})` : escapeHtml(r.progression || "");
-          const link = r.source_url ? ` <a href="${escapeHtml(r.source_url)}" target="_blank" rel="noopener" style="font-size:11px;">来源 ↗</a>` : "";
-          action = `<span style="font-size:11px;color:#38bdf8;white-space:nowrap;">${prog}${link}</span>`;
+          const cleanQ = (cleanYopuQuery(r.title) + " " + cleanYopuQuery(r.artist)).trim() || r.title;
+          const encodedQ = encodeURIComponent(cleanQ);
+          const yopuLink = `<a href="https://yopu.co/search?q=${encodedQ}#q=${encodedQ}" target="_blank" rel="noopener" class="listen-pill yopu-pill" style="font-size:10px;padding:2px 6px;" title="在有谱么搜索吉他谱">有谱么 ↗</a>`;
+          const srcLink = r.source_url ? ` <a href="${escapeHtml(r.source_url)}" target="_blank" rel="noopener" class="listen-pill source-pill" style="font-size:10px;padding:2px 6px;">来源 ↗</a>` : "";
+          const loadBtn = `<button class="btn btn-secondary btn-load-local-item" data-prog="${escapeHtml(r.progression || '')}" data-key="${escapeHtml(r.key || 'C')}" data-title="${title}" style="padding:2px 8px;font-size:11px;">载入 ➔</button>`;
+          action = `<div style="display:flex;align-items:center;gap:6px;white-space:nowrap;"><span style="font-size:11px;color:#38bdf8;">${prog}</span>${yopuLink}${srcLink}${loadBtn}</div>`;
         } else {
           action = `<button class="btn btn-secondary btn-import-item" data-id="${escapeHtml(r.id)}" data-title="${title}" data-artist="${artist}" style="padding:2px 8px;font-size:11px;">解析 ➔</button>`;
         }
@@ -1129,6 +1133,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
 
+      yopuSearchResultsBox.querySelectorAll(".btn-load-local-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const prog = btn.getAttribute("data-prog");
+          const key = btn.getAttribute("data-key") || "C";
+          const title = btn.getAttribute("data-title") || "";
+          if (prog) {
+            const degs = parseInputToDegrees(prog);
+            if (degs.length > 0) {
+              activeDegrees = degs;
+              renderBuilderDisplay();
+            }
+          }
+          const cleanKey = normalizeKeyRoot(key);
+          if (playKeySelect && optionExists(playKeySelect, cleanKey)) {
+            playKeySelect.value = cleanKey;
+          }
+          updateGuitarSuite(prog, cleanKey);
+          showToast(`已成功载入《${title}》和弦进行与指法`);
+        });
+      });
+
     } catch (e) {
       yopuSearchResultsBox.innerHTML = `<div style="font-size:12px;color:#ef4444;">搜索失败: ${e.message}</div>`;
     } finally {
@@ -1140,6 +1165,12 @@ document.addEventListener("DOMContentLoaded", () => {
   btnYopuImport?.addEventListener("click", async () => {
     const raw = yopuImportInput.value.trim();
     if (!raw) return;
+
+    // Auto-detect search URL or keywords without a direct sheet ID, routing to search
+    if (/yopu\.co\/search/i.test(raw) || (!/yopu\.co\/(?:view|sheet)/i.test(raw) && !/^[0-9a-f]{24}$/i.test(raw) && !/^[A-Za-z0-9_-]{8}$/i.test(raw) && !/^[0-9a-f]{6,16}$/i.test(raw))) {
+      btnYopuSearch.click();
+      return;
+    }
     btnYopuImport.textContent = "解析中...";
     btnYopuImport.disabled = true;
     yopuImportResult.style.display = "block";

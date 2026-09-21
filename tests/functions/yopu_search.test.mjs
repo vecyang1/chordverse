@@ -226,9 +226,33 @@ test("cleanYopuQuery strips bilingual and subtitle brackets from search queries"
   assert.equal(cleanYopuQuery("怒放的生命 国语版"), "怒放的生命");
   assert.equal(cleanYopuQuery("海阔天空 粤语"), "海阔天空");
   assert.equal(cleanYopuQuery("汪峰/Wang Feng"), "汪峰");
+  assert.equal(cleanYopuQuery("汪峰 - 怒放的生命"), "汪峰 怒放的生命");
+  assert.equal(cleanYopuQuery("怒放的生命-汪峰"), "怒放的生命 汪峰");
+  assert.equal(cleanYopuQuery("怒放的生命/汪峰"), "怒放的生命 汪峰");
+  assert.equal(cleanYopuQuery("汪峰·怒放的生命"), "汪峰 怒放的生命");
+  assert.equal(cleanYopuQuery("怒放的生命 吉他谱"), "怒放的生命");
+  assert.equal(cleanYopuQuery("怒放的生命吉他谱"), "怒放的生命");
+  assert.equal(cleanYopuQuery("怒放的生命 谱"), "怒放的生命");
+  assert.equal(cleanYopuQuery("怒放的生命 弹唱谱"), "怒放的生命");
+  assert.equal(cleanYopuQuery("怒放的生命 汪峰 吉他谱"), "怒放的生命 汪峰");
+  assert.equal(cleanYopuQuery("https://yopu.co/search?q=%E6%80%92%E6%94%BE%E7%9A%84%E7%94%9F%E5%91%BD%20%E6%B1%AA%E5%B3%B0"), "怒放的生命 汪峰");
+  assert.equal(cleanYopuQuery("https://yopu.co/search#q=%E6%80%92%E6%94%BE%E7%9A%84%E7%94%9F%E5%91%BD"), "怒放的生命");
   assert.equal(cleanYopuQuery("晴天 华语新歌"), "晴天");
   assert.equal(cleanYopuQuery("孤勇者"), "孤勇者");
   assert.equal(cleanYopuQuery(""), "");
   assert.equal(cleanYopuQuery(null), "");
 });
+
+test("fallback gracefully backs off to title-only when multi-token search has missing artist in local corpus", async () => {
+  installFetch((url) => {
+    if (url === "https://yopu.co/explore") throw new TypeError("fetch failed");
+    return corpusPlan(url) || new Response("", { status: 404 });
+  });
+
+  const { body } = await call("q=%E5%86%8D%E8%A7%81%E9%9D%92%E6%98%A5%20%E6%9C%AA%E7%9F%A5%E5%90%89%E4%BB%96%E6%89%8B"); // 再见青春 未知吉他手
+  assert.equal(body.source, SOURCE_LOCAL);
+  assert.equal(body.results.length, 1);
+  assert.equal(body.results[0].title, "再见青春");
+});
+
 

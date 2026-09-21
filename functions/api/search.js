@@ -12,6 +12,8 @@
  *    loop matches by repetitions, then sequence matches by occurrences.
  */
 
+import { cleanYopuQuery } from "./yopu-search.js";
+
 export const MIN_SEQUENCE_OCCURRENCES = 2;
 
 export const ROMAN_MAP = { 1: "I", 2: "ii", 3: "iii", 4: "IV", 5: "V", 6: "vi", 7: "vii°" };
@@ -299,64 +301,78 @@ export async function onRequestGet(context) {
   if (lang === "zh") allSongs = allSongs.filter((s) => s.language === "zh");
   else if (lang === "en") allSongs = allSongs.filter((s) => s.language === "en");
 
-  const matchedSongs = [];
+  let matchedSongs = [];
   const seen = new Set();
 
-  for (const s of allSongs) {
-    const sTitle = (s.title || "").toLowerCase();
-    const sArtist = (s.artist || "").toLowerCase();
-    if (keyFilter && !keyMatches(s, keyFilter)) continue;
-    if (artistFilter && !sArtist.includes(artistFilter) && !sTitle.includes(artistFilter)) continue;
+  function runMatch(targetTokens) {
+    const list = [];
+    for (const s of allSongs) {
+      const sTitle = (s.title || "").toLowerCase();
+      const sArtist = (s.artist || "").toLowerCase();
+      if (keyFilter && !keyMatches(s, keyFilter)) continue;
+      if (artistFilter && !sArtist.includes(artistFilter) && !sTitle.includes(artistFilter)) continue;
 
-    let match = null;
-    if (textKeyword) {
-      const tokens = textKeyword.split(/\s+/).filter(Boolean);
-      const haystack = `${sTitle} ${sArtist}`;
-      if (tokens.every((tok) => haystack.includes(tok))) match = { kind: "text", occurrences: 0 };
-    } else if (targetDegrees.length > 0) {
-      match = matchSong(s, targetDegrees);
-    } else {
-      match = { kind: "all", occurrences: 0 };
+      let match = null;
+      if (targetTokens && targetTokens.length > 0) {
+        const haystack = `${sTitle} ${sArtist}`;
+        if (targetTokens.every((tok) => haystack.includes(tok))) match = { kind: "text", occurrences: 0 };
+      } else if (targetDegrees.length > 0) {
+        match = matchSong(s, targetDegrees);
+      } else {
+        match = { kind: "all", occurrences: 0 };
+      }
+      if (!match) continue;
+
+      const normTitle = normalizeTitle(s.title);
+      const normArtist = normalizeArtist(s.artist);
+      // Deduplicate translated titles (e.g. Plum Sauce vs Plum Jam) for progression searches
+      const uniqKey = isDegreeQuery && cleanProg
+        ? `${normTitle}|${normArtist}`
+        : `${s.title}|${s.artist}|${s.section || ""}`.toLowerCase();
+      if (seen.has(uniqKey)) continue;
+      seen.add(uniqKey);
+
+      // The whole-song sequence is evidence, not a row the client renders.
+      const { degree_sequence: _seq, ...publicRow } = s;
+
+      if (match.kind === "sequence") {
+        const matchingChords = scaleDegreesToChords(targetDegrees, s.analysis_key || s.key);
+        const romanStr = targetDegrees.map((d) => ROMAN_MAP[d] || d).join("-");
+        const sectionName = cleanProg === "4,5,3,6,2,5,1"
+          ? "匹配乐段 (Royal Road 4-5-3-6-2-5-1)"
+          : (taxonomy[cleanProg] ? `匹配乐段 (${taxonomy[cleanProg].split(/[\s/]+/)[0]} ${cleanProg})` : `匹配乐段 (${cleanProg})`);
+
+        list.push({
+          ...publicRow,
+          progression: cleanProg,
+          roman: romanStr,
+          chords: matchingChords,
+          section: sectionName,
+          primary_loop_progression: s.progression,
+          primary_loop_chords: s.chords,
+          match_kind: match.kind,
+          match_occurrences: match.occurrences
+        });
+      } else {
+        list.push({
+          ...publicRow,
+          match_kind: match.kind,
+          match_occurrences: match.occurrences
+        });
+      }
     }
-    if (!match) continue;
+    return list;
+  }
 
-    const normTitle = normalizeTitle(s.title);
-    const normArtist = normalizeArtist(s.artist);
-    // Deduplicate translated titles (e.g. Plum Sauce vs Plum Jam) for progression searches
-    const uniqKey = isDegreeQuery && cleanProg
-      ? `${normTitle}|${normArtist}`
-      : `${s.title}|${s.artist}|${s.section || ""}`.toLowerCase();
-    if (seen.has(uniqKey)) continue;
-    seen.add(uniqKey);
-
-    // The whole-song sequence is evidence, not a row the client renders.
-    const { degree_sequence: _seq, ...publicRow } = s;
-
-    if (match.kind === "sequence") {
-      const matchingChords = scaleDegreesToChords(targetDegrees, s.analysis_key || s.key);
-      const romanStr = targetDegrees.map((d) => ROMAN_MAP[d] || d).join("-");
-      const sectionName = cleanProg === "4,5,3,6,2,5,1"
-        ? "匹配乐段 (Royal Road 4-5-3-6-2-5-1)"
-        : (taxonomy[cleanProg] ? `匹配乐段 (${taxonomy[cleanProg].split(/[\s/]+/)[0]} ${cleanProg})` : `匹配乐段 (${cleanProg})`);
-
-      matchedSongs.push({
-        ...publicRow,
-        progression: cleanProg,
-        roman: romanStr,
-        chords: matchingChords,
-        section: sectionName,
-        primary_loop_progression: s.progression,
-        primary_loop_chords: s.chords,
-        match_kind: match.kind,
-        match_occurrences: match.occurrences
-      });
-    } else {
-      matchedSongs.push({
-        ...publicRow,
-        match_kind: match.kind,
-        match_occurrences: match.occurrences
-      });
+  if (textKeyword) {
+    const cleanKeyword = cleanYopuQuery(rawQuery);
+    const tokens = (cleanKeyword || textKeyword).toLowerCase().split(/\s+/).filter(Boolean);
+    matchedSongs = runMatch(tokens);
+    if (matchedSongs.length === 0 && tokens.length > 1) {
+      matchedSongs = runMatch([tokens[0]]);
     }
+  } else {
+    matchedSongs = runMatch(null);
   }
 
   const ordered = targetDegrees.length > 0 ? sortByEvidence(matchedSongs, cleanProg) : matchedSongs;

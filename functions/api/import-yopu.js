@@ -62,7 +62,9 @@ function extractScoreId(inputStr) {
   const str = String(inputStr || "").trim();
   const urlMatch = str.match(/yopu\.co\/(?:view|sheet)\/([a-zA-Z0-9_-]+)/i);
   if (urlMatch) return urlMatch[1];
+  if (/yopu\.co\/search/i.test(str)) return "";
   const clean = str.replace(/^https?:\/\/[^\/]+\//, "").trim().split(/[?#]/)[0];
+  if (clean.toLowerCase() === "search") return "";
   const idMatch = clean.match(/[a-zA-Z0-9_-]{6,32}/);
   return idMatch ? idMatch[0] : clean;
 }

@@ -8,17 +8,38 @@ import {
   detectSecondaryDominant
 } from "./guitar_suite.js";
 
-// Clean parenthesized subtitles and noise from Yopu search queries and links
+// Clean parenthesized subtitles, URL parameters, delimiters, and noise from Yopu search queries and links
 function cleanYopuQuery(str) {
-  const raw = String(str || "").trim();
-  let stripped = raw
-    .replace(/[\(（\[【][^\)）\]】]*[\)）\]】]/g, " ")
-    .replace(/\/[\s]*[a-zA-Z\s0-9\-_]+$/g, "")
-    .replace(/(?:^|[\s\-–—_/]+)(?:华语|国语|粤语|台语|闽南语|欧美|日韩|POP909)(?:版|流行|新歌|经典|金曲)?(?=[\s\-–—_/]+|$)/gi, " ")
-    .replace(/(?:^|[\s\-–—_/]+)(?:流行|新歌|经典|现场版|原版|伴奏|Live)(?=[\s\-–—_/]+|$)/gi, " ")
-    .replace(/\s+/g, " ")
-    .replace(/^[\s\-–—_/]+|[\s\-–—_/]+$/g, "")
-    .trim();
+  let raw = String(str || "").trim();
+  // 1. Extract query from search URLs (e.g. https://yopu.co/search?q=... or #q=...)
+  const urlMatch = raw.match(/[?&#]q=([^&#]+)/i);
+  if (urlMatch) {
+    try {
+      raw = decodeURIComponent(urlMatch[1]).trim();
+    } catch (_e) {
+      raw = urlMatch[1].trim();
+    }
+  }
+
+  // 2. Strip bracketed content (e.g. (Blooming Life), (Wang Feng), [G.E.M.])
+  let stripped = raw.replace(/[\(（\[【<《][^\)）\]】>》]*[\)）\]】>》]/g, " ");
+
+  // 3. Strip trailing bilingual slash (e.g. /Wang Feng)
+  stripped = stripped.replace(/\/[\s]*[a-zA-Z\s0-9\-_]+$/g, "");
+
+  // 4. Convert punctuation delimiters to spaces (e.g. 汪峰 - 怒放的生命 -> 汪峰 怒放的生命, 怒放的生命-汪峰)
+  stripped = stripped.replace(/[\-–—_/\~·:：|，,。]/g, " ");
+
+  // 5. Strip sheet music keywords and noise suffixes (attached or spaced)
+  stripped = stripped.replace(/(?:吉他弹唱谱|尤克里里弹唱谱|吉他和弦谱|尤克里里和弦谱|吉他谱|和弦谱|尤克里里谱|钢琴谱|弹唱谱|六线谱|简谱|曲谱|谱子|简易版|吉他弹唱|弹唱|吉他独奏|独奏|指弹|现场版|Live|cover)$/gi, "");
+  stripped = stripped.replace(/(?:^|\s+)(?:吉他弹唱谱|尤克里里弹唱谱|吉他和弦谱|尤克里里和弦谱|吉他谱|和弦谱|尤克里里谱|钢琴谱|弹唱谱|六线谱|简谱|曲谱|谱子|吉他|谱|简易版|吉他弹唱|弹唱|吉他独奏|独奏|指弹|原版|现场版|伴奏|原唱|翻唱|Live|cover)(?=\s+|$)/gi, " ");
+
+  // 6. Strip language and category noise tags
+  stripped = stripped.replace(/(?:^|\s+)(?:华语|国语|粤语|台语|闽南语|欧美|日韩|POP909)(?:版|流行|新歌|经典|金曲)?(?=\s+|$)/gi, " ");
+  stripped = stripped.replace(/(?:^|\s+)(?:流行|新歌|经典)(?=\s+|$)/gi, " ");
+
+  // 7. Collapse spaces
+  stripped = stripped.replace(/\s+/g, " ").trim();
   return stripped || raw.replace(/[\(（\)）\[\]【】]/g, " ").trim();
 }
 
@@ -542,9 +563,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let match = null;
       if (textKeyword) {
-        const tokens = textKeyword.split(/\s+/).filter(Boolean);
+        const cleanKeyword = cleanYopuQuery(query);
+        const tokens = (cleanKeyword || textKeyword).toLowerCase().split(/\s+/).filter(Boolean);
         const haystack = `${sTitle} ${sArtist}`;
-        if (tokens.every(tok => haystack.includes(tok))) match = { kind: "text", occurrences: 0 };
+        if (tokens.length > 0 && tokens.every(tok => haystack.includes(tok))) match = { kind: "text", occurrences: 0 };
       } else if (targetDegs.length > 0) {
         match = matchSongClient(s, targetDegs);
       } else {

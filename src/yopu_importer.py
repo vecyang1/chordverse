@@ -61,32 +61,35 @@ CHINESE_CORPUS_FILE = STATIC_DATA_DIR / "chinese_corpus.json" if (STATIC_DATA_DI
 POP909_INDEX_FILE = DATA_DIR / "pop909_indexed_chords.json" if (DATA_DIR / "pop909_indexed_chords.json").exists() else STATIC_DATA_DIR / "pop909_indexed_chords.json"
 
 def clean_yopu_query(query: str) -> str:
-    """Sanitize query by stripping English/Chinese parenthesized subtitles, bilingual slashes, and noise tags."""
+    """Sanitize query by extracting search URL queries, stripping subtitles, delimiters, sheet intent words, and noise tags."""
     raw = str(query or "").strip()
     if not raw:
         return ""
-    # 1. Strip bracketed content
-    stripped = re.sub(r"[\(（\[【][^\)）\]】]*[\)）\]】]", " ", raw)
-    # 2. Strip bilingual slash translation if trailing part is Latin: "汪峰/Wang Feng" -> "汪峰"
+    # 1. Extract query from search URLs (e.g. https://yopu.co/search?q=... or #q=...)
+    url_match = re.search(r"[?&#]q=([^&#]+)", raw, flags=re.IGNORECASE)
+    if url_match:
+        try:
+            from urllib.parse import unquote
+            raw = unquote(url_match.group(1)).strip()
+        except Exception:
+            raw = url_match.group(1).strip()
+
+    # 2. Strip bracketed content (e.g. (Blooming Life), (Wang Feng), [G.E.M.])
+    stripped = re.sub(r"[\(（\[【<《][^\)）\]】>》]*[\)）\]】>》]", " ", raw)
+    # 3. Strip trailing bilingual slash (e.g. /Wang Feng)
     stripped = re.sub(r"/[\s]*[a-zA-Z\s0-9\-_]+$", "", stripped)
-    # 3. Strip language and category noise tags with optional delimiters and suffixes
-    stripped = re.sub(
-        r"(?:^|[\s\-–—_/]+)(?:华语|国语|粤语|台语|闽南语|欧美|日韩|POP909)(?:版|流行|新歌|经典|金曲)?(?=[\s\-–—_/]+|$)",
-        " ",
-        stripped,
-        flags=re.IGNORECASE,
-    )
-    # 4. Strip standalone noise suffixes
-    stripped = re.sub(
-        r"(?:^|[\s\-–—_/]+)(?:流行|新歌|经典|现场版|原版|伴奏|Live)(?=[\s\-–—_/]+|$)",
-        " ",
-        stripped,
-        flags=re.IGNORECASE,
-    )
-    # 5. Normalize whitespace and trailing/leading punctuation
-    stripped = re.sub(r"\s+", " ", stripped)
-    stripped = re.sub(r"^[\s\-–—_/]+|[\s\-–—_/]+$", "", stripped).strip()
+    # 4. Convert punctuation delimiters to spaces (e.g. 汪峰 - 怒放的生命 -> 汪峰 怒放的生命, 怒放的生命-汪峰)
+    stripped = re.sub(r"[\-–—_/\~·:：|，,。]", " ", stripped)
+    # 5. Strip sheet music keywords and noise suffixes (attached or spaced)
+    stripped = re.sub(r"(?:吉他弹唱谱|尤克里里弹唱谱|吉他和弦谱|尤克里里和弦谱|吉他谱|和弦谱|尤克里里谱|钢琴谱|弹唱谱|六线谱|简谱|曲谱|谱子|简易版|吉他弹唱|弹唱|吉他独奏|独奏|指弹|现场版|Live|cover)$", "", stripped, flags=re.IGNORECASE)
+    stripped = re.sub(r"(?:^|\s+)(?:吉他弹唱谱|尤克里里弹唱谱|吉他和弦谱|尤克里里和弦谱|吉他谱|和弦谱|尤克里里谱|钢琴谱|弹唱谱|六线谱|简谱|曲谱|谱子|吉他|谱|简易版|吉他弹唱|弹唱|吉他独奏|独奏|指弹|原版|现场版|伴奏|原唱|翻唱|Live|cover)(?=\s+|$)", " ", stripped, flags=re.IGNORECASE)
+    # 6. Strip language and category noise tags
+    stripped = re.sub(r"(?:^|\s+)(?:华语|国语|粤语|台语|闽南语|欧美|日韩|POP909)(?:版|流行|新歌|经典|金曲)?(?=\s+|$)", " ", stripped, flags=re.IGNORECASE)
+    stripped = re.sub(r"(?:^|\s+)(?:流行|新歌|经典)(?=\s+|$)", " ", stripped, flags=re.IGNORECASE)
+    # 7. Normalize whitespace
+    stripped = re.sub(r"\s+", " ", stripped).strip()
     return stripped if stripped else re.sub(r"[\(（\)）\[\]【】]", " ", raw).strip()
+
 
 SEMITONES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 FLAT_MAP = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#"}

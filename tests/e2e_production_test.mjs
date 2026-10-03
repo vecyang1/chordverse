@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 
-const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'https://chord.example.com/';
+const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'http://localhost:8788/';
 console.log(`🌐 Launching Headless Chromium to test production URL: ${TARGET_URL}...`);
 
 (async () => {

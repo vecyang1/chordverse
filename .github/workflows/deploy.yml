@@ -37,7 +37,7 @@ jobs:
           python3 scripts/export_web_bundle.py
 
   deploy:
-    name: Deploy to Cloudflare Pages (chord.example.com)
+    name: Deploy to Cloudflare Pages
     needs: test
     runs-on: ubuntu-latest
     permissions:

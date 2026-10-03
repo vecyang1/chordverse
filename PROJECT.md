@@ -2,7 +2,7 @@
 
 ## Architecture
 ChordVerse is an intelligent harmonic progression analyzer, song catalog, and guitar learning platform. It runs as a hybrid system:
-1. **Frontend / Static App (`src/static/`)**: Pure static zero-build web app hosted on Cloudflare Pages (`chord.example.com`), featuring interactive progression selection, SVG guitar fretboard visualizer, Capo calculator, and Web Audio acoustic strumming synthesizer (`audio_synth.js`).
+1. **Frontend / Static App (`src/static/`)**: Pure static zero-build web app hosted on Cloudflare Pages, featuring interactive progression selection, SVG guitar fretboard visualizer, Capo calculator, and Web Audio acoustic strumming synthesizer (`audio_synth.js`).
 2. **Cloudflare Edge Functions (`functions/api/`)**: Serverless edge endpoints handling song search (`search.js`), Yopu sheet search (`yopu-search.js`), and structured score chord extraction (`import-yopu.js`).
 3. **Core Python Intelligence Engines (`src/`)**: Offline progression extraction, corpus management (`pop909_engine.py`, `chinese_corpus.py`), external integrations (`hooktheory_client.py`, `yopu_importer.py`), and web bundle export (`scripts/export_web_bundle.py`).
 4. **External CLI Toolchain (`yopu-cli`)**: Located in `vec-productivity-skills/yopu-cli` and `skills/yopu-cli`, providing terminal score search and structured parsing.

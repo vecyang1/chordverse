@@ -1,7 +1,7 @@
 /**
  * ChordVerse Production Ego-Browser Acceptance Test Suite
  * 
- * Target: https://chord.example.com (or CHORDVERSE_BASE_URL)
+ * Target: http://localhost:8788 (or CHORDVERSE_BASE_URL)
  * Core Verification Scenarios:
  *   1. Yopu External Links: Bracket stripping, subtitle removal, and noise elimination (e.g. Mercury Records).
  *   2. Chord Progression Zero False-Positives: 6,4,1,5 search never returns 1,5,6,4 at the top.
@@ -16,10 +16,11 @@ let chromium;
 try {
   ({ chromium } = await import('playwright'));
 } catch {
-  ({ chromium } = await import('playwright'));
+  const fallbackPath = path.resolve('../world-inspire-page-kit/node_modules/playwright/index.mjs');
+  ({ chromium } = await import(fallbackPath));
 }
 
-const TARGET_BASE_URL = process.env.CHORDVERSE_BASE_URL || 'https://chord.example.com/';
+const TARGET_BASE_URL = process.env.CHORDVERSE_BASE_URL || 'http://localhost:8788/';
 console.log(`🌐 [Ego-Browser] Launching Chrome acceptance runner on ${TARGET_BASE_URL}...`);
 
 (async () => {

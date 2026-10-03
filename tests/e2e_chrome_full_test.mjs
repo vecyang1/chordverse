@@ -1,7 +1,14 @@
-import { chromium } from 'playwright';
 import path from 'path';
 
-const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'https://chord.example.com/';
+let chromium;
+try {
+  ({ chromium } = await import('playwright'));
+} catch {
+  const fallbackPath = path.resolve('../world-inspire-page-kit/node_modules/playwright/index.mjs');
+  ({ chromium } = await import(fallbackPath));
+}
+
+const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'http://localhost:8788/';
 
 // Wait for the edge search round-trip (0.4-2 s live) instead of a fixed sleep.
 async function searchKeywordAndWait(page, keyword) {

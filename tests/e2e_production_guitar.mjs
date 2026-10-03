@@ -1,7 +1,14 @@
-import { chromium } from 'playwright';
 import path from 'path';
 
-const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'https://chord.example.com/?q=4,5,3,6,2,5,1';
+let chromium;
+try {
+  ({ chromium } = await import('playwright'));
+} catch {
+  const fallbackPath = path.resolve('../world-inspire-page-kit/node_modules/playwright/index.mjs');
+  ({ chromium } = await import(fallbackPath));
+}
+
+const TARGET_URL = process.env.CHORDVERSE_BASE_URL || 'http://localhost:8788/?q=4,5,3,6,2,5,1';
 
 console.log(`🌐 Launching Chrome to execute guitar suite production E2E test on ${TARGET_URL}...`);
 

@@ -2,6 +2,14 @@
 
 All notable changes to the Chord Progression Analyzer (ChordVerse) will be documented in this file.
 
+## [2026-10-04] - 2026-10-04
+
+### Documentation
+- Add .env.example configuration template (`1cea557`)
+
+### Maintenance
+- Sanitize estate domains and portable test runner imports per github-ops gates (`31119ff`)
+
 ## [1.9.2] - 2026-09-21
 
 ### Fixed & Enhanced

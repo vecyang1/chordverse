@@ -4,7 +4,14 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   workflow_dispatch:
+
+concurrency:
+  group: deploy-chordverse-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:

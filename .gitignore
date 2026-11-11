@@ -53,3 +53,14 @@ CLAUDE.md
 GEMINI.md
 .agents/
 
+
+# Security, Private Workspaces & Agent Constitutions
+AGENTS.md
+CODEX.md
+FILE_MAP_INDEX.md
+MEMORY.md
+operations/
+.env.*
+!.env.example
+!.env.sample
+!.env.template

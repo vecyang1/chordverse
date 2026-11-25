@@ -8,6 +8,55 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      if (location.hostname !== 'chord.worldinspirelab.com') return;
+      window.dataLayer = window.dataLayer || [];
+      if (typeof window.gtag === 'undefined') {
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        window.gtag('consent', 'default', {
+          ad_personalization: 'granted',
+          ad_storage: 'granted',
+          ad_user_data: 'granted',
+          analytics_storage: 'granted',
+          personalization_storage: 'granted',
+          functionality_storage: 'granted',
+          security_storage: 'granted',
+          wait_for_update: 500
+        });
+      }
+      function loadGtm() {
+        if (window.__wilGtmLoaded) return;
+        window.__wilGtmLoaded = true;
+        window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = document.getElementsByTagName('script')[0];
+        var j = document.createElement('script');
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-5G7SFL9R';
+        if (f && f.parentNode) f.parentNode.insertBefore(j, f);
+        else document.head.appendChild(j);
+      }
+      if ('requestIdleCallback' in window) window.requestIdleCallback(loadGtm, { timeout: 1500 });
+      else window.setTimeout(loadGtm, 100);
+      document.addEventListener('click', function (e) {
+        var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+        if (!a) return;
+        var href = a.getAttribute('href') || '';
+        if (href.indexOf('worldinspirelab.com/tools') === -1 && href.indexOf('youtube.com/@vecyang') === -1) return;
+        try {
+          var u = new URL(href, location.origin);
+          window.dataLayer.push({
+            event: 'app_flywheel_cta_click',
+            source_app: 'chordverse',
+            cta_surface: u.searchParams.get('utm_medium') || 'app_footer',
+            tool_slug: u.hostname.indexOf('youtube.com') !== -1 ? 'youtube_build_log' : 'tools_hub',
+            tool_category: 'flywheel',
+            destination_host: u.hostname.toLowerCase()
+          });
+        } catch (err) {}
+      }, true);
+    })();
+  </script>
 </head>
 <body>
   <div class="app-container">

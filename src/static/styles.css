@@ -1030,9 +1030,31 @@ a:focus-visible {
 /* Footer */
 .app-footer {
   text-align: center;
-  padding: 16px;
+  padding: 18px 16px;
   font-size: 12px;
   color: var(--text-muted);
+}
+
+.app-footer-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.app-footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.app-footer-links a:hover,
+.app-footer-links a:focus-visible {
+  color: var(--primary-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 
